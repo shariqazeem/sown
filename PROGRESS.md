@@ -163,6 +163,17 @@ Everything in Day 3's code part is done. What remains needs the founder (below):
 mainnet funds, the deploy, the phone, the film. The README's GIF comes from the film; a
 placeholder comment marks the spot.
 
+## Known limits (not blocking the submission)
+
+- **A move out of a Face ID wallet** looks for the wallet's claim among the 300 newest envelopes;
+  past 300 envelopes an older claimer's move would be refused until the cache can look claims up
+  by wallet.
+- **A receipt older than RPC's event history** (about a week) links its transactions only if this
+  server's cache saw them; the cache is on by default, so run the mainnet server with its `var/`
+  kept between deploys.
+- **The Face ID claim in a browser** was verified on the first contract; on the redeployed one the
+  same server path ran in the battery and the smoke, and the classic claim ran in the browser.
+
 ## Decisions (recorded in CLAUDE.md "Known drift")
 
 - **The link's secret is an ed25519 seed; a claim is a signature over (contract, id, to).** The
