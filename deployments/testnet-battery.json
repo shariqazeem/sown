@@ -21,7 +21,7 @@
       "least": "92.6018410"
     },
     {
-      "name": "classic wallet created with 0 XLM and its USDC trustline sponsored",
+      "name": "a new classic wallet, made ready to hold USDC by Sown's servers",
       "account": "GCDAE4EU4MVPKXDJLHXLIDZYOAN67XZ2DND2ZKYFPGSVULO5ZRTGCD3I",
       "tx": "67c3f71bdbc003735386d41ef24b3a884fa656176faca98db6d12ceab6a1cd0c"
     },
@@ -43,7 +43,7 @@
       "seconds": "3.1"
     },
     {
-      "name": "claimed into a new passkey wallet: one Face ID, Sown's servers paid both transactions",
+      "name": "claimed into a wallet made with one Face ID, Sown's servers paid both transactions",
       "wallet": "CAAH2CL2VCZMDXTBT722FWDKYSPE6MPHQHTKTBO4JUGO2WEQNT2GBSVT",
       "deployTx": "7ab7561399537d928a9a98847981dc0b0687c09b6a2ad53e6b819028c2bde8f3",
       "claimTx": "222d5726ad18c172c33e18da7dcda67b33ad4f3a73bdf59ba416b464ce40f282",

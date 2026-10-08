@@ -1,0 +1,41 @@
+/* /plan: one card, one button. Tokens only. */
+.sw-plan {
+  margin-top: var(--s-6);
+  max-width: 520px;
+}
+.sw-plan-card {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sheet);
+}
+.sw-plan-card .what {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.sw-plan-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+}
+.sw-plan-day select {
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1rem;
+}
+.sw-plan-card .fine {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}

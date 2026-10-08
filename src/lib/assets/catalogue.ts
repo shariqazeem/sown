@@ -153,7 +153,7 @@ const TESTNET: readonly KeepAssetEntry[] = [
     inIdx: 0,
     outIdx: 1,
     decimals: 7,
-    quote: "No tokenized Treasuries exist on testnet, so a testnet send keeps XLM through the Aquarius testnet pool.",
+    quote: "No US Treasuries are issued on testnet, so a testnet send keeps XLM through the Aquarius testnet pool.",
     quoteSource: "https://docs.aqua.network/developers/testing-on-testnet",
     quoteSourceLabel: "Sown, on why testnet keeps XLM",
     issuerPage: "https://developers.stellar.org/docs/learn/fundamentals/lumens",

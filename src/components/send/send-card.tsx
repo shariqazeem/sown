@@ -7,7 +7,7 @@ import { useLocalMoney } from "@/components/money/use-local-money";
 import { useTxToast } from "@/components/toast/use-tx-toast";
 import { claimKey, encodeSecret, newSecret } from "@/lib/envelope/claim";
 import { dateUTC, fromRaw, units, usd, usdAligned, xlm } from "@/lib/format";
-import { saveLink } from "@/lib/local";
+import { saveLink, writeJson } from "@/lib/local";
 import { type WalletOption, connectWallet, isPhone, listWallets, rememberWallet, rememberedWallet, signWith } from "@/lib/wallet/kit";
 import type { CardAsset, HoldingsBody, PreparedBody, Quote, RecordedBody } from "./types";
 import "./send.css";
@@ -74,6 +74,26 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
     const r = rememberedWallet();
     if (r) setAccount(r);
   }, []);
+
+  // A plan's reminder opens the card prefilled: /?usd=50&keep=1000&asset=usdy#send.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const u = Number(p.get("usd"));
+    const k = Number(p.get("keep"));
+    const a = p.get("asset");
+    if (Number.isFinite(u) && u >= 1 && u <= 10_000) {
+      const chip = (AMOUNTS as readonly number[]).includes(u);
+      setAmount({ usd: u, source: chip ? "chip" : "other" });
+      if (!chip) setOtherAmount(String(u));
+    }
+    if (Number.isInteger(k) && k >= 0 && k <= 10_000) {
+      setKeepBps(k);
+      const chip = (KEEPS as readonly number[]).includes(k);
+      setKeepSource(chip ? "chip" : "other");
+      if (!chip) setOtherKeep(String(k / 100));
+    }
+    if (a && assets.some((x) => x.key === a)) setAssetKey(a);
+  }, [assets]);
   useEffect(() => {
     if (!account) {
       setHoldings(null);
@@ -223,6 +243,8 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
       } catch {
         // No haptics here.
       }
+      // The plan copies the last send.
+      writeJson("last-send", { usd: amount.usd, keepBps, asset: assetKey, at: Math.floor(Date.now() / 1000) });
       router.push(`/receipt/${body.id}?sent=1`);
     } catch {
       setPhase("failed");

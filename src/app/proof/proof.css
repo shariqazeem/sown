@@ -1,0 +1,116 @@
+/* /proof: the one dark surface. Aliases of the inverse tokens only. */
+.sw-proof-title {
+  max-width: 18ch;
+}
+.sw-proof-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--s-4);
+  margin: var(--s-7) 0;
+}
+.sw-proof-count {
+  display: grid;
+  gap: var(--s-1);
+  padding: var(--s-4);
+  border: 1px solid var(--border-inverse);
+  border-radius: var(--r-md);
+  background: var(--surface-inverse-raised);
+}
+.sw-proof-count .n {
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink-inverse);
+  font-variant-numeric: tabular-nums;
+}
+/* "Unaudited" in the same size as the counts, with the room a word needs. */
+.sw-proof-count.is-word {
+  grid-column: span 2;
+}
+.sw-proof-count.is-word .n {
+  font-size: var(--fs-h1);
+}
+@media (max-width: 420px) {
+  .sw-proof-count.is-word {
+    grid-column: 1 / -1;
+  }
+}
+.sw-proof-count .l {
+  font-size: var(--fs-caption);
+  color: var(--ink-inverse-muted);
+}
+.sw-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-7) var(--s-8);
+  margin-bottom: var(--s-8);
+}
+.sw-proof-grid .sw-section + .sw-section {
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .sw-proof-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.sw-proof-match {
+  display: block;
+  margin-top: var(--s-1);
+  font-size: var(--fs-caption);
+}
+.sw-proof-match.is-ok {
+  color: var(--ok-inverse);
+}
+.sw-proof-match.is-err {
+  color: var(--err-inverse);
+}
+.sw-proof-held {
+  color: var(--ok-inverse);
+}
+.sw-proof-cmd {
+  display: block;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--surface-inverse-raised);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--ink-inverse);
+  overflow-wrap: anywhere;
+}
+.sw-proof-rows {
+  display: grid;
+}
+.sw-ink .sw-env-line,
+.sw-ink .sw-env-line:last-child {
+  border-color: var(--border-inverse);
+}
+.sw-ink .sw-env-line-main {
+  color: var(--ink-inverse);
+}
+.sw-ink .sw-env-line-main .keep {
+  color: var(--ink-inverse-muted);
+}
+.sw-ink .sw-env-line-main .date {
+  color: var(--ink-inverse-faint);
+}
+.sw-ink .sw-env-line-main:hover .amount {
+  color: var(--accent-inverse);
+}
+.sw-ink .sw-chip {
+  background: transparent;
+  border-color: var(--border-inverse);
+  color: var(--ink-inverse-muted);
+}
+.sw-ink .sw-chip.is-claimed {
+  color: var(--ok-inverse);
+}
+.sw-ink .sw-chip.is-waiting {
+  color: var(--warn-border);
+}
+.sw-proof-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+  margin-top: var(--s-7);
+}

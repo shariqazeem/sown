@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
  * a surface may not.
  */
 const ROOT = join(__dirname, "..", "..");
-const SURFACES = ["src/app", "src/components"];
+const SURFACES = ["src/app", "src/components", "src/content"];
 
 const NEVER_ANYWHERE: Array<[string, RegExp]> = [
   ["keeper", /\bkeepers?\b/i],
@@ -25,6 +25,7 @@ const NEVER_ANYWHERE: Array<[string, RegExp]> = [
   ["crank", /\bcrank/i],
   ["escrow", /\bescrow/i],
   ["RWA", /\bRWAs?\b/],
+  ["reserve", /\breserves?\b/i],
 ];
 // Face ID and fingerprints on consumer surfaces; the mechanism's names in the docs only.
 const NOT_OUTSIDE_DOCS: Array<[string, RegExp]> = [
@@ -49,7 +50,8 @@ function surfaceText(src: string): string[] {
     .replace(/^\s*import .*$/gm, "");
   const out: string[] = [];
   for (const m of code.matchAll(/"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g)) {
-    const s = m[1] ?? m[2] ?? m[3] ?? "";
+    // A template's own text only: its ${…} parts are code.
+    const s = m[1] ?? m[2] ?? (m[3] ?? "").replace(/\$\{[^}]*\}/g, " ");
     if (CODE_LITERALS.has(s) || /^(\/|https?:|#|\.|@|[a-z-]+\/)/.test(s) || /^[\w-]+(\s[\w-]+)*$/.test(s) && /-/.test(s)) continue;
     out.push(s);
   }
@@ -63,12 +65,31 @@ describe("no surface says what Sown never says", () => {
       const rel = relative(ROOT, file);
       it(rel, () => {
         const text = surfaceText(readFileSync(file, "utf8"));
-        const rules = rel.startsWith("src/app/docs") ? NEVER_ANYWHERE : [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
+        const rules = rel.startsWith("src/app/docs") || rel.startsWith("src/content/docs") ? NEVER_ANYWHERE : [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
         const hits = text.flatMap((t) => rules.filter(([, re]) => re.test(t)).map(([w]) => `"${w}" in: ${t.trim().slice(0, 100)}`));
         expect(hits).toEqual([]);
       });
     }
   }
+});
+
+describe("the catalogue's words, printed on every asset row", () => {
+  it("say nothing Sown never says", async () => {
+    const { CATALOGUE } = await import("@/lib/assets/catalogue");
+    const rules = [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
+    const text = [...CATALOGUE.mainnet, ...CATALOGUE.testnet].flatMap((a) => [a.name, a.fullName, a.quote, a.quoteSourceLabel, a.issuerName]);
+    const hits = text.flatMap((t) => rules.filter(([, re]) => re.test(t)).map(([w]) => `"${w}" in: ${t}`));
+    expect(hits).toEqual([]);
+  });
+});
+
+describe("the evidence /proof prints", () => {
+  it("names every battery step in surface words", () => {
+    const battery = JSON.parse(readFileSync(join(ROOT, "deployments", "testnet-battery.json"), "utf8")) as { steps: Array<{ name: string }> };
+    const rules = [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
+    const hits = battery.steps.flatMap((s) => rules.filter(([, re]) => re.test(s.name)).map(([w]) => `"${w}" in: ${s.name}`));
+    expect(hits).toEqual([]);
+  });
 });
 
 describe("the reader of surfaces", () => {

@@ -1,0 +1,54 @@
+/* The docs: a reading column at the 720 px measure. Tokens only. */
+.sw-doc-index {
+  display: grid;
+  margin-top: var(--s-6);
+  border-top: 1px solid var(--border-strong);
+}
+.sw-doc-index li {
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid var(--border);
+}
+.sw-doc-index .t {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.sw-doc-index .t:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sw-doc-index .d {
+  margin-top: var(--s-1);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+}
+.sw-doc-body {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border-strong);
+  line-height: 1.7;
+}
+.sw-doc-body strong {
+  font-weight: 600;
+}
+.sw-doc-body a {
+  color: var(--accent);
+}
+.sw-doc-body a:hover {
+  text-decoration: underline;
+}
+.sw-doc-code {
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.sw-doc-next {
+  margin-top: var(--s-7);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+}

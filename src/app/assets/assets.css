@@ -1,0 +1,93 @@
+/* /assets: one sheet per asset, the issuer's powers as chips. Tokens only. */
+.sw-asset-rows {
+  display: grid;
+  gap: var(--s-7);
+  margin-top: var(--s-7);
+  max-width: 860px;
+}
+.sw-asset-rows .sw-section {
+  gap: var(--s-5);
+}
+.sw-asset {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sheet);
+}
+.sw-asset-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-3);
+}
+.sw-asset-head .name {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.sw-asset-head .tick {
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+}
+.sw-asset .quote {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+.sw-asset .line {
+  font-size: var(--fs-small);
+  line-height: 1.55;
+}
+.sw-asset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.sw-flag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-caption);
+  color: var(--ink-muted);
+  background: var(--bg);
+}
+/* A power the issuer holds over the balance: held, not alarming; --warn, never red. */
+.sw-flag.is-power {
+  color: var(--warn);
+  border-color: var(--warn-border);
+  background: var(--warn-soft);
+}
+.sw-asset-facts {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+.sw-asset-facts > div {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-small);
+}
+.sw-asset-facts dt {
+  color: var(--ink-muted);
+}
+.sw-asset-facts dd {
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) {
+  .sw-asset-facts > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+.sw-assets-close {
+  margin-top: var(--s-7);
+  max-width: 60ch;
+  color: var(--ink-muted);
+}

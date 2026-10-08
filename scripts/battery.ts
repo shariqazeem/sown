@@ -119,7 +119,7 @@ async function main() {
   trustTx.sign(fresh); // the one wallet prompt
   const trusted = await relayTrustlines(deps, { id: a.id.toString(), account: fresh.publicKey(), signed: trustTx.toXDR() }, "battery");
   if (!trusted.ok || !("tx" in trusted.value)) throw new Error(trusted.ok ? "expected a submitted transaction" : trusted.why);
-  step("classic wallet created with 0 XLM and its USDC trustline sponsored", { account: fresh.publicKey(), tx: trusted.value.tx });
+  step("a new classic wallet, made ready to hold USDC by Sown's servers", { account: fresh.publicKey(), tx: trusted.value.tx });
   const claimed = await relayClaim(deps, { id: a.id.toString(), to: fresh.publicKey(), sig: signClaim(a.secret, CONTRACT, a.id, fresh.publicKey()).toString("hex") }, "battery");
   if (!claimed.ok) throw new Error(claimed.why);
   const gotUsdc = await balanceOf(usdc.sac, fresh.publicKey());
@@ -158,7 +158,7 @@ async function main() {
   const eb = await readEnvelope(net, CONTRACT, b.id);
   const wUsdc = await balanceOf(usdc.sac, made.contractId);
   const wXlm = await balanceOf(keep.sac, made.contractId);
-  step("claimed into a new passkey wallet: one Face ID, Sown's servers paid both transactions", {
+  step("claimed into a wallet made with one Face ID, Sown's servers paid both transactions", {
     wallet: made.contractId,
     deployTx: viaPasskey.value.deployTx,
     claimTx: viaPasskey.value.claimTx,
