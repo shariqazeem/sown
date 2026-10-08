@@ -19,7 +19,7 @@ records the receipt and proof pages with Playwright at 1440 px for the clean ins
 | 4 | 0:20–0:32 | The confirm sheet: the outcome, the least it can become, the issuer line, the trust line. Click "Approve $50 in wallet". Freighter opens; approve. | "One signature. The slice is bought inside the same transaction on Aquarius." |
 | 5 | 0:32–0:40 | The receipt prints. The link appears with "Share on WhatsApp". Click it; WhatsApp opens with the link in a chat with "Ammi". | "The envelope waits on Stellar. She needs no wallet, no app, nothing." |
 | 6 | 0:40–0:48 | Phone: WhatsApp, the link arrives. Tap. The claim page: the dashed envelope, "$45.00 to spend · 4.38 USDY, yours". | "She taps." |
-| 7 | 0:48–1:00 | Phone: "Claim with Face ID". Face ID prompt #1. "Making your wallet…". Face ID #2. "Claiming…". The receipt prints: "Claimed on Stellar". | "Her face makes a wallet only she controls. Sown's servers pay the network." |
+| 7 | 0:48–1:00 | Phone: "Claim with Face ID". One Face ID prompt. "Making your wallet…", then "Claiming…". The receipt prints: "Claimed on Stellar". | "Her face makes a wallet only she controls. Sown's servers pay the network." |
 | 8 | 1:00–1:10 | Phone: `/mine`: $45.00 USDC (₨12,580) · 4.38 USDY ≈ $5.00, US Treasuries (Ondo). "Cash out" row visible. | "Dollars to spend at MoneyGram-connected wallets. Treasuries that stay." |
 | 9 | 1:10–1:25 | Laptop: stellar.expert for the send transaction: the Sown contract, the Aquarius pool call, USDC in, USDY out; then the claim transaction into a C-address. | "Every figure is on the ledger: the swap, the envelope, the claim." |
 | 10 | 1:25–1:38 | Laptop: `/receipt/<id>` scrolled slowly: Sent, Kept, Price on Aquarius, At the least, Claimed by a wallet made with Face ID, Still held "measured on 3 Nov". | "A receipt for both. In 30 days, anyone can measure whether it is still held." |
@@ -33,7 +33,7 @@ Recording list for the founder (silent, one take each, 1440 × 900 browser, no b
 R1 `/` → send $50 keep 10% → confirm → Freighter approve → receipt → Share on WhatsApp.
 R2 stellar.expert: the send tx, the claim tx (addresses copied from `/receipt`).
 R3 `/assets` hover, `/plan` click, `/proof` scroll.
-Phone (the recipient, screen recording on): P1 WhatsApp → link → claim page → Face ID ×2 →
+Phone (the recipient, screen recording on): P1 WhatsApp → link → claim page → Face ID once →
 receipt → "Open your wallet" → `/mine`.
 
 ## The pitch, as a judge hears it (90 seconds, for the form and for a stage)

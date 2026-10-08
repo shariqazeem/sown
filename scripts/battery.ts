@@ -15,22 +15,21 @@
  * Writes deployments/testnet-battery.json with every transaction hash.
  */
 import { writeFileSync } from "node:fs";
-import http from "node:http";
 import { join } from "node:path";
-import { Address, Asset, BASE_FEE, Keypair, Operation, TransactionBuilder, nativeToScVal, rpc, scValToNative } from "@stellar/stellar-sdk";
+import { Address, Keypair, Operation, TransactionBuilder, nativeToScVal, scValToNative } from "@stellar/stellar-sdk";
 import { MemoryStorage, SmartAccountKit } from "smart-account-kit";
 import { USDC, keepAssets } from "@/lib/assets/catalogue";
 import { deployment } from "@/lib/deployments";
-import { claimKey, newSecret, signClaim } from "@/lib/envelope/claim";
+import { newSecret, signClaim } from "@/lib/envelope/claim";
 import { readEnvelope } from "@/lib/envelope/read";
 import { KIT } from "@/lib/passkey/config";
-import { quote } from "@/lib/quote";
-import { type RelayDeps, relayClaim, relayMove, relayPasskeyClaim, relayTrustlines } from "@/lib/relay/handle";
+import { type RelayDeps, relayClaim, relayPasskeyClaim, relayTrustlines } from "@/lib/relay/handle";
 import { resetLimits } from "@/lib/relay/limit";
-import { DAY, prepareSend } from "@/lib/send/build";
 import { baseNetwork } from "@/lib/stellar/network";
 import { invokeAs, read, rpcServer, sendAndWait, simulate } from "@/lib/stellar/soroban";
+import { kitRelay } from "./lib/kit-relay";
 import { ROOT, keypair } from "./lib/keys";
+import { sendFromKey } from "./lib/send-from-key";
 import { softPasskey } from "./lib/soft-webauthn";
 
 const net = baseNetwork("testnet");
@@ -58,40 +57,42 @@ async function balanceOf(token: string, who: string): Promise<bigint> {
   return r.ok ? BigInt(r.value) : 0n;
 }
 
+/** Testnet XLM for the sender: Friendbot funds one account once, so a fresh one is funded and merged in. */
+async function topUpXlm(sender: Keypair) {
+  const spare = Keypair.random();
+  const res = await fetch(`https://friendbot.stellar.org/?addr=${spare.publicKey()}`, { signal: AbortSignal.timeout(30_000) });
+  if (!res.ok) throw new Error(`Friendbot answered ${res.status}`);
+  const server = rpcServer(net);
+  const acct = await server.getAccount(spare.publicKey());
+  const tx = new TransactionBuilder(acct, { fee: "10000", networkPassphrase: net.passphrase }).addOperation(Operation.accountMerge({ destination: sender.publicKey() })).setTimeout(120).build();
+  tx.sign(spare);
+  const landed = await sendAndWait(net, tx);
+  if (!landed.ok) throw new Error(`merging Friendbot's XLM into the sender: ${landed.why}`);
+  step("topped up the sender with Friendbot's XLM", { tx: landed.value.hash });
+}
+
+/** Buy only the test USDC the sender is short of, from the same pool the sends use. */
 async function ensureUsdc(sender: Keypair, want: bigint) {
-  if ((await balanceOf(usdc.sac, sender.publicKey())) >= want) return;
-  const xlmIn = 3_000_0000000n;
-  const est = await simulate(net, keep.pool, "estimate_swap", [nativeToScVal(keep.outIdx, { type: "u32" }), nativeToScVal(keep.inIdx, { type: "u32" }), nativeToScVal(xlmIn, { type: "u128" })]);
+  const have = await balanceOf(usdc.sac, sender.publicKey());
+  if (have >= want) return;
+  const probe = 100_0000000n;
+  const est = await simulate(net, keep.pool, "estimate_swap", [nativeToScVal(keep.outIdx, { type: "u32" }), nativeToScVal(keep.inIdx, { type: "u32" }), nativeToScVal(probe, { type: "u128" })]);
   if (!est.ok) throw new Error(est.why);
-  const out = BigInt(scValToNative(est.value.retval!));
-  const s = await invokeAs(net, sender, keep.pool, "swap", [Address.fromString(sender.publicKey()).toScVal(), nativeToScVal(keep.outIdx, { type: "u32" }), nativeToScVal(keep.inIdx, { type: "u32" }), nativeToScVal(xlmIn, { type: "u128" }), nativeToScVal((out * 98n) / 100n, { type: "u128" })]);
+  const per100 = BigInt(scValToNative(est.value.retval!));
+  const xlmIn = ((want - have) * probe * 12n) / (per100 * 10n);
+  if ((await balanceOf(keep.sac, sender.publicKey())) < xlmIn + 100_0000000n) await topUpXlm(sender);
+  const out = await simulate(net, keep.pool, "estimate_swap", [nativeToScVal(keep.outIdx, { type: "u32" }), nativeToScVal(keep.inIdx, { type: "u32" }), nativeToScVal(xlmIn, { type: "u128" })]);
+  if (!out.ok) throw new Error(out.why);
+  const got = BigInt(scValToNative(out.value.retval!));
+  const s = await invokeAs(net, sender, keep.pool, "swap", [Address.fromString(sender.publicKey()).toScVal(), nativeToScVal(keep.outIdx, { type: "u32" }), nativeToScVal(keep.inIdx, { type: "u32" }), nativeToScVal(xlmIn, { type: "u128" }), nativeToScVal((got * 98n) / 100n, { type: "u128" })]);
   if (!s.ok) throw new Error(s.why);
-  step("bought test USDC for the sender", { usdc: u7(out), tx: s.value.hash });
+  step("bought test USDC for the sender", { usdc: u7(got), tx: s.value.hash });
 }
 
 async function send(sender: Keypair, usd: number, keepBps: number) {
-  const amountRaw = BigInt(Math.round(usd * 1e7));
-  const q = await quote(net, keep, amountRaw, keepBps);
-  if (!q.ok) throw new Error(q.why);
-  const secret = newSecret();
-  const t0 = Date.now();
-  const prepared = await prepareSend(net, CONTRACT, {
-    sender: sender.publicKey(),
-    amountRaw,
-    keepBps,
-    keepAsset: keep.sac,
-    minKeepOutRaw: BigInt(q.value.minKeepOutRaw),
-    claimKeyHex: claimKey(secret).toString("hex"),
-    memoHex: "00".repeat(32),
-    returnAt: Math.floor(Date.now() / 1000) + 30 * DAY,
-  });
-  if (!prepared.ok) throw new Error(prepared.why);
-  const tx = TransactionBuilder.fromXDR(prepared.value.xdr, net.passphrase);
-  tx.sign(sender);
-  const landed = await sendAndWait(net, tx);
-  if (!landed.ok) throw new Error(landed.why);
-  const id = BigInt(scValToNative(landed.value.returnValue!) as bigint);
-  return { id, secret, hash: landed.value.hash, quote: q.value, seconds: (Date.now() - t0) / 1000, fee: landed.value.feeCharged };
+  const r = await sendFromKey(net, CONTRACT, sender, keep, usd, keepBps);
+  if (!r.ok) throw new Error(r.why);
+  return r.value;
 }
 
 async function main() {
@@ -100,7 +101,7 @@ async function main() {
   const sender = keypair("sown-sender");
   const deps: RelayDeps = { net, contractId: CONTRACT, sponsor, kit: KIT.testnet, usdc, keepAssets: keepAssets("testnet") };
   console.log(`contract ${CONTRACT}\nsender ${sender.publicKey()}\nsponsor ${sponsor.publicKey()}\n`);
-  await ensureUsdc(sender, 40_0000000n);
+  await ensureUsdc(sender, 20_0000000n);
 
   // 1. A send, one signature.
   const a = await send(sender, 10, 1_000);
@@ -136,14 +137,7 @@ async function main() {
   const b = await send(sender, 5, 1_000);
   step("send 5 USDC, keep 10%", { id: b.id, tx: b.hash, seconds: b.seconds.toFixed(1) });
   // The kit's relayer endpoint, exactly as /api/relay/kit runs it: shape 4 and nothing else.
-  const kitRelay = http.createServer(async (req, res) => {
-    let raw = "";
-    for await (const c of req) raw += c;
-    const r = await relayMove(deps, JSON.parse(raw) as Record<string, unknown>, "battery");
-    res.setHeader("content-type", "application/json");
-    res.end(JSON.stringify(r.ok ? { success: true, data: { hash: r.value.tx, status: "SUCCESS" } } : { success: false, error: r.why }));
-  });
-  await new Promise<void>((r) => kitRelay.listen(0, "127.0.0.1", () => r()));
+  const kitRelayServer = await kitRelay(deps, "battery");
   const storage = new MemoryStorage();
   const passkey = softPasskey("http://localhost:3100", "localhost");
   const kit = new SmartAccountKit({
@@ -156,7 +150,7 @@ async function main() {
     rpName: "Sown",
     allowedOrigins: [passkey.origin],
     webAuthn: passkey.webAuthn as never,
-    relayerUrl: `http://127.0.0.1:${(kitRelay.address() as { port: number }).port}`,
+    relayerUrl: kitRelayServer.url,
   });
   const t3 = Date.now();
   const made = await kit.createWallet("Sown", "battery", { autoSubmit: false });
@@ -201,7 +195,7 @@ async function main() {
   step("moved 1 XLM out of the Face ID wallet, paid by Sown's servers", { tx: moved.hash, seconds: ((Date.now() - t3b) / 1000).toFixed(1), prompts: passkey.prompts() - promptsBefore, left: u7(wXlmAfter) });
   expect(passkey.prompts() - promptsBefore === 1, "one prompt to move, none to reconnect");
   expect(wXlmAfter === wXlm - 10_000_000n, "exactly 1 XLM left the wallet");
-  kitRelay.close();
+  kitRelayServer.close();
 
   // 4. Take it back; a stranger cannot before the date.
   const c = await send(sender, 2, 1_000);
@@ -231,11 +225,6 @@ async function main() {
   evidence.failures = failures;
   writeFileSync(join(ROOT, "deployments", "testnet-battery.json"), `${JSON.stringify(evidence, (_k, v) => (typeof v === "bigint" ? v.toString() : v), 2)}\n`);
   console.log(`\n${failures === 0 ? "all green" : `${failures} FAILED`} · ${count.ok ? count.value : "?"} envelopes on the contract · deployments/testnet-battery.json`);
-  void Asset;
-  void BASE_FEE;
-  void Operation;
-  void rpc;
-  void rpcServer;
   process.exit(failures === 0 ? 0 : 1);
 }
 

@@ -4,13 +4,16 @@ import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import { contractId } from "@/lib/deployments";
 import { networkName } from "@/lib/stellar/network";
-import { txs } from "./schema";
+import { envelopeTxs } from "./schema";
 
 /**
  * A CACHE OF THE CHAIN, NEVER A LEDGER OF RECORD. It remembers the transaction hashes the RPC
  * forgets after its event retention, so a months-old receipt still links its send and claim.
- * `SOWN_DB=""` turns it off (the tests do); every page then reads the chain alone.
+ * `SOWN_DB=""` turns it off (the tests do); every page then reads the chain alone. Rows are
+ * keyed by the contract: after a redeploy, envelope numbers start again at 0. (Files from
+ * before 9 October also hold a `txs` table without the contract; it is no longer read.)
  */
 type Db = ReturnType<typeof drizzle>;
 const KEY = Symbol.for("sown.db");
@@ -25,10 +28,10 @@ function open(): Db | null {
     mkdirSync(dirname(path), { recursive: true });
     const sqlite = new Database(path);
     sqlite.pragma("journal_mode = WAL");
-    sqlite.exec(`CREATE TABLE IF NOT EXISTS txs (
-      network TEXT NOT NULL, envelope_id TEXT NOT NULL, kind TEXT NOT NULL,
+    sqlite.exec(`CREATE TABLE IF NOT EXISTS envelope_txs (
+      contract TEXT NOT NULL, envelope_id TEXT NOT NULL, kind TEXT NOT NULL,
       hash TEXT NOT NULL, ledger INTEGER NOT NULL, at INTEGER NOT NULL,
-      PRIMARY KEY (network, envelope_id, kind))`);
+      PRIMARY KEY (contract, envelope_id, kind))`);
     g[KEY] = drizzle(sqlite);
   } catch {
     g[KEY] = null;
@@ -38,21 +41,21 @@ function open(): Db | null {
 
 export type TxKind = "send" | "claim" | "refund" | "deploy" | "trust";
 
-export function recordTx(envelopeId: string, kind: TxKind, hash: string, ledger: number, at: number): void {
+export function recordTx(envelopeId: string, kind: TxKind, hash: string, ledger: number, at: number, contract: string | null = contractId()): void {
   const db = open();
-  if (!db) return;
+  if (!db || !contract) return;
   try {
-    db.insert(txs).values({ network: networkName(), envelopeId, kind, hash, ledger, at }).onConflictDoNothing().run();
+    db.insert(envelopeTxs).values({ contract, envelopeId, kind, hash, ledger, at }).onConflictDoNothing().run();
   } catch {
     // A cache that cannot write is a cache that is empty; the chain still answers.
   }
 }
 
-export function cachedTx(envelopeId: string, kind: TxKind): { hash: string; ledger: number; at: number } | null {
+export function cachedTx(envelopeId: string, kind: TxKind, contract: string | null = contractId()): { hash: string; ledger: number; at: number } | null {
   const db = open();
-  if (!db) return null;
+  if (!db || !contract) return null;
   try {
-    const row = db.select().from(txs).where(and(eq(txs.network, networkName()), eq(txs.envelopeId, envelopeId), eq(txs.kind, kind))).get();
+    const row = db.select().from(envelopeTxs).where(and(eq(envelopeTxs.contract, contract), eq(envelopeTxs.envelopeId, envelopeId), eq(envelopeTxs.kind, kind))).get();
     return row ? { hash: row.hash, ledger: row.ledger, at: row.at } : null;
   } catch {
     return null;

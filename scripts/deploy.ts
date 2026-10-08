@@ -10,15 +10,20 @@
  *
  * Mainnet refuses to run without SOWN_MAINNET=yes and a secret in the environment; it never
  * reads a key from disk. This script was written by the agent and not run on mainnet.
+ *
+ * It can be run again after a failure without paying twice: code already on the ledger is not
+ * uploaded again, and a contract this script created (recorded as `partial` the moment it
+ * exists) is picked up where it stopped instead of creating a second one.
  */
 import { createHash, randomBytes } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { Address, Operation, nativeToScVal, scValToNative } from "@stellar/stellar-sdk";
+import { Address, Operation, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 import { USDC, keepAssets } from "@/lib/assets/catalogue";
 import { codeOf } from "@/lib/stellar/code";
+import { gated } from "@/lib/stellar/limiter";
 import { type NetworkName, baseNetwork } from "@/lib/stellar/network";
-import { invokeAs, read } from "@/lib/stellar/soroban";
+import { invokeAs, read, rpcServer } from "@/lib/stellar/soroban";
 import { ROOT, keypair, keypairFromEnv } from "./lib/keys";
 import { extendContract } from "./keep-alive";
 import { submitOp } from "./lib/submit-op";
@@ -36,24 +41,55 @@ async function main() {
   const sha256 = createHash("sha256").update(wasm).digest("hex");
   console.log(`${which}: deploying artifacts/sown.wasm (${wasm.length} bytes, sha256 ${sha256}) as ${admin.publicKey()}`);
 
-  const upload = await submitOp(net, admin, Operation.uploadContractWasm({ wasm }));
-  console.log(`  uploaded: ${upload.hash}`);
+  const file = join(ROOT, "deployments", `${which}.json`);
+  type Progress = { contractId?: string | null; sha256?: string; partial?: boolean; uploadTx?: string; deployTx?: string; ledger?: number; createdAt?: number; assets?: Array<{ key: string; sac: string; pool: string; inIdx: number; outIdx: number; tx: string }> };
+  const prior = (existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {}) as Progress;
+  const resume = prior.partial === true && prior.sha256 === sha256 && typeof prior.contractId === "string" ? prior : null;
 
-  const created = await submitOp(
-    net,
-    admin,
-    Operation.createCustomContract({
-      address: Address.fromString(admin.publicKey()),
-      wasmHash: Buffer.from(sha256, "hex"),
-      salt: randomBytes(32),
-      constructorArgs: [Address.fromString(admin.publicKey()).toScVal(), Address.fromString(usdc.sac).toScVal()],
-    }),
-  );
-  const contractId = Address.fromScVal(created.returnValue!).toString();
-  console.log(`  contract: ${contractId} (${created.hash}, ledger ${created.ledger})`);
+  const server = rpcServer(net);
+  const codeKey = xdr.LedgerKey.contractCode(new xdr.LedgerKeyContractCode({ hash: Buffer.from(sha256, "hex") }));
+  const codeThere = (await gated(net.rpcUrl, () => server.getLedgerEntries(codeKey))).entries.length > 0;
+  let uploadTx = resume?.uploadTx ?? null;
+  if (codeThere) console.log("  the code is already on the ledger: not uploading it again");
+  else {
+    const upload = await submitOp(net, admin, Operation.uploadContractWasm({ wasm }));
+    uploadTx = upload.hash;
+    console.log(`  uploaded: ${upload.hash}`);
+  }
 
-  const assets: Array<{ key: string; sac: string; pool: string; inIdx: number; outIdx: number; tx: string }> = [];
+  let contractId: string;
+  let deployTx: string;
+  let ledger: number;
+  let createdAt: number;
+  if (resume) {
+    contractId = resume.contractId!;
+    deployTx = resume.deployTx!;
+    ledger = resume.ledger!;
+    createdAt = resume.createdAt!;
+    console.log(`  resuming the contract this script created: ${contractId}`);
+  } else {
+    const created = await submitOp(
+      net,
+      admin,
+      Operation.createCustomContract({
+        address: Address.fromString(admin.publicKey()),
+        wasmHash: Buffer.from(sha256, "hex"),
+        salt: randomBytes(32),
+        constructorArgs: [Address.fromString(admin.publicKey()).toScVal(), Address.fromString(usdc.sac).toScVal()],
+      }),
+    );
+    contractId = Address.fromScVal(created.returnValue!).toString();
+    deployTx = created.hash;
+    ledger = created.ledger;
+    createdAt = created.createdAt;
+    console.log(`  contract: ${contractId} (${created.hash}, ledger ${created.ledger})`);
+  }
+
+  const assets = [...(resume?.assets ?? [])];
+  const savePartial = () => writeFileSync(file, `${JSON.stringify({ network: which, contractId, sha256, partial: true, uploadTx, deployTx, ledger, createdAt, assets }, null, 2)}\n`);
+  savePartial();
   for (const a of keepAssets(which)) {
+    if (assets.some((x) => x.sac === a.sac)) continue;
     const r = await invokeAs(net, admin, contractId, "set_asset", [
       Address.fromString(a.sac).toScVal(),
       Address.fromString(a.pool).toScVal(),
@@ -61,8 +97,9 @@ async function main() {
       nativeToScVal(a.outIdx, { type: "u32" }),
       nativeToScVal(true),
     ]);
-    if (!r.ok) throw new Error(`set_asset ${a.ticker}: ${r.why}`);
+    if (!r.ok) throw new Error(`set_asset ${a.ticker}: ${r.why}. Run the same command again to carry on from here.`);
     assets.push({ key: a.key, sac: a.sac, pool: a.pool, inIdx: a.inIdx, outIdx: a.outIdx, tx: r.value.hash });
+    savePartial();
     console.log(`  set_asset ${a.ticker}: ${r.value.hash}`);
   }
 
@@ -87,16 +124,15 @@ async function main() {
     admin: admin.publicKey(),
     usdc: usdc.sac,
     assets,
-    uploadTx: upload.hash,
-    deployTx: created.hash,
+    uploadTx,
+    deployTx,
     extendTx: extended.hash,
-    ledger: created.ledger,
-    deployedAt: new Date(created.createdAt * 1000).toISOString(),
+    ledger,
+    deployedAt: new Date(createdAt * 1000).toISOString(),
     config: cfg.ok ? JSON.parse(JSON.stringify(cfg.value, (_k, v) => (typeof v === "bigint" ? v.toString() : v))) : null,
   };
-  writeFileSync(join(ROOT, "deployments", `${which}.json`), `${JSON.stringify(record, null, 2)}\n`);
+  writeFileSync(file, `${JSON.stringify(record, null, 2)}\n`);
   console.log(`  wrote deployments/${which}.json`);
-  void scValToNative;
 }
 
 main().catch((e) => {

@@ -1,7 +1,8 @@
 # Progress
 
 > Kept by the build agent. Every "works" line names the transaction that proves it; each hash
-> opens on `https://stellar.expert/explorer/testnet/tx/<hash>`. Last updated Thu 8 Oct 2026, evening.
+> opens on `https://stellar.expert/explorer/testnet/tx/<hash>`. Last updated Fri 9 Oct 2026,
+> 04:15 PKT (23:15 UTC on the 8th).
 
 ## What works (testnet unless marked)
 
@@ -25,98 +26,172 @@
 
 ### The contract
 
-- **Deployed**: `CBNZK4NDWZZD5YBLK4GTUICA2RF7PIXL7RHADRVQSTYF7EQ4OSCGMOFB`; wasm 15,372 bytes, sha256
-  `791ace708783ed3d97b4b02ef33e5768b04d93fe8c3ca43ec366a5702e5897ce`, dumped back from the ledger
-  and compared. Upload `d26dd7849e9df92d6cbad0e78f29f8834cdbe8002d6a897e05ce6f232c0f8574`, deploy
-  `ea6952255a29e0f3bcc4fa8e2e9289f564687ced814b371a06af140470973e56`, `set_asset(XLM stand-in)`
-  `1697e099b319eb1741b192946551723ea38275567dc1b829a8e41fe5b9cceb1a`.
-- **Rust suite**: 22 tests green (`npm run contract:test`): the slice arithmetic, the min-out and a
+- **Deployed** (since 8 Oct, 22:33 UTC): `CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB`;
+  wasm 15,311 bytes, sha256 `7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167`,
+  dumped back from the ledger and compared. Upload `f084b0b9b1ab161cf21e950e47748e52be996efbd2eff4f3e608e226c99da277`,
+  deploy `fde11ab9124e3857bc8c3b051227cd2ec848a9014d61f91c3079fcf09ae4b34c` (ledger 5,095,044),
+  `set_asset(XLM stand-in)` `5e3391508daeea89d86879cda38000c7d18e27d8a9cf23ce2b677adce538a246`,
+  instance and code extended to 60 days from outside `3a6516a0eb738032091aebdedc73a04f495fa84ebe7ebe8f6453994e37abbb68`.
+- **Why it was redeployed**: the first contract (`CBNZK4NDWZZD5YBLK4GTUICA2RF7PIXL7RHADRVQSTYF7EQ4OSCGMOFB`,
+  deploy `ea6952255a29e0f3bcc4fa8e2e9289f564687ced814b371a06af140470973e56`) extended its own
+  instance on every call, and extending an instance extends its code, whose rent is charged on its
+  in-memory size: that constructor paid 154.9 test XLM, and on mainnet a sender or a sponsored claim
+  would have paid about 27 XLM whenever the instance fell under half its life. No function extends
+  the contract's own life now; `npm run keep-alive` does it from outside. The first contract's
+  transactions below stay as evidence of the same code paths.
+- **Rust suite**: 23 tests green (`npm run contract:test`): the slice arithmetic, the min-out and a
   short fill reverting everything, the state machine, the signature binding the destination, the
   stranger's early refund, measure once at 30 days, the admin unable to touch an envelope, events,
-  the TTL, the claim-message bytes shared with TypeScript, and a property test over random
-  send/claim/refund sequences holding balances equal to the sums over open envelopes.
+  the envelope's TTL, no user call extending the contract's own life (mutation-checked), the
+  claim-message bytes shared with TypeScript, and a property test over random send/claim/refund
+  sequences holding balances equal to the sums over open envelopes.
 
 ### The battery (`npm run battery:testnet`, `deployments/testnet-battery.json`), all green
 
+Run of 9 Oct on `CCKMIXT4…HQSB`:
+
 | Step | Transaction |
 | --- | --- |
-| send 10 USDC keeping 10% → 93.54 XLM, one signature, 4.2 s | `8e574b773c437c897f067598106a87bd8f7d513fd2807965841c1a8e4cbf568f` |
-| a brand-new classic wallet made ready to hold USDC (created with 0 XLM; one wallet approval) | `67c3f71bdbc003735386d41ef24b3a884fa656176faca98db6d12ceab6a1cd0c` |
-| the claim into it, paid by Sown's servers (9 USDC + 93.54 XLM arrived) | `fcaff49b6e3393595611403339105caa2fa027e4be66c3bd5aa59955b1856412` |
-| send 5 USDC keeping 10% | `e61df42cde4687402072a85c2c8357018394a96c3e213efcbd078766d4049bd0` |
-| a wallet made with one (software) Face ID, deployed by Sown's servers | `7ab7561399537d928a9a98847981dc0b0687c09b6a2ad53e6b819028c2bde8f3` |
-| the claim into that wallet (4.5 USDC + 46.72 XLM), 12.6 s for both | `222d5726ad18c172c33e18da7dcda67b33ad4f3a73bdf59ba416b464ce40f282` |
-| send 2 USDC, then the sender takes it back | `31ed4d45b580b1da89f9e77e6c6d7fd106bdd5213aca0ea6f5e3912aa7b8c41d`, `9a50480f826f07d22e1fb947686765d815f16de90b1b4d663076b322126a0cc4` |
+| send 10 USDC keeping 10% → 104.66 XLM, one signature, 7.0 s | `06e5b39da138278a397e54e30d64e68ae1ec9d9ca3f478161cfddfb4cea7fcd9` |
+| a brand-new classic wallet made ready to hold USDC (created with 0 XLM; one wallet approval) | `0dfcde7d7b0a1eb0b55b7562138271963f70a8ec26119a7d1ea27d39e42a89e1` |
+| the claim into it, paid by Sown's servers (9 USDC + 104.66 XLM arrived) | `4884b7cb298eb2ab90abea4dd2a3a4cce34dacf44f54c1eebcd25fb9b2084fa3` |
+| send 5 USDC keeping 10% | `c5b64782dc2f6c40941cedcee776fef85f2bfb9c83412a7e0d5f2dbb037e6007` |
+| a wallet made with one (software) Face ID `CDO67GWS…RJGE`, deployed by Sown's servers | `ddeda510e59a23056076514fd5afa05aabfa420fdd90c24a7187d7484bb786d5` |
+| the claim into that wallet (4.5 USDC + 52.28 XLM), 16.2 s for both, one prompt | `fcc73d60db9451f0a0ace30c47a86d1dd5bc1dfcb286b3226fd922d5e2cd15fb` |
+| 1 XLM moved out of that wallet, one prompt, Sown's servers paid | `a192e510ef9a45bc440146a1aef43e8ae279175a91df2d030ea27d2dc20896f7` |
+| send 2 USDC, then the sender takes it back | `13f1549b4cd20dd044aaf6780e4bb91abfb5fa53c32726b3f7abbe8458ecb38a`, `7a5edd7abe78415eef145ea3286bc6a2339aec235b5e9c7c2c7e4acce9414d85` |
 | refused, costing Sown nothing: a second claim, a wrong link, a stranger's early refund, an early measurement | — |
+
+The same battery on the first contract (8 Oct): send `8e574b77…568f`, classic claim `fcaff49b…6412`,
+Face ID claim `222d5726…f282`, refund `9a50480f…0cc4`.
+
+### The mainnet smoke, proven on testnet (`npm run smoke:mainnet -- --network testnet`)
+
+The script the founder runs on mainnet, run with the same code on testnet (`deployments/testnet-smoke.json`):
+
+| Step | Transaction |
+| --- | --- |
+| checks first: the code on the ledger is `artifacts/sown.wasm`, the asset is open with the catalogue's pool, both balances, the send simulated | — (`--dry` stops here) |
+| send $1 keeping 10%, 7.8 s | `14a4935819102bef157663ce3848d63477b7094625e8d6487101c4cfb0328810` |
+| a wallet made with one software passkey `CAHL4UCP…ZD6T` | `f80e296496a57e558adc1d872ff806e95f90d895ad1b8667c034040708d95d19` |
+| the claim into it, 14.3 s for both; 15 s from send to claim on the ledger | `a3e539337c550bca5351e7bb415d517a33de295a2b2508c84107149fbb48c03d` |
+| 0.90 USDC moved back to the sender (the wallet restored from its saved key, as `--recover` does) | `486a86431d5e8aded623ae755026d070232521565078546ae104fa45bc523230` |
+| 10.47 XLM moved back to the sender; the wallet empty, its key deleted | `210c6855e9ce698026fe0a593ce69617c3a4daffa3d9f09be9b679c044b84445` |
+
+`--record <id>` read envelope 0 (into a classic wallet, 10 s send to claim) and envelope 4 (into a
+Face ID wallet, 15 s) back from the chain correctly.
 
 ### The app (`npm run dev`, port 3100), verified in a browser against testnet
 
-- **Claim with Face ID, in the browser**: the real Smart Account Kit running in the page (a software
-  P-256 authenticator stood in for the phone's), the real `/api/relay`. One passkey prompt each.
-  - envelope 4 (send `5dff843affb0ce74a87b2548af0e9e2ef96cdb1c269eb9925564bdf3fc985801`) into wallet
-    `CCDTVZEY554I5R2MHMG7KJ36V7OHUKCRSTPHNF2EBFJBIO24FLZINYNF`, claim `9959b3598e51ef79c6926671b67e4bd180735abd8eba42cb9a0d4c7a73e46710`
-  - envelope 5 (send `485a42a14c7c78394ab4e04c068269fb79e5cadc627b2add48f071dad586b96c`) into wallet
-    `CCCQCWLGYB42MNAFPO4T3L7YSKUVIRLLGXQNKFBG6OWUMX2RVKSXYRJN`, claim `d3477f0b813fc795e5886b6b8180f45c8ad1977f4e34481347044505f6e07e52`
-- **Move to a wallet** from `/mine`: 5 XLM out of `CCCQCWLG…YRJN`, one passkey prompt (reconnecting
-  needed none: the wallet's birth is written into the kit's store after the relay deploys it),
-  submitted by Sown's servers: `5761e5745d1cc67142e573c958e1fe2cb330e64581dd6e30311acba8c64909aa`.
-- **Pages seen rendering from the chain**: `/` (send card with the pool's live quote and local
-  money), `/r/[id]` (waiting, claiming, claimed, wrong-link states), `/receipt/[id]` (the send and
-  claim transactions from the contract's events, "at the least" from the send's own arguments,
-  "a wallet made with Face ID" checked by the claimer's wasm hash), `/mine` (holdings worth at
-  Aquarius's price, envelopes, move, cash-out links verified to resolve), `/assets` (on testnet,
-  the stand-in plus the three mainnet rows with Ondo's and Etherfuse's flags read from mainnet),
-  `/proof` (ink: code hash dumped back and matching the repository, the admin's one power, what
-  Sown's servers hold and have paid, counts, pools, every envelope, the battery's transactions),
-  `/docs` (six pages), `/plan`, the share images (`/receipt/1/opengraph-image` and the figure-free
-  `/r/5/opengraph-image`).
-- **Offline suite**: 115 Vitest tests in 15 files, plus lint and typecheck, all clean: the relay's
-  inspection against real recorded deploy and move transactions and every near-miss, the claim
-  message's bytes, the quote and send arithmetic, the envelope decoder on real `get()` results, the
-  issuer line, the plan's calendar file, the pinned versions, the docs links, the share images'
-  colours against `tokens.css`, and a scan of every surface for the words Sown never says.
+Run against the first contract on 8 Oct; the code paths are unchanged since.
+
+- **Send from the test wallet** (a Wallets Kit module, testnet only, behind
+  `NEXT_PUBLIC_SOWN_TEST_WALLET=1`): the card, the confirm sheet (simulated fee, the least it can
+  become, the return date, the issuer), the wallet, `/api/send/record`, the receipt with the link:
+  `5aa81c440aaf89927da260fd0e9c1b7bebf4375302a9c12e57fb8fc70ea9a1ee`; then the classic-wallet
+  claim from the claim page: `826c07a2c3199df6024ad7f7671ca08fa48b9d84f13495ea3b44531e8e7648a1`.
+- **Claim with Face ID, in the browser**: the real Smart Account Kit in the page (a software P-256
+  authenticator stood in for the phone's), the real `/api/relay`, one passkey prompt each:
+  send `5dff843affb0ce74a87b2548af0e9e2ef96cdb1c269eb9925564bdf3fc985801` → wallet `CCDTVZEY…YNF`,
+  claim `9959b3598e51ef79c6926671b67e4bd180735abd8eba42cb9a0d4c7a73e46710`; send
+  `485a42a14c7c78394ab4e04c068269fb79e5cadc627b2add48f071dad586b96c` → wallet `CCCQCWLG…YRJN`,
+  claim `d3477f0b813fc795e5886b6b8180f45c8ad1977f4e34481347044505f6e07e52`.
+- **Move to a wallet** from `/mine`: 5 XLM out of `CCCQCWLG…YRJN`, one passkey prompt, none to
+  reconnect: `5761e5745d1cc67142e573c958e1fe2cb330e64581dd6e30311acba8c64909aa`.
+- **Pages seen rendering from the chain**: `/`, `/r/[id]` (waiting, claiming, claimed, wrong-link),
+  `/receipt/[id]`, `/mine`, `/assets` (the three mainnet rows with Ondo's and Etherfuse's flags read
+  from mainnet), `/proof` (ink), `/docs` (six pages), `/plan`, the share images.
+- **Production build**: `npm run build` (into `.next-build`) and `npm run start` serve every page
+  and the share images (9 Oct).
+
+### Tests
+
+- **Offline suite**: 127 Vitest tests in 19 files, plus lint and typecheck, all clean (4 more skip:
+  the live and mainnet-only ones). Among them: the relay's inspection against real recorded
+  transactions and every near-miss; the claim message's bytes; the send arithmetic; the envelope
+  decoder on real `get()` results; **two lists that drift**: every catalogue asset's contract
+  against the address its code and issuer derive, the deployment record against the catalogue,
+  the deployed sha256 against `artifacts/sown.wasm`, and the README naming the deployed contract;
+  the transaction cache keyed by contract; and a scan of every surface, the README, and the
+  evidence `/proof` prints for the words Sown never says.
+- **Live** (`SOWN_LIVE=1 npx vitest run src/lib/assets/parity.test.ts`): the contract's `asset()`
+  and `config()` against the catalogue, green on testnet.
+
+### Mainnet, measured and simulated, nothing sent (`npm run preflight`, 9 Oct)
+
+| What | Cost | Who pays |
+| --- | --- | --- |
+| upload the code (rent on the compiled module's size for 120 days) | 22.08 XLM ≈ $4.25 | the admin |
+| create the contract, three assets | 0.08 XLM | the admin |
+| one send (the envelope kept about 180 days) | 0.21 XLM ≈ $0.04 (0.28 the first time) | the sender |
+| one Face ID claim: the wallet, then the claim | 0.20 + 0.09 XLM | Sown's servers |
+| one claim into a classic wallet | 0.014 XLM, plus 2 XLM set aside if the wallet is brand new (returned when it lets go) | Sown's servers |
+| keep the contract alive after its first 120 days | about 4.8 XLM per 30 days | whoever runs Sown |
+
+## Cut, and why
+
+- **Nothing from the cut list.** The passkey claim (cut line 6) claimed testnet envelopes on Day 1
+  and stays in. `/plan`, USTRY and CETES, "Move to a wallet", the share images and the six docs
+  pages all shipped.
+- **The fee-bump shape for a classic wallet's claim**: every claim is submitted by Sown's servers
+  instead (one shape fewer to inspect; recorded in `CLAUDE.md` Known drift).
 
 ## Next, in build-plan order
 
-1. **The sender's path in a browser**: send card → confirm sheet → wallet → `/api/send/record` →
-   receipt with the link, and the classic-wallet claim. No wallet extension can be installed in the
-   agent's browser, so: a testnet-only test wallet behind a flag (a Wallets Kit module holding a key
-   in the browser, funded by Friendbot and Aquarius), which also lets anyone try testnet without
-   installing anything.
-2. **The battery**: add moving out of a passkey wallet (shape 4) and the app's own HTTP routes.
-3. **Mainnet scripts, written and not run**: `smoke:mainnet`, `preflight`, `measure`.
-4. **Two lists that drift**: the catalogue against the contract's `asset()` (a live test), and the
-   contract id in `deployments/`, the README and `/proof`.
-5. **README** above the fold.
-6. **Every state at 375 px and 1440 px.**
+1. **Every state at 375 px and 1440 px**, on the redeployed contract, which also re-runs the browser
+   paths above against it.
+2. **The README's GIF**: from the founder's film; a placeholder comment marks the spot.
 
 ## Decisions (recorded in CLAUDE.md "Known drift")
 
 - **The link's secret is an ed25519 seed; a claim is a signature over (contract, id, to).** The
   secret never reaches a server or the ledger, a claim cannot be redirected, and the recipient sees
   one Face ID instead of two.
-- **Every claim is submitted by Sown's servers**; there is no fee-bump shape. A classic wallet
-  approves once, only to be made ready to hold the assets.
+- **Every claim is submitted by Sown's servers**; there is no fee-bump shape.
 - **A fourth relay shape: moving out of a passkey wallet**, only Sown's assets, only from a wallet
   that claimed an envelope, a few times a day.
 - **Testnet runs on Aquarius's test USDC**, the asset in its only USDC/XLM pool.
-- **The receipt's TTL stays at the network maximum.** It is almost the whole fee: about 1.1 XLM per
-  send on testnet, about 0.2 XLM (about 4 cents) on mainnet. The confirm sheet shows the simulated fee.
-- **Every submitted simulation carries 1M instructions of headroom.**
+- **The contract never extends its own instance or code**; `npm run keep-alive` does, paid by whoever
+  runs Sown. Each envelope keeps the maximum TTL for itself.
+- **The deploy picks up where it stopped** instead of paying twice: code already on the ledger is
+  not uploaded again, and a half-made deployment (`partial` in `deployments/<network>.json`) is
+  resumed, never treated as live.
+- **The mainnet smoke moves its dollar back**, and keeps the wallet's key under `.keys/` until the
+  wallet is empty; the filmed run is recorded from the chain with `--record`.
+- **The cache is keyed by contract**: a redeploy numbers envelopes from 0 again.
 
-## Blocked on the founder
+## Blocked on the founder, in order
 
 1. **Confirm the deadline hour** on demo.stellarpassport.xyz and paste the submission fields into
    `docs/DEMO-AND-PITCH.md` §Submission.
-2. **Choose the domain.** Passkeys bind to the origin they were made on, so the domain must be final
-   before the first mainnet claim. Set `NEXT_PUBLIC_SITE_URL` to it.
-3. **Fund a mainnet account for Sown's servers** with about 60 XLM and put its secret in the
-   server's environment as `SOWN_SPONSOR_SECRET` (never in git).
-4. **Fund a Freighter wallet** with about 20 USDC on mainnet, and a little XLM for fees (a send is
-   about 0.2 XLM).
-5. **Deploy to mainnet**: `npm run contract:build`, then
-   `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet` (the admin key stays on
-   your machine), then `npm run smoke:mainnet`. Add your wallets to `src/lib/team.ts` first.
-6. **A real phone**: claim one testnet envelope with real Face ID on the final domain
-   (`npx tsx scripts/dev-send.ts 5 10` prints a fresh link), and one send from a real Freighter.
-7. **Publish the repository** (no remote has been added) and set `NEXT_PUBLIC_REPO_URL`.
+2. **Choose the domain and host the app on it** (TLS required for Face ID). Passkeys bind to the
+   origin they were made on, so the domain must be final before the first mainnet claim. On the
+   server: `npm ci && npm run build`, then `npm run start` (port 3100, from `.next-build`) behind
+   nginx, e.g. under pm2. Environment: `NEXT_PUBLIC_SOWN_NETWORK=mainnet`,
+   `NEXT_PUBLIC_SITE_URL=https://<domain>`, `SOWN_SPONSOR_SECRET`, `NEXT_PUBLIC_REPO_URL`; a paid
+   RPC (`SOWN_RPC_URL`, `NEXT_PUBLIC_SOWN_RPC_URL`) is worth it once strangers arrive.
+3. **Fund three mainnet accounts** (no secret ever goes into git; each is read from the environment):
+   - the **admin**, about **24 XLM** (upload 22.1, create and assets 0.1, its own 1 XLM minimum);
+     its key stays on your machine;
+   - **Sown's servers** (`SOWN_SPONSOR_SECRET`), **30–60 XLM**: about 0.3 XLM per Face ID claim,
+     2 XLM set aside per brand-new classic wallet, alerts under 20 XLM;
+   - a **smoke sender** (`SOWN_SMOKE_SENDER_SECRET`, e.g. `stellar keys generate sown-smoke`):
+     **$2 USDC and 3 XLM**; and your **Freighter** wallet for the film: about **$20 USDC and 2 XLM**.
+4. **Deploy**: `npm run preflight`, then
+   `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet` (if it stops, run it
+   again: it resumes). Add your wallets (admin, servers, smoke sender, Freighter) to `src/lib/team.ts`.
+5. **Smoke**: `npm run smoke:mainnet -- --dry` (read only) with `SOWN_SPONSOR_PUBLIC` and
+   `SOWN_SMOKE_SENDER_PUBLIC`, then `SOWN_MAINNET=yes SOWN_SPONSOR_SECRET=S… SOWN_SMOKE_SENDER_SECRET=S… npm run smoke:mainnet`.
+   It sends $1 into USDY, claims it, moves both parts back, and writes `deployments/mainnet-smoke.json`.
+6. **Put the mainnet contract id into the README** (a test fails until it is there) and commit
+   `deployments/mainnet.json` and `deployments/mainnet-smoke.json`.
+7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
+   Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
+   events after about a week) so `/proof` prints it.
+8. **A real phone on testnet first**, if there is time: `npx tsx scripts/dev-send.ts 5 10` prints a
+   fresh testnet link to claim with real Face ID on the final domain.
+9. **Keep it alive**: by about 120 days after the deploy, `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run keep-alive -- --network mainnet --days 180`
+   (about 4.8 XLM per 30 days extended); and
+   `SOWN_MEASURER_SECRET=S… SOWN_MAINNET=yes npm run measure -- --network mainnet` on a cron from
+   30 days after the first claim (any funded account can measure).
+10. **Publish the repository** (no remote has been added) and set `NEXT_PUBLIC_REPO_URL`.

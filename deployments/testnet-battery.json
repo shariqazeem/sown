@@ -1,36 +1,31 @@
 {
   "network": "testnet",
   "contract": "CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB",
-  "at": "2026-10-08T22:33:51.941Z",
+  "at": "2026-10-08T23:01:48.674Z",
   "steps": [
     {
-      "name": "bought test USDC for the sender",
-      "usdc": "28.9819194",
-      "tx": "638beb7fd186576df9dd8390a372f61165a74fe2c55820f3321608636fe1a020"
-    },
-    {
       "name": "send 10 USDC, keep 10%",
-      "id": "0",
-      "tx": "a312357030c1c19e0c6b0c797dd1ac21cf0ce4205c7a8f22778185f690178fe2",
-      "seconds": "4.5",
-      "fee_stroops": "12755292",
+      "id": "5",
+      "tx": "06e5b39da138278a397e54e30d64e68ae1ec9d9ca3f478161cfddfb4cea7fcd9",
+      "seconds": "7.0",
+      "fee_stroops": "11635949",
       "cash": "9.0000000",
       "keep_in": "1.0000000",
-      "keep_out_xlm": "104.9387431",
-      "quoted": "104.9387431",
-      "least": "103.8893556"
+      "keep_out_xlm": "104.6643350",
+      "quoted": "104.6643350",
+      "least": "103.6176916"
     },
     {
       "name": "a new classic wallet, made ready to hold USDC by Sown's servers",
-      "account": "GB5EHRMDELYCZSKPF5M5TUG4YXW4YFYV3H4XLDD4EM56NQLV77RJW4TY",
-      "tx": "cc43701866ea05d458954bb72871fff225a9636bbacc337a8c606446e848cf3b"
+      "account": "GC42O7SAHMDQRNJQ5FRVREPV4PIT4PDTQQVB5Q5LB6LXDGHJTXXSB7EY",
+      "tx": "0dfcde7d7b0a1eb0b55b7562138271963f70a8ec26119a7d1ea27d39e42a89e1"
     },
     {
       "name": "claimed into the classic wallet, paid by Sown's servers",
-      "tx": "3c7642c55c6d415547a9f8ab0cf46371e90489c386a5c24d897d4873a10f2cf8",
-      "seconds": "10.2",
+      "tx": "4884b7cb298eb2ab90abea4dd2a3a4cce34dacf44f54c1eebcd25fb9b2084fa3",
+      "seconds": "20.7",
       "usdc": "9.0000000",
-      "xlm": "104.9387431"
+      "xlm": "104.6643350"
     },
     {
       "name": "a second claim is refused",
@@ -38,26 +33,26 @@
     },
     {
       "name": "send 5 USDC, keep 10%",
-      "id": "1",
-      "tx": "3c12385e8968f4ae91d3933743a4f994f64095991aaa78d3ef455b3f7ac91fa5",
-      "seconds": "4.5"
+      "id": "6",
+      "tx": "c5b64782dc2f6c40941cedcee776fef85f2bfb9c83412a7e0d5f2dbb037e6007",
+      "seconds": "8.1"
     },
     {
       "name": "claimed into a wallet made with one Face ID, Sown's servers paid both transactions",
-      "wallet": "CAAIX6GHDS2L7CYHNS767Z4R5LIEL66LYW2LPM57JYGPA7NOZ2KU3BAS",
-      "deployTx": "374591c7aae83a95fcc9bb64c4a4944be63dd2b1a075257995d2380276970e2c",
-      "claimTx": "fd0198fa709e4e2121c7e86b9cadec783da1f64ed88b90f7fa761bd747ef8c0d",
-      "seconds": "10.1",
+      "wallet": "CDO67GWSKHAYI7REFFCMUCSYFOQFEYR7SOUQ3MFOIF675PNUUDIGRJGE",
+      "deployTx": "ddeda510e59a23056076514fd5afa05aabfa420fdd90c24a7187d7484bb786d5",
+      "claimTx": "fcc73d60db9451f0a0ace30c47a86d1dd5bc1dfcb286b3226fd922d5e2cd15fb",
+      "seconds": "16.2",
       "passkeyPrompts": 1,
       "usdc": "4.5000000",
-      "xlm": "52.4136644"
+      "xlm": "52.2766787"
     },
     {
       "name": "moved 1 XLM out of the Face ID wallet, paid by Sown's servers",
-      "tx": "f816cf1ec27a4bdda1e67d0def141dae2725813d24a5f0310aceef6f0a7da50b",
-      "seconds": "13.2",
+      "tx": "a192e510ef9a45bc440146a1aef43e8ae279175a91df2d030ea27d2dc20896f7",
+      "seconds": "12.1",
       "prompts": 1,
-      "left": "51.4136644"
+      "left": "51.2766787"
     },
     {
       "name": "a stranger cannot return it before the date",
@@ -66,14 +61,14 @@
     },
     {
       "name": "the sender took it back",
-      "id": "2",
-      "sendTx": "de8a8c4a7279660ed53516499bc70fec60509b0dd3c86a2cba81a922b5c44aa8",
-      "refundTx": "1180adf3030710b1e68d79b0edd562863d7af897f7744cfd0f1f9613a16644fa",
+      "id": "7",
+      "sendTx": "13f1549b4cd20dd044aaf6780e4bb91abfb5fa53c32726b3f7abbe8458ecb38a",
+      "refundTx": "7a5edd7abe78415eef145ea3286bc6a2339aec235b5e9c7c2c7e4acce9414d85",
       "state": "returned"
     },
     {
       "name": "a wrong link is refused before anything is paid",
-      "id": "3",
+      "id": "8",
       "why": "This link does not open this envelope. Ask the sender to share it again."
     },
     {
@@ -83,9 +78,9 @@
     }
   ],
   "openEnvelope": {
-    "id": "3",
+    "id": "8",
     "note": "left open for the claim page; its link is not stored"
   },
-  "count": 4,
+  "count": 9,
   "failures": 0
 }

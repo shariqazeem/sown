@@ -1,0 +1,46 @@
+{
+  "network": "testnet",
+  "contract": "CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB",
+  "at": "2026-10-08T22:52:05.441Z",
+  "usd": 1,
+  "keepBps": 1000,
+  "asset": "XLM",
+  "sender": "GBL2HPXJUXNQ4GAJFLLKF5ISERWN6GQCDHFI3GMTSYZQMUWIVJ2SR6P5",
+  "steps": [
+    {
+      "name": "sent $1, keeping 10% as XLM, a testnet stand-in",
+      "id": "4",
+      "tx": "14a4935819102bef157663ce3848d63477b7094625e8d6487101c4cfb0328810",
+      "seconds": "7.8",
+      "keep": "10.4746",
+      "least": "10.3698"
+    },
+    {
+      "name": "claimed into a wallet made with one Face ID (a software one), Sown's servers paid both",
+      "wallet": "CAHL4UCPMMQLYQ2FFRDROZEDS5JZQ7X75V7QZ3DJJ4DVSRKJQIBOZD6T",
+      "deployTx": "f80e296496a57e558adc1d872ff806e95f90d895ad1b8667c034040708d95d19",
+      "claimTx": "a3e539337c550bca5351e7bb415d517a33de295a2b2508c84107149fbb48c03d",
+      "seconds": "14.3",
+      "prompts": 1
+    },
+    {
+      "name": "moved 0.9000 USDC back to the sender, paid by Sown's servers",
+      "tx": "486a86431d5e8aded623ae755026d070232521565078546ae104fa45bc523230",
+      "seconds": "13.5",
+      "prompts": 1
+    },
+    {
+      "name": "moved 10.4746 XLM back to the sender, paid by Sown's servers",
+      "tx": "210c6855e9ce698026fe0a593ce69617c3a4daffa3d9f09be9b679c044b84445",
+      "seconds": "14.6",
+      "prompts": 1
+    }
+  ],
+  "wallet": "CAHL4UCPMMQLYQ2FFRDROZEDS5JZQ7X75V7QZ3DJJ4DVSRKJQIBOZD6T",
+  "seconds": {
+    "send": 7.8,
+    "claim": 14.3,
+    "sendToClaimOnTheLedger": 15
+  },
+  "failures": 0
+}

@@ -16,7 +16,9 @@ export type Deployment = {
   readonly admin: string;
   readonly usdc: string;
   readonly assets: ReadonlyArray<{ key: string; sac: string; pool: string; inIdx: number; outIdx: number; tx: string }>;
-  readonly uploadTx: string;
+  /** Null when the code was already on the ledger and was not uploaded again. */
+  readonly uploadTx: string | null;
+  readonly extendTx?: string | null;
   readonly deployTx: string;
   readonly ledger: number;
   readonly deployedAt: string;
@@ -24,8 +26,9 @@ export type Deployment = {
 
 const RAW: Record<NetworkName, unknown> = { mainnet, testnet };
 
+/** A finished deployment. One the deploy script is still in the middle of (`partial`) is not one yet. */
 function isDeployment(v: unknown): v is Deployment {
-  return typeof v === "object" && v !== null && typeof (v as { contractId?: unknown }).contractId === "string";
+  return typeof v === "object" && v !== null && typeof (v as { contractId?: unknown }).contractId === "string" && (v as { partial?: unknown }).partial !== true;
 }
 
 /** The deployment on a network, or null while Sown is not deployed there. */

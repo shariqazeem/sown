@@ -84,10 +84,26 @@ describe("the catalogue's words, printed on every asset row", () => {
 });
 
 describe("the evidence /proof prints", () => {
-  it("names every battery step in surface words", () => {
-    const battery = JSON.parse(readFileSync(join(ROOT, "deployments", "testnet-battery.json"), "utf8")) as { steps: Array<{ name: string }> };
-    const rules = [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
-    const hits = battery.steps.flatMap((s) => rules.filter(([, re]) => re.test(s.name)).map(([w]) => `"${w}" in: ${s.name}`));
+  const rules = [...NEVER_ANYWHERE, ...NOT_OUTSIDE_DOCS];
+  it("names every battery and smoke step in surface words", () => {
+    const names = ["testnet-battery.json", "testnet-smoke.json", "mainnet-smoke.json"].flatMap((f) => (JSON.parse(readFileSync(join(ROOT, "deployments", f), "utf8")) as { steps: Array<{ name: string }> }).steps.map((s) => s.name));
+    const hits = names.flatMap((n) => rules.filter(([, re]) => re.test(n)).map(([w]) => `"${w}" in: ${n}`));
+    expect(hits).toEqual([]);
+  });
+  it("prints nothing else Sown never says", async () => {
+    const { evidenceWords } = await import("@/lib/evidence");
+    const hits = evidenceWords().flatMap((t) => rules.filter(([, re]) => re.test(t)).map(([w]) => `"${w}" in: ${t}`));
+    expect(hits).toEqual([]);
+  });
+});
+
+describe("the README, which a judge reads first", () => {
+  it("says nothing Sown never says (the mechanism's names are allowed, as in the docs)", () => {
+    const text = readFileSync(join(ROOT, "README.md"), "utf8")
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/`[^`]*`/g, "")
+      .replace(/\([^)]*\)/g, (m) => (/^\((https?:|\.\/|[\w-]+\/)/.test(m) ? "" : m));
+    const hits = text.split("\n").flatMap((line) => NEVER_ANYWHERE.filter(([, re]) => re.test(line)).map(([w]) => `"${w}" in: ${line.trim().slice(0, 100)}`));
     expect(hits).toEqual([]);
   });
 });

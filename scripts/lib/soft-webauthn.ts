@@ -28,6 +28,16 @@ export function p1363ToDer(sig: Uint8Array): Buffer {
   return Buffer.concat([Buffer.from([0x30, r.length + s.length]), r, s]);
 }
 
+/** What it takes to use the same passkey in another process: a secret, kept under `.keys/` only. */
+export type SavedPasskey = {
+  readonly origin: string;
+  readonly rpId: string;
+  readonly credentialId: string;
+  readonly privateJwk: JsonWebKey;
+  readonly publicJwk: JsonWebKey;
+  readonly counter: number;
+};
+
 export type SoftPasskey = {
   readonly webAuthn: {
     startRegistration: (o: { optionsJSON: { rp: { id?: string }; challenge: string } }) => Promise<unknown>;
@@ -36,13 +46,24 @@ export type SoftPasskey = {
   readonly origin: string;
   /** How many assertions it has made: one per Face ID a person would see. */
   readonly prompts: () => number;
+  /** The key and its credential id, to restore it elsewhere (null before registration). */
+  readonly save: () => Promise<SavedPasskey | null>;
 };
 
-export function softPasskey(origin: string, rpId: string): SoftPasskey {
+const P256 = { name: "ECDSA", namedCurve: "P-256" } as const;
+
+export function softPasskey(origin: string, rpId: string, saved?: SavedPasskey): SoftPasskey {
   let key: CryptoKeyPair | null = null;
-  let credentialId: Buffer | null = null;
-  let counter = 0;
+  let credentialId: Buffer | null = saved ? Buffer.from(saved.credentialId, "base64url") : null;
+  let counter = saved?.counter ?? 0;
   let prompts = 0;
+  const restore = async (): Promise<void> => {
+    if (key || !saved) return;
+    key = {
+      privateKey: await subtle.importKey("jwk", saved.privateJwk, P256, true, ["sign"]),
+      publicKey: await subtle.importKey("jwk", saved.publicJwk, P256, true, ["verify"]),
+    };
+  };
 
   const authData = (withCounter: number): Buffer => {
     const flags = 0x01 | 0x04; // user present, user verified
@@ -54,10 +75,22 @@ export function softPasskey(origin: string, rpId: string): SoftPasskey {
   return {
     origin,
     prompts: () => prompts,
+    save: async () => {
+      await restore();
+      if (!key || !credentialId) return null;
+      return {
+        origin,
+        rpId,
+        credentialId: b64u(credentialId),
+        privateJwk: await subtle.exportKey("jwk", key.privateKey),
+        publicJwk: await subtle.exportKey("jwk", key.publicKey),
+        counter,
+      };
+    },
     webAuthn: {
       async startRegistration({ optionsJSON }) {
         prompts += 1;
-        key = (await subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"])) as CryptoKeyPair;
+        key = (await subtle.generateKey(P256, true, ["sign", "verify"])) as CryptoKeyPair;
         credentialId = randomBytes(16);
         const spki = Buffer.from(await subtle.exportKey("spki", key.publicKey));
         const clientDataJSON = Buffer.from(JSON.stringify({ type: "webauthn.create", challenge: optionsJSON.challenge, origin, crossOrigin: false }));
@@ -78,6 +111,7 @@ export function softPasskey(origin: string, rpId: string): SoftPasskey {
         };
       },
       async startAuthentication({ optionsJSON }) {
+        await restore();
         if (!key || !credentialId) throw new Error("No passkey on this authenticator yet");
         prompts += 1;
         counter += 1;

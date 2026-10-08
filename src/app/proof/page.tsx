@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EnvelopeRow } from "@/components/envelope/envelope";
 import { Row, Section, SiteFrame } from "@/components/site/site-frame";
-import battery from "../../../deployments/testnet-battery.json";
 import { assetRows } from "@/lib/assets/rows";
 import { stillHeld } from "@/lib/envelope/view";
+import { evidenceFor } from "@/lib/evidence";
 import { bps, dateUTC, fromRaw, short, units, usdAligned } from "@/lib/format";
 import { readProof } from "@/lib/proof";
 import { REPO_URL } from "@/lib/site";
@@ -15,8 +15,6 @@ import "./proof.css";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Proof", description: "The Sown contract, its code, its admin, what Sown's servers pay, and every envelope, read from the Stellar ledger." };
 
-type BatteryStep = { name: string; tx?: string; claimTx?: string; deployTx?: string; refundTx?: string; sendTx?: string; [k: string]: unknown };
-
 /** /proof — the one dark surface. Every figure read from the chain as the page loads. */
 export default async function ProofPage() {
   const p = await readProof();
@@ -26,7 +24,7 @@ export default async function ProofPage() {
   const measured = all.filter((e) => e.measuredAt > 0);
   const firstClaim = all.filter((e) => e.state === "claimed").sort((a, b) => a.claimedAt - b.claimedAt)[0];
   const tickers = Object.fromEntries(rows.map((r) => [r.asset.sac, r.asset.ticker]));
-  const steps = (p.net.name === "testnet" ? (battery as { steps: BatteryStep[] }).steps : []).filter((s) => s.tx || s.claimTx || s.refundTx);
+  const evidence = evidenceFor(p.net.name);
 
   return (
     <SiteFrame current="proof" ink>
@@ -179,21 +177,31 @@ export default async function ProofPage() {
           )}
         </Section>
 
-        {steps.length > 0 ? (
-          <Section label="Every path, run on testnet by the battery" aside={dateUTC(Math.floor(new Date((battery as { at: string }).at).getTime() / 1000))}>
+        {evidence ? (
+          <Section label={evidence.label} aside={evidence.at ? dateUTC(Math.floor(new Date(evidence.at).getTime() / 1000)) : undefined}>
             <div className="sw-truths">
-              {steps.map((s, i) => {
-                const hash = s.claimTx ?? s.tx ?? s.refundTx;
-                return (
-                  <Row key={i} k={s.name}>
-                    {hash ? (
-                      <a href={txUrl(p.net, String(hash))} className="mono">
-                        {short(String(hash))}
-                      </a>
-                    ) : null}
-                  </Row>
-                );
-              })}
+              {evidence.film ? (
+                <Row k={`Envelope ${evidence.film.id}, on film`}>
+                  ${evidence.film.amount}, {bps(evidence.film.keepBps)} kept as {evidence.film.asset}, claimed into {evidence.film.into}, {evidence.film.secondsFromSendToClaim} seconds from send to claim on the ledger.{" "}
+                  {evidence.film.sendTx ? (
+                    <a href={txUrl(p.net, evidence.film.sendTx)} className="mono">
+                      {short(evidence.film.sendTx)}
+                    </a>
+                  ) : null}{" "}
+                  {evidence.film.claimTx ? (
+                    <a href={txUrl(p.net, evidence.film.claimTx)} className="mono">
+                      {short(evidence.film.claimTx)}
+                    </a>
+                  ) : null}
+                </Row>
+              ) : null}
+              {evidence.steps.map((s, i) => (
+                <Row key={i} k={s.name}>
+                  <a href={txUrl(p.net, s.hash)} className="mono">
+                    {short(s.hash)}
+                  </a>
+                </Row>
+              ))}
             </div>
           </Section>
         ) : null}

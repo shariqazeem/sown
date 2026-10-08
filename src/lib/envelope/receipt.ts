@@ -28,11 +28,11 @@ export type ReceiptData = {
 };
 
 async function txFor(net: NetworkConfig, contract: string, envelopeId: string, kind: "send" | "claim" | "refund", topic: "sent" | "claimed" | "refunded", fromLedger: number): Promise<EventTx | null> {
-  const cached = cachedTx(envelopeId, kind);
+  const cached = cachedTx(envelopeId, kind, contract);
   if (cached) return cached;
   if (!fromLedger) return null;
   const found = await eventTx(net, contract, topic, BigInt(envelopeId), fromLedger);
-  if (found) recordTx(envelopeId, kind, found.hash, found.ledger, found.at);
+  if (found) recordTx(envelopeId, kind, found.hash, found.ledger, found.at, contract);
   return found;
 }
 

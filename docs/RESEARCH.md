@@ -252,7 +252,7 @@ and the keep asset index 0, so `set_asset(asset, pool, 1, 0, true)`.
 | USTRY/USDC `CCX2TYR4…2MIA` | constant product, 0.30% | 1,018,726.88 USTRY / 1,095,689.99 USDC | 0.9269681 USTRY | 9.2696060 | 92.6884700 | $1.078786 → $1.078883 |
 | CETES/USDC `CCKGQSQG…L2AD` | constant product, 0.10% | 17,685,067.53 CETES / 1,163,145.63 USDC | 15.1892994 CETES | 151.8918206 | 1,518.8008056 | $0.065836 → $0.065841 |
 
-### What a send and a claim cost (`deployments/testnet-battery.json`, `scripts/lib/rent-rate.ts`)
+### What a send and a claim cost (`deployments/testnet-battery.json`, `scripts/lib/rent.ts`, `npm run preflight`)
 
 | Transaction | Fee charged (testnet) | Of which rent |
 | --- | --- | --- |
@@ -278,10 +278,12 @@ asks for; the confirm sheet shows the simulated fee, never the design's "about $
 | the first constructor's `extend_ttl(max/2, max)` on the instance, which also extends the code, to 180 days | rent charged **154.9 XLM** on testnet (tx `ea695225…`) |
 | the same upload, simulated on mainnet (rent 1,000 stroops per KB, the floor; new entries live at least 120 days) | **21.58 XLM**, about $4.15 at Aquarius's XLM price |
 | one Face ID wallet's deployment, simulated on mainnet | 0.198 XLM |
-| keeping instance and code alive, from testnet's own `ExtendFootprintTTL` (tx `3a6516a0…`, 7 → 60 days, 56.4 test XLM) at mainnet's rate | about 4.7 XLM per 30 days |
+| keeping instance and code alive, from testnet's own `ExtendFootprintTTL` (tx `3a6516a0…`, 7 → 60 days, 56.4 test XLM) at mainnet's rate | about 4.7 XLM per 30 days (4.83 on 9 October, rent 1,022 stroops per KB with 2.00 GB live) |
+| the same upload, simulated again on 9 October | 22.08 XLM: the rent rate rises with the live state's size |
 
 Rent per entry, as soroban-env-host computes it: the extension at the new size, plus any growth in
 size over the life already paid for (a claim grows the envelope by 44 bytes with about 180 days
 left, which is nearly all of a claim's rent). Modelled that way, the battery's send, claims and
 refund match the rent testnet charged within 0.1–4.2%; repriced at mainnet's rate: a send about
-0.28 XLM, a claim into a Face ID wallet about 0.087 XLM, into a classic wallet about 0.014 XLM.
+0.21 XLM (0.28 for the first send on a new contract, which also opens the contract's USDC and keep
+balances), a claim into a Face ID wallet about 0.09 XLM, into a classic wallet about 0.014 XLM.

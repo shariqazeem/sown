@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev --turbopack -p 3100",
     "build": "NEXT_DIST_DIR=.next-build next build",
-    "start": "next start -p 3100",
+    "start": "NEXT_DIST_DIR=.next-build next start -p ${PORT:-3100}",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -22,6 +22,7 @@
     "measure": "tsx scripts/measure.ts",
     "preflight": "tsx scripts/preflight.ts",
     "keep-alive": "tsx scripts/keep-alive.ts",
+    "setup:testnet": "tsx scripts/setup-testnet.ts",
     "smoke:day0": "tsx scripts/smoke/aquarius-testnet.ts && tsx scripts/smoke/mainnet-pools.ts && tsx scripts/smoke/kit-testnet.ts"
   },
   "dependencies": {
