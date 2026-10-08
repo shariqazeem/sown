@@ -9,6 +9,7 @@ import { claimKey, encodeSecret, newSecret } from "@/lib/envelope/claim";
 import { dateUTC, fromRaw, units, usd, usdAligned, xlm } from "@/lib/format";
 import { saveLink, writeJson } from "@/lib/local";
 import { type WalletOption, connectWallet, isPhone, listWallets, rememberWallet, rememberedWallet, signWith } from "@/lib/wallet/kit";
+import { parsePrefill } from "./prefill";
 import type { CardAsset, HoldingsBody, PreparedBody, Quote, RecordedBody } from "./types";
 import "./send.css";
 
@@ -77,22 +78,19 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
 
   // A plan's reminder opens the card prefilled: /?usd=50&keep=1000&asset=usdy#send.
   useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    const u = Number(p.get("usd"));
-    const k = Number(p.get("keep"));
-    const a = p.get("asset");
-    if (Number.isFinite(u) && u >= 1 && u <= 10_000) {
-      const chip = (AMOUNTS as readonly number[]).includes(u);
-      setAmount({ usd: u, source: chip ? "chip" : "other" });
-      if (!chip) setOtherAmount(String(u));
+    const pre = parsePrefill(window.location.search, assets.map((x) => x.key));
+    if (pre.usd !== undefined) {
+      const chip = (AMOUNTS as readonly number[]).includes(pre.usd);
+      setAmount({ usd: pre.usd, source: chip ? "chip" : "other" });
+      if (!chip) setOtherAmount(String(pre.usd));
     }
-    if (Number.isInteger(k) && k >= 0 && k <= 10_000) {
-      setKeepBps(k);
-      const chip = (KEEPS as readonly number[]).includes(k);
+    if (pre.keepBps !== undefined) {
+      setKeepBps(pre.keepBps);
+      const chip = (KEEPS as readonly number[]).includes(pre.keepBps);
       setKeepSource(chip ? "chip" : "other");
-      if (!chip) setOtherKeep(String(k / 100));
+      if (!chip) setOtherKeep(String(pre.keepBps / 100));
     }
-    if (a && assets.some((x) => x.key === a)) setAssetKey(a);
+    if (pre.asset) setAssetKey(pre.asset);
   }, [assets]);
   useEffect(() => {
     if (!account) {

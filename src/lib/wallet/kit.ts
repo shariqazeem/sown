@@ -24,10 +24,11 @@ function kit(passphrase: string): Promise<Kit> {
         import("@creit-tech/stellar-wallets-kit/modules/hana"),
         import("@creit-tech/stellar-wallets-kit/modules/albedo"),
       ]);
-      StellarWalletsKit.init({
-        modules: [new fr.FreighterModule(), new xb.xBullModule(), new lo.LobstrModule(), new ha.HanaModule(), new al.AlbedoModule()],
-        network: passphrase as never,
-      });
+      const modules: unknown[] = [new fr.FreighterModule(), new xb.xBullModule(), new lo.LobstrModule(), new ha.HanaModule(), new al.AlbedoModule()];
+      // Testnet only, behind NEXT_PUBLIC_SOWN_TEST_WALLET=1: a wallet held in this browser.
+      const { TestWalletModule, testWalletEnabled } = await import("./test-wallet");
+      if (testWalletEnabled()) modules.unshift(new TestWalletModule());
+      StellarWalletsKit.init({ modules: modules as never, network: passphrase as never });
       return StellarWalletsKit;
     })();
   }

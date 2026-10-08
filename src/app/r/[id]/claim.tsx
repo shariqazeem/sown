@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Copy, Fingerprint, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Copy, Fingerprint } from "lucide-react";
 import { Envelope } from "@/components/envelope/envelope";
 import { LocalAmount } from "@/components/money/local-amount";
 import { SkeletonEnvelope } from "@/components/skeleton/skeleton";
 import { useTxToast } from "@/components/toast/use-tx-toast";
+import { WalletSheet } from "@/components/wallet/wallet-sheet";
 import { assetLine } from "@/lib/assets/catalogue";
 import { decodeSecret, secretOpens, signClaim } from "@/lib/envelope/claim";
 import { type EnvelopeJson, envelopeFromJson } from "@/lib/envelope/types";
@@ -14,7 +15,7 @@ import { returnWords } from "@/lib/envelope/view";
 import { bps, dateUTC, fromRaw, short, stampUTC, units, usdAligned } from "@/lib/format";
 import { rememberClaim, saveWallet, savedWallet } from "@/lib/local";
 import { faceSupport, inAppBrowser, makeWallet, recordBirth } from "@/lib/passkey/client";
-import { type WalletOption, connectWallet, isPhone, listWallets, signWith } from "@/lib/wallet/kit";
+import { type WalletOption, connectWallet, signWith } from "@/lib/wallet/kit";
 
 /**
  * THE CLAIM. One primary button, "Claim with Face ID": the phone makes a passkey (the one Face
@@ -35,9 +36,9 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   const [why, setWhy] = useState<string | null>(null);
   const [mine, setMine] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
-  const [wallets, setWallets] = useState<WalletOption[] | null>(null);
+  // Which wallet this page just claimed into: a passkey wallet opens at /mine, a classic one in its own app.
+  const [into, setInto] = useState<{ kind: "passkey" | "classic"; address: string } | null>(null);
   const [claimTx, setClaimTx] = useState<string | null>("envelope" in read ? read.claimTx : null);
-  const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     setSecret(decodeSecret(window.location.hash));
@@ -45,12 +46,6 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
     setMine(savedWallet()?.contractId ?? null);
     void faceSupport().then(setFace);
   }, []);
-  useEffect(() => {
-    const d = dialog.current;
-    if (!d) return;
-    if (sheet && !d.open) d.showModal();
-    else if (!sheet && d.open) d.close();
-  }, [sheet]);
 
   const busy = phase === "making" || phase === "preparing" || phase === "approving" || phase === "claiming";
   const toastPhase = phase === "making" || phase === "preparing" ? "building" : phase === "approving" ? "signing" : phase === "claiming" ? "confirming" : phase === "done" ? "done" : phase === "failed" ? "failed" : "idle";
@@ -117,6 +112,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
         return;
       }
       saveWallet({ contractId: made.value.contractId, credentialId: made.value.credentialId, at: Math.floor(Date.now() / 1000) });
+      setInto({ kind: "passkey", address: made.value.contractId });
       await recordBirth(made.value.credentialId, made.value.contractId, body.deployTx, body.deployLedger);
       rememberClaim(id);
       setMine(made.value.contractId);
@@ -129,10 +125,9 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
     }
   };
 
-  const openWallets = async () => {
+  const openWallets = () => {
     setWhy(null);
     setSheet(true);
-    setWallets(await listWallets(passphrase));
   };
 
   const claimClassic = async (w: WalletOption) => {
@@ -180,6 +175,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
         return;
       }
       rememberClaim(id);
+      setInto({ kind: "classic", address: account });
       if (claimed.claimTx) setClaimTx(claimed.claimTx);
       await refresh();
       setPhase("done");
@@ -191,7 +187,9 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
 
   // ── claimed: the receipt, printing if it was claimed here and now ──
   if (e.state === "claimed") {
-    const ours = mine && e.claimedBy === mine;
+    // A passkey wallet this browser holds, whether it claimed here and now or on an earlier visit.
+    const passkeyHere = (into?.kind === "passkey" && into.address === e.claimedBy) || (!!mine && e.claimedBy === mine);
+    const classicHere = into?.kind === "classic" && into.address === e.claimedBy;
     return (
       <div className="sw-claim">
         <Envelope
@@ -203,7 +201,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
           symbol={ticker}
           assetLine={asset ? assetLine(asset) : undefined}
           when={phase === "done" ? "just now" : `Claimed ${stampUTC(e.claimedAt)}`}
-          where={phase === "done" || ours ? "in your wallet" : <>to <span className="addr">{short(e.claimedBy ?? "")}</span></>}
+          where={passkeyHere || classicHere ? "in your wallet" : <>to <span className="addr">{short(e.claimedBy ?? "")}</span></>}
           sections={[
             {
               rows: [
@@ -215,16 +213,25 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
           printing={phase === "done"}
         />
         <div className="sw-claim-after">
-          {phase === "done" || ours ? (
+          {passkeyHere ? (
             <>
               <Link href="/mine" className="sw-btn is-primary is-block">
                 Open your wallet
               </Link>
               <p className="sw-claim-under">
-                {mine?.startsWith("C") && (phase === "done" || ours) ? "Your wallet opens with your face, on this phone." : "The dollars and the keep are in the wallet you chose."}{" "}
+                Your wallet opens with your face, on this phone.{" "}
                 <Link href={`/receipt/${id}`} className="sw-link">
                   The receipt
                 </Link>
+              </p>
+            </>
+          ) : classicHere ? (
+            <>
+              <Link href={`/receipt/${id}`} className="sw-btn is-primary is-block">
+                See the receipt
+              </Link>
+              <p className="sw-claim-under">
+                The dollars and the keep are in your wallet, <span className="mono">{short(e.claimedBy ?? "")}</span>. Open it in its own app to spend them or cash out.
               </p>
             </>
           ) : (
@@ -290,7 +297,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
               <Copy size={16} strokeWidth={2} aria-hidden />
               Copy the link
             </button>
-            <button type="button" className="sw-textbtn sw-claim-alt" onClick={() => void openWallets()} disabled={busy}>
+            <button type="button" className="sw-textbtn sw-claim-alt" onClick={openWallets} disabled={busy}>
               I already have a Stellar wallet
             </button>
           </>
@@ -301,7 +308,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
               {phase === "making" ? "Making your wallet…" : phase === "claiming" ? "Claiming…" : phase === "preparing" ? "Preparing your wallet…" : phase === "approving" ? "Approve in your wallet…" : phase === "failed" ? "Try again" : "Claim with Face ID"}
             </button>
             <p className="sw-claim-under">Your face or fingerprint makes a wallet that only you control. No app, no password, nothing to pay. Sown&apos;s servers pay the network.</p>
-            <button type="button" className="sw-textbtn sw-claim-alt" onClick={() => void openWallets()} disabled={busy}>
+            <button type="button" className="sw-textbtn sw-claim-alt" onClick={openWallets} disabled={busy}>
               I already have a Stellar wallet
             </button>
           </>
@@ -318,43 +325,15 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
         </div>
       </div>
 
-      <dialog ref={dialog} className="sw-sheet" aria-label="Claim with a Stellar wallet" onClose={() => setSheet(false)} onCancel={() => setSheet(false)}>
-        <div className="sw-sheet-head">
-          <p className="sw-sheet-title">Claim with a Stellar wallet</p>
-          <button type="button" className="sw-sheet-close" onClick={() => setSheet(false)} aria-label="Close">
-            <X size={18} strokeWidth={2} aria-hidden />
-          </button>
-        </div>
-        <div className="sw-sheet-body">
-          <p className="sw-sheet-say">
-            Approve once, the first time: Sown&apos;s servers prepare your wallet to hold USDC{asset && !asset.standIn ? ` and ${asset.ticker}` : ""}, and pay for it. Then the claim goes through by itself.
-          </p>
-          {wallets === null ? (
-            <p className="sw-sheet-say">Looking for Stellar wallets in this browser…</p>
-          ) : (
-            <div className="sw-wallets">
-              {wallets.filter((w) => w.available).map((w) => (
-                <button key={w.id} type="button" className="sw-wallet" onClick={() => void claimClassic(w)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {w.icon ? <img src={w.icon} alt="" width={22} height={22} /> : null}
-                  {w.name}
-                </button>
-              ))}
-              {wallets.filter((w) => !w.available).map((w) => (
-                <a key={w.id} href={w.url} className="sw-wallet is-install" target="_blank" rel="noreferrer">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {w.icon ? <img src={w.icon} alt="" width={22} height={22} /> : null}
-                  Get {w.name}
-                </a>
-              ))}
-            </div>
-          )}
-          {wallets && wallets.every((w) => !w.available) ? (
-            <p className="sw-sheet-fine">{isPhone() ? "No Stellar wallet is open in this browser. Open this link inside your wallet app's browser, or claim with Face ID." : "No Stellar wallet is installed in this browser."}</p>
-          ) : null}
-          {why ? <p className="sw-note is-warn">{why}</p> : null}
-        </div>
-      </dialog>
+      <WalletSheet
+        open={sheet}
+        onClose={() => setSheet(false)}
+        onPick={(w) => void claimClassic(w)}
+        passphrase={passphrase}
+        title="Claim with a Stellar wallet"
+        intro={`Approve once, the first time: Sown's servers prepare your wallet to hold USDC${asset && !asset.standIn ? ` and ${asset.ticker}` : ""}, and pay for it. Then the claim goes through by itself.`}
+        why={sheet ? why : null}
+      />
     </div>
   );
 }
