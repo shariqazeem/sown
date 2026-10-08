@@ -38,9 +38,22 @@ export function newSecret(): Uint8Array {
   return b;
 }
 
+/**
+ * Unpadded base64url by hand: the `buffer` polyfill browsers get with stellar-sdk knows only
+ * base64, and a link must decode the same on a phone as in Node.
+ */
+export function toBase64Url(b: Uint8Array): string {
+  return Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+export function fromBase64Url(s: string): Buffer {
+  const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+  return Buffer.from(b64 + "=".repeat((4 - (b64.length % 4)) % 4), "base64");
+}
+
 /** The fragment form: unpadded base64url, 43 characters. */
 export function encodeSecret(secret: Uint8Array): string {
-  return Buffer.from(secret).toString("base64url");
+  return toBase64Url(secret);
 }
 
 /** Null for anything that is not exactly a 32-byte secret: an incomplete link says so. */
@@ -48,7 +61,7 @@ export function decodeSecret(fragment: string | null | undefined): Uint8Array | 
   if (!fragment) return null;
   const s = fragment.replace(/^#/, "").trim();
   if (!/^[A-Za-z0-9_-]{43}$/.test(s)) return null;
-  const b = Buffer.from(s, "base64url");
+  const b = fromBase64Url(s);
   return b.length === 32 ? new Uint8Array(b) : null;
 }
 

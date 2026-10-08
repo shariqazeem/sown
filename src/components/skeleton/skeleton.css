@@ -1,0 +1,70 @@
+/* The wait, in the shape of what is coming. Tokens only; never a figure. */
+.sw-skel-note {
+  margin-bottom: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--ink-faint);
+}
+.sw-skel-rows {
+  border-top: 1px solid var(--border);
+}
+.sw-skel-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr) 80px;
+  gap: var(--s-4);
+  align-items: center;
+  min-height: 56px;
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid var(--border);
+}
+.sw-skel-bar {
+  display: block;
+  height: 10px;
+  border-radius: var(--r-sm);
+  background: var(--border);
+  animation: sw-skel 1.6s var(--ease-out) infinite;
+}
+.sw-skel-bar.is-tall {
+  height: 44px;
+  margin: var(--s-2) 0;
+}
+.sw-skel-env {
+  width: 100%;
+  max-width: 440px;
+}
+.sw-skel-sheet {
+  display: grid;
+  gap: var(--s-3);
+  min-height: 360px;
+  padding: var(--s-5);
+  border: 1px dashed var(--border-strong);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  background: var(--surface);
+}
+.sw-skel-sheet hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--s-2) 0;
+}
+@keyframes sw-skel {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-skel-bar {
+    animation: none;
+  }
+}
+@media (max-width: 720px) {
+  .sw-skel-row {
+    grid-template-columns: minmax(0, 1fr) 60px;
+  }
+  .sw-skel-row .sw-skel-bar:nth-child(2) {
+    display: none;
+  }
+}

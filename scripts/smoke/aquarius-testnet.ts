@@ -94,7 +94,7 @@ async function main() {
     console.log(`  credentials: ${cred}`);
     for (const l of tree(entry.rootInvocation())) console.log("   ", l);
   }
-  console.log("  cost:", JSON.stringify(sim.value.sim.cost), "minResourceFee:", sim.value.sim.minResourceFee);
+  console.log("  minResourceFee:", sim.value.sim.minResourceFee);
 
   // 4. Do it.
   const done = await invokeAs(net, sender, POOL, "swap", swapArgs);

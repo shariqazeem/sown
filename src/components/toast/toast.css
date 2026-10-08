@@ -1,0 +1,98 @@
+/* One line per money action, bottom left. Tokens only; it sits over both materials. */
+.sw-toasts {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  max-width: min(460px, calc(100vw - 32px));
+}
+.sw-toast {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-float);
+  font-size: var(--fs-small);
+  animation: sw-toast-in var(--dur-2) var(--ease-out);
+}
+@keyframes sw-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.sw-toast .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--ink-faint);
+  align-self: center;
+  flex: none;
+}
+.sw-toast.is-building .dot,
+.sw-toast.is-signing .dot,
+.sw-toast.is-confirming .dot {
+  background: var(--accent);
+  animation: sw-toast-pulse 1.4s var(--ease-out) infinite;
+}
+.sw-toast.is-settled .dot {
+  background: var(--ok);
+}
+.sw-toast.is-failed .dot {
+  background: var(--err);
+}
+@keyframes sw-toast-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.sw-toast .what {
+  font-weight: 600;
+}
+.sw-toast .phase {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+}
+.sw-toast .detail {
+  flex-basis: 100%;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+.sw-toast .open {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+}
+.sw-toast .close {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+.sw-toast .close:hover {
+  color: var(--ink);
+}
+@media (max-width: 720px) {
+  .sw-toasts {
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    max-width: none;
+  }
+}

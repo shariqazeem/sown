@@ -51,3 +51,13 @@ describe("the secret in the link", () => {
     expect(p.split("#")[0]).not.toContain(encodeSecret(s));
   });
 });
+
+describe("base64url by hand", () => {
+  it("matches Node's own encoding, so a phone and the server read the same link", () => {
+    for (let i = 0; i < 50; i += 1) {
+      const s = newSecret();
+      expect(encodeSecret(s)).toBe(Buffer.from(s).toString("base64url"));
+      expect(Buffer.from(decodeSecret(encodeSecret(s))!)).toEqual(Buffer.from(s));
+    }
+  });
+});

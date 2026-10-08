@@ -1,4 +1,5 @@
 import { Address, StrKey, hash, nativeToScVal, scValToNative, xdr } from "@stellar/stellar-sdk";
+import { fromBase64Url } from "@/lib/envelope/claim";
 import { type Outcome, held, ok } from "@/lib/outcome";
 import type { KitConfig } from "@/lib/passkey/config";
 
@@ -23,7 +24,7 @@ export function parseClaim(raw: { id?: unknown; to?: unknown; sig?: unknown }): 
   const to = typeof raw.to === "string" ? raw.to.trim() : "";
   if (!(StrKey.isValidEd25519PublicKey(to) || StrKey.isValidContract(to))) return held("That is not a Stellar wallet address.");
   const sigText = typeof raw.sig === "string" ? raw.sig.trim() : "";
-  const sig = /^[0-9a-f]{128}$/i.test(sigText) ? Buffer.from(sigText, "hex") : /^[A-Za-z0-9_-]{86}$/.test(sigText) ? Buffer.from(sigText, "base64url") : null;
+  const sig = /^[0-9a-f]{128}$/i.test(sigText) ? Buffer.from(sigText, "hex") : /^[A-Za-z0-9_-]{86}$/.test(sigText) ? fromBase64Url(sigText) : null;
   if (!sig || sig.length !== 64) return held("The link's signature is missing or malformed.");
   return ok({ id: BigInt(idText), to, sig });
 }

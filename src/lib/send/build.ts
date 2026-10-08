@@ -25,6 +25,12 @@ export type SendArgs = {
 export const DAY = 86_400;
 export const DEFAULT_RETURN_DAYS = 30;
 
+/** The return date, with room on both sides for the minutes between preparing and landing. */
+export function returnAtFor(days: number, nowSeconds: number): number {
+  const at = nowSeconds + days * DAY;
+  return Math.min(Math.max(at, nowSeconds + DAY + 900), nowSeconds + 365 * DAY - 900);
+}
+
 export function sendArgs(a: SendArgs): xdr.ScVal[] {
   return [
     Address.fromString(a.sender).toScVal(),

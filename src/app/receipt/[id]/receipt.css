@@ -1,0 +1,85 @@
+/* The receipt: the envelope as the hero, the facts beside it; print-like. Tokens only. */
+.sw-receipt {
+  display: grid;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+  gap: var(--s-8);
+  align-items: start;
+  padding-top: var(--s-6);
+}
+.sw-receipt-hero {
+  position: sticky;
+  top: var(--s-5);
+}
+.sw-receipt-side {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+.sw-receipt-side .sw-section + .sw-section {
+  margin-top: 0;
+}
+.sw-receipt-foot {
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+  line-height: 1.55;
+  max-width: 60ch;
+}
+.sw-receipt-actions {
+  margin-top: var(--s-5);
+}
+@media (max-width: 900px) {
+  .sw-receipt {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+    padding-top: var(--s-3);
+  }
+  .sw-receipt-hero {
+    position: static;
+  }
+}
+
+/* the link, once, after a send: a sheet that cannot be missed */
+.sw-sent-sheet {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sheet);
+}
+.sw-sent-sheet.is-pending {
+  min-height: 260px;
+  border-color: var(--border);
+}
+.sw-sent-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.sw-sent-link {
+  padding: var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-small);
+  word-break: break-all;
+  user-select: all;
+}
+.sw-sent-fine {
+  font-size: var(--fs-small);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.sw-sent-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+  font-size: var(--fs-small);
+}
+@media print {
+  .sw-nav,
+  .sw-foot,
+  .sw-sent-sheet {
+    display: none;
+  }
+}

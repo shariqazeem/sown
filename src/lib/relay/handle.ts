@@ -143,7 +143,7 @@ export async function trustNeed(deps: RelayDeps, account: string, e: Envelope): 
   if (keep && keep.issuer && e.keepOut > 0n) wanted.push(new Asset(keep.code, keep.issuer));
   if (!acct.value) return ok({ exists: false, assets: wanted });
   const a = acct.value;
-  return ok({ exists: true, assets: wanted.filter((w) => !hasTrustline(a, w.getCode(), w.getIssuer())) });
+  return ok({ exists: true, assets: wanted.filter((w) => !hasTrustline(a, w.getCode(), w.getIssuer() ?? "")) });
 }
 
 async function classicReady(deps: RelayDeps, account: string, e: Envelope): Promise<Outcome<true>> {

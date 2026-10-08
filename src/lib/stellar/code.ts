@@ -12,6 +12,28 @@ import { rpcServer } from "./soroban";
  */
 export type OnChainCode = { readonly wasmHash: string; readonly sha256: string; readonly bytes: number; readonly liveUntilLedger?: number };
 
+/** The wasm hash a contract instance runs, without fetching the code itself. */
+export async function wasmHashOf(net: NetworkConfig, contractId: string): Promise<Outcome<string>> {
+  const server = rpcServer(net);
+  const instanceKey = xdr.LedgerKey.contractData(
+    new xdr.LedgerKeyContractData({
+      contract: Address.fromString(contractId).toScAddress(),
+      key: xdr.ScVal.scvLedgerKeyContractInstance(),
+      durability: xdr.ContractDataDurability.persistent(),
+    }),
+  );
+  try {
+    const inst = await gated(net.rpcUrl, () => server.getLedgerEntries(instanceKey));
+    const entry = inst.entries[0];
+    if (!entry) return held("No contract instance at that address.");
+    const exec = entry.val.contractData().val().instance().executable();
+    if (exec.switch().name !== "contractExecutableWasm") return held("That contract is not a wasm contract.");
+    return ok(Buffer.from(exec.wasmHash()).toString("hex"));
+  } catch (err) {
+    return held(`Could not read the contract instance (${err instanceof Error ? err.message : String(err)}).`);
+  }
+}
+
 export async function codeOf(net: NetworkConfig, contractId: string): Promise<Outcome<OnChainCode>> {
   const server = rpcServer(net);
   const instanceKey = xdr.LedgerKey.contractData(

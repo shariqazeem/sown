@@ -181,3 +181,8 @@ export function keepAssetBySac(network: NetworkName, sac: string): KeepAssetEntr
 export function defaultKeep(network: NetworkName): KeepAssetEntry {
   return CATALOGUE[network][0]!;
 }
+
+/** The asset's line under the units: "US Treasuries, Ondo", or what a stand-in stands in for. */
+export function assetLine(a: { readonly name: string; readonly issuerName: string; readonly standIn: boolean; readonly ticker?: string }): string {
+  return a.standIn ? "XLM, standing in for US Treasuries on testnet" : `${a.name}, ${a.issuerName}`;
+}

@@ -1,0 +1,132 @@
+/**
+ * THE FRONT DOOR, ON PAPER. Headline left, the card right; on a phone the card comes first so
+ * it is within reach of the first screen. Every value is a token.
+ */
+.sw-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+  gap: var(--s-8);
+  align-items: start;
+  padding-top: var(--s-7);
+}
+.sw-hero-words {
+  padding-top: var(--s-6);
+}
+.sw-hero-line {
+  margin-top: var(--s-5);
+  max-width: 46ch;
+  font-size: var(--fs-small);
+  color: var(--ink-faint);
+}
+.sw-hero-net {
+  margin-top: var(--s-5);
+  max-width: 52ch;
+}
+@media (max-width: 900px) {
+  .sw-hero {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+    padding-top: var(--s-4);
+  }
+  .sw-hero-card {
+    order: -1;
+  }
+  .sw-hero-words {
+    padding-top: 0;
+  }
+  .sw-hero .sw-display {
+    font-size: var(--fs-h1);
+  }
+}
+
+/* how it works */
+.sw-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-6);
+  margin-top: var(--s-6);
+}
+.sw-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border-strong);
+}
+.sw-steps .n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+.sw-steps .t {
+  font-weight: 600;
+  line-height: 1.4;
+}
+.sw-steps .d {
+  margin-top: var(--s-2);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+@media (max-width: 900px) {
+  .sw-steps {
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+  }
+}
+
+/* two columns: words, then an object */
+.sw-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+  gap: var(--s-8);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .sw-two {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+}
+.sw-asset-list {
+  display: grid;
+}
+.sw-asset-row {
+  padding: var(--s-4) 0;
+  border-top: 1px solid var(--border);
+}
+.sw-asset-row:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.sw-asset-row .name {
+  font-weight: 600;
+}
+.sw-asset-row .tick {
+  margin-left: var(--s-2);
+  font-size: var(--fs-caption);
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+.sw-asset-row .line {
+  margin-top: var(--s-1);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+.sw-env-slot {
+  display: flex;
+  justify-content: center;
+}
+.sw-front-net {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+}

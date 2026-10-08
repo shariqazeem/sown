@@ -1,0 +1,62 @@
+/* The claim: the envelope, then the one action. Phone first; side by side on a wide screen. */
+.sw-claim-sec {
+  padding-top: var(--s-6);
+}
+.sw-claim {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 420px);
+  gap: var(--s-7);
+  align-items: start;
+  justify-content: center;
+}
+.sw-claim-words {
+  grid-column: 1 / -1;
+  max-width: var(--measure);
+}
+.sw-claim-after {
+  display: grid;
+  gap: var(--s-4);
+  padding-top: var(--s-5);
+}
+.sw-claim-title {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: var(--tracking-h2);
+  font-weight: 600;
+}
+.sw-claim-say {
+  line-height: 1.55;
+}
+.sw-claim-under {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+.sw-claim-alt {
+  justify-self: start;
+  min-height: 44px;
+  font-size: var(--fs-small);
+}
+.sw-claim-facts {
+  display: grid;
+  gap: var(--s-2);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+@media (max-width: 900px) {
+  .sw-claim {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+    justify-items: stretch;
+  }
+  .sw-claim-after {
+    padding-top: 0;
+  }
+  .sw-claim .sw-env,
+  .sw-claim .sw-skel-env {
+    max-width: none;
+  }
+}
