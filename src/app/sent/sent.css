@@ -1,0 +1,49 @@
+/* /sent: the sender's envelopes as rows. Tokens only. */
+.sw-sent,
+.sw-sent-door {
+  display: grid;
+  gap: var(--s-4);
+  max-width: 820px;
+  margin-top: var(--s-6);
+}
+.sw-sent-door {
+  justify-items: start;
+}
+.sw-sent-who {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+}
+.sw-sent-rows {
+  display: grid;
+}
+.sw-sent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-2) var(--s-5);
+}
+.sw-sent-actions a {
+  color: var(--accent);
+}
+.sw-sent-actions .sw-textbtn {
+  min-height: 32px;
+}
+.sw-sent-share {
+  display: grid;
+  gap: var(--s-2);
+  width: 100%;
+  padding: var(--s-3);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.sw-sent-share .mono {
+  word-break: break-all;
+}
+.sw-sent-share .fine {
+  font-size: var(--fs-caption);
+  color: var(--ink);
+}
+.sw-env-line-note a {
+  color: var(--accent);
+}

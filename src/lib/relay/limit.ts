@@ -8,11 +8,13 @@
  *    not deployed again, and a wallet that already trusts an asset is not sponsored again.
  */
 const KEY = Symbol.for("sown.relay.limits");
-type Store = { hits: Map<string, { count: number; resetAt: number }>; busy: Set<string> };
+type Store = { hits: Map<string, { count: number; resetAt: number }>; busy: Set<string>; wallets: Map<string, { count: number; resetAt: number }> };
 
 function store(): Store {
   const g = globalThis as unknown as Record<symbol, Store | undefined>;
-  return (g[KEY] ??= { hits: new Map(), busy: new Set() });
+  const s = (g[KEY] ??= { hits: new Map(), busy: new Set(), wallets: new Map() });
+  s.wallets ??= new Map();
+  return s;
 }
 
 export const WINDOW_MS = 10 * 60_000;
@@ -28,6 +30,21 @@ export function allowIp(ip: string, now: number = Date.now()): boolean {
   }
   if (h.count >= PER_WINDOW) return false;
   h.count += 1;
+  return true;
+}
+
+export const MOVES_PER_DAY = Number(process.env.SOWN_RELAY_MOVES_PER_DAY ?? 5);
+
+/** A passkey wallet's moves paid by Sown: a few a day. */
+export function allowWallet(address: string, now: number = Date.now()): boolean {
+  const { wallets } = store();
+  const w = wallets.get(address);
+  if (!w || w.resetAt <= now) {
+    wallets.set(address, { count: 1, resetAt: now + 86_400_000 });
+    return true;
+  }
+  if (w.count >= MOVES_PER_DAY) return false;
+  w.count += 1;
   return true;
 }
 
@@ -48,4 +65,5 @@ export function resetLimits(): void {
   const s = store();
   s.hits.clear();
   s.busy.clear();
+  s.wallets.clear();
 }

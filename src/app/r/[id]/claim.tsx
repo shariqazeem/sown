@@ -13,7 +13,7 @@ import { type EnvelopeJson, envelopeFromJson } from "@/lib/envelope/types";
 import { returnWords } from "@/lib/envelope/view";
 import { bps, dateUTC, fromRaw, short, stampUTC, units, usdAligned } from "@/lib/format";
 import { rememberClaim, saveWallet, savedWallet } from "@/lib/local";
-import { faceSupport, inAppBrowser, makeWallet } from "@/lib/passkey/client";
+import { faceSupport, inAppBrowser, makeWallet, recordBirth } from "@/lib/passkey/client";
 import { type WalletOption, connectWallet, isPhone, listWallets, signWith } from "@/lib/wallet/kit";
 
 /**
@@ -110,13 +110,14 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ kind: "passkey", id, to: made.value.contractId, sig, func: made.value.func, auth: made.value.auth }),
       });
-      const body = (await res.json()) as { ok: boolean; why?: string; claimTx?: string };
+      const body = (await res.json()) as { ok: boolean; why?: string; claimTx?: string; deployTx?: string; deployLedger?: number };
       if (!body.ok) {
         setPhase("failed");
         setWhy(body.why ?? "The claim did not go through.");
         return;
       }
       saveWallet({ contractId: made.value.contractId, credentialId: made.value.credentialId, at: Math.floor(Date.now() / 1000) });
+      await recordBirth(made.value.credentialId, made.value.contractId, body.deployTx, body.deployLedger);
       rememberClaim(id);
       setMine(made.value.contractId);
       if (body.claimTx) setClaimTx(body.claimTx);

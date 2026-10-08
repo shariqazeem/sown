@@ -1,6 +1,7 @@
 import { Account, Address, Asset, Keypair, Operation, StrKey, TransactionBuilder, rpc, xdr } from "@stellar/stellar-sdk";
 import type { CashAsset, KeepAssetEntry } from "@/lib/assets/catalogue";
-import { readEnvelope } from "@/lib/envelope/read";
+import { readAll, readEnvelope } from "@/lib/envelope/read";
+import { wasmHashOf } from "@/lib/stellar/code";
 import type { Envelope } from "@/lib/envelope/types";
 import { type Outcome, held, ok } from "@/lib/outcome";
 import type { KitConfig } from "@/lib/passkey/config";
@@ -9,8 +10,8 @@ import { gated } from "@/lib/stellar/limiter";
 import type { NetworkConfig } from "@/lib/stellar/network";
 import { INSTRUCTION_LEEWAY, rpcServer, sendAndWait, simulationReason } from "@/lib/stellar/soroban";
 import { checkSponsorBalance } from "./alert";
-import { claimHostFunction, inspectWalletDeploy, parseClaim } from "./inspect";
-import { allowIp, lock, unlock } from "./limit";
+import { claimHostFunction, inspectMove, inspectWalletDeploy, parseClaim } from "./inspect";
+import { allowIp, allowWallet, lock, unlock } from "./limit";
 import { submitFuncAuth } from "./submit";
 import { type TrustNeed, buildTrustlineTx, inspectSignedTrustlineTx } from "./trustlines";
 
@@ -34,7 +35,7 @@ export type RelayDeps = {
   readonly keepAssets: readonly KeepAssetEntry[];
 };
 
-export type ClaimDone = { readonly claimTx: string; readonly ledger: number; readonly to: string; readonly deployTx?: string };
+export type ClaimDone = { readonly claimTx: string; readonly ledger: number; readonly to: string; readonly deployTx?: string; readonly deployLedger?: number };
 
 async function openEnvelope(deps: RelayDeps, id: bigint): Promise<Outcome<Envelope>> {
   const e = await readEnvelope(deps.net, deps.contractId, id);
@@ -109,14 +110,16 @@ export async function relayPasskeyClaim(deps: RelayDeps, body: Record<string, un
     const sim = await simulateClaim(deps, c.value.id, c.value.to, c.value.sig);
     if (!sim.ok) return sim;
     let deployTx: string | undefined;
+    let deployLedger: number | undefined;
     if (!(await contractExists(deps.net, c.value.to))) {
       const made = await submitFuncAuth(deps.net, deps.sponsor, deploy.value.func, deploy.value.auth);
       if (!made.ok) return held(`Your wallet could not be made (${made.why.replace(/ Nothing moved\.$/, "")}). Nothing moved; your envelope is still waiting.`);
       deployTx = made.value.hash;
+      deployLedger = made.value.ledger;
     }
     const done = await submitClaim(deps, c.value.id, c.value.to, c.value.sig);
     if (!done.ok) return held(`Your wallet is ready, but the claim did not go through: ${done.why}`);
-    return ok({ claimTx: done.value.hash, ledger: done.value.ledger, to: c.value.to, deployTx });
+    return ok({ claimTx: done.value.hash, ledger: done.value.ledger, to: c.value.to, deployTx, deployLedger });
   } finally {
     unlock(key);
   }
@@ -186,6 +189,34 @@ export async function relayTrustlines(deps: RelayDeps, body: Record<string, unkn
     if (!landed.ok) {
       return held(/bad_?seq|txBadSeq/i.test(landed.why) ? "The network moved on while you approved. Approve once more." : landed.why);
     }
+    return ok({ tx: landed.value.hash });
+  } finally {
+    unlock(key);
+  }
+}
+
+/**
+ * Shape 4: move what a recipient holds out of their passkey wallet, paid by Sown. Only for a
+ * passkey wallet (its code is the kit's account) that claimed a Sown envelope, a few times a day.
+ * The passkey's own authorisation is what moves the money; the sponsor only pays the network.
+ */
+export async function relayMove(deps: RelayDeps, body: Record<string, unknown>, ip: string): Promise<Outcome<{ readonly tx: string }>> {
+  if (!allowIp(ip)) return held("Too many requests from here. Wait a few minutes; nothing moved.");
+  const tokens = [deps.usdc.sac, ...deps.keepAssets.map((a) => a.sac)];
+  const m = inspectMove(tokens, body.func, body.auth);
+  if (!m.ok) return m;
+  const code = await wasmHashOf(deps.net, m.value.from);
+  if (!code.ok || code.value !== deps.kit.accountWasmHash) return held("Sown's servers pay only for moves out of a wallet made with Face ID.");
+  const all = await readAll(deps.net, deps.contractId, 300);
+  if (!all.ok) return all;
+  if (!all.value.some((e) => e.claimedBy === m.value.from)) return held("Sown's servers pay only for wallets that claimed an envelope.");
+  if (!allowWallet(m.value.from)) return held("This wallet has moved money several times today. Try again tomorrow; nothing moved.");
+  const key = `move:${m.value.from}`;
+  if (!lock(key)) return held("A move from this wallet is already going through.");
+  try {
+    const landed = await submitFuncAuth(deps.net, deps.sponsor, m.value.func, m.value.auth);
+    void checkSponsorBalance(deps.net, deps.sponsor.publicKey());
+    if (!landed.ok) return landed;
     return ok({ tx: landed.value.hash });
   } finally {
     unlock(key);

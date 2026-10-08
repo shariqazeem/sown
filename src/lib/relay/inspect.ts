@@ -109,3 +109,54 @@ export function describeHostFunction(func: xdr.HostFunction): string {
   }
   return func.switch().name;
 }
+
+export type MoveInspection = {
+  readonly func: xdr.HostFunction;
+  readonly auth: xdr.SorobanAuthorizationEntry[];
+  readonly token: string;
+  readonly from: string;
+  readonly to: string;
+  readonly amount: bigint;
+};
+
+/**
+ * Shape 4: a recipient moves what they hold out of their passkey wallet. Exactly one token
+ * `transfer(from, to, amount)` on one of Sown's own assets (USDC or a keep asset), from a C-address,
+ * authorised by one entry for `from` covering exactly that call and nothing beneath it. Whether
+ * `from` is a passkey wallet that claimed a Sown envelope is checked against the chain by the
+ * handler; this checks only the bytes.
+ */
+export function inspectMove(tokens: readonly string[], funcB64: unknown, authB64: unknown): Outcome<MoveInspection> {
+  const refuse = (why: string) => held<MoveInspection>(`Sown's servers will not pay for this move: ${why}.`);
+  if (typeof funcB64 !== "string" || !Array.isArray(authB64) || !authB64.every((a) => typeof a === "string")) return refuse("the request is not a transfer");
+  let func: xdr.HostFunction;
+  let auth: xdr.SorobanAuthorizationEntry[];
+  try {
+    func = xdr.HostFunction.fromXDR(funcB64, "base64");
+    auth = (authB64 as string[]).map((a) => xdr.SorobanAuthorizationEntry.fromXDR(a, "base64"));
+  } catch {
+    return refuse("it could not be read");
+  }
+  if (func.switch().name !== "hostFunctionTypeInvokeContract") return refuse("it is not a contract call");
+  const call = func.invokeContract();
+  const token = Address.fromScAddress(call.contractAddress()).toString();
+  if (!tokens.includes(token)) return refuse("it moves something Sown did not send");
+  if (call.functionName().toString() !== "transfer") return refuse("it is not a transfer");
+  const args = call.args();
+  if (args.length !== 3 || args[0]!.switch().name !== "scvAddress" || args[1]!.switch().name !== "scvAddress" || args[2]!.switch().name !== "scvI128") return refuse("its arguments are not a transfer's");
+  const from = Address.fromScAddress(args[0]!.address()).toString();
+  const to = Address.fromScAddress(args[1]!.address()).toString();
+  const amount = BigInt(scValToNative(args[2]!) as bigint);
+  if (!from.startsWith("C")) return refuse("it is not from a passkey wallet");
+  if (amount <= 0n) return refuse("it moves nothing");
+  if (from === to) return refuse("it moves to itself");
+  if (auth.length !== 1) return refuse("it carries other authorisations");
+  const entry = auth[0]!;
+  if (entry.credentials().switch().name !== "sorobanCredentialsAddress" || Address.fromScAddress(entry.credentials().address().address()).toString() !== from) return refuse("it is not authorised by the wallet it moves from");
+  const root = entry.rootInvocation();
+  if (root.subInvocations().length !== 0) return refuse("it authorises more than the transfer");
+  const fn = root.function();
+  if (fn.switch().name !== "sorobanAuthorizedFunctionTypeContractFn") return refuse("it authorises something else");
+  if (!Buffer.from(fn.contractFn().toXDR()).equals(Buffer.from(call.toXDR()))) return refuse("its authorisation is for another call");
+  return ok({ func, auth, token, from, to, amount });
+}
