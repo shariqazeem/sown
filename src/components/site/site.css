@@ -262,6 +262,8 @@
 /* a ruled section with a label */
 .sw-section {
   display: grid;
+  /* Beside a taller neighbour, the label stays one line tall and the rows start under it. */
+  align-content: start;
   gap: var(--s-4);
   padding-top: var(--s-4);
   border-top: 1px solid var(--line-strong);
@@ -359,6 +361,22 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+/* A link or a text button standing on its own is a target a finger can hit: 44 px tall,
+   without moving the text around it. */
+.sw-link,
+.sw-textbtn {
+  position: relative;
+}
+.sw-link::after,
+.sw-textbtn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  left: -4px;
+  height: 44px;
+  transform: translateY(-50%);
+}
 .sw-actions {
   display: flex;
   flex-wrap: wrap;
@@ -393,7 +411,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--s-3) var(--s-5);
+  gap: 0 var(--s-5);
   width: 100%;
   max-width: 1120px;
   margin: var(--s-9) auto 0;
@@ -404,6 +422,11 @@
 }
 .sw-foot .spacer {
   flex: 1;
+}
+.sw-foot a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 .sw-foot a:hover {
   color: var(--accent);

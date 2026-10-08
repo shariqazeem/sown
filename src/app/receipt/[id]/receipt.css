@@ -4,6 +4,9 @@
   grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
   gap: var(--s-8);
   align-items: start;
+}
+/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
+.sw-sec.sw-receipt {
   padding-top: var(--s-6);
 }
 .sw-receipt-hero {
@@ -31,6 +34,8 @@
   .sw-receipt {
     grid-template-columns: 1fr;
     gap: var(--s-6);
+  }
+  .sw-sec.sw-receipt {
     padding-top: var(--s-3);
   }
   .sw-receipt-hero {

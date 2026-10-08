@@ -33,6 +33,8 @@ export function WalletSheet({
     if (!d) return;
     if (open && !d.open) {
       d.showModal();
+      d.querySelector<HTMLElement>(".sw-sheet-title")?.focus();
+      d.scrollTop = 0;
       void listWallets(passphrase).then(setWallets);
     } else if (!open && d.open) d.close();
   }, [open, passphrase]);
@@ -41,7 +43,9 @@ export function WalletSheet({
   return (
     <dialog ref={ref} className="sw-sheet" aria-label={title} onClose={onClose} onCancel={onClose}>
       <div className="sw-sheet-head">
-        <p className="sw-sheet-title">{title}</p>
+        <p className="sw-sheet-title" tabIndex={-1}>
+          {title}
+        </p>
         <button type="button" className="sw-sheet-close" onClick={onClose} aria-label="Close">
           <X size={18} strokeWidth={2} aria-hidden />
         </button>

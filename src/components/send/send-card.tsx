@@ -148,8 +148,13 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
   useEffect(() => {
     const d = dialog.current;
     if (!d) return;
-    if (sheet && !d.open) d.showModal();
-    else if (!sheet && d.open) d.close();
+    if (sheet && !d.open) {
+      d.showModal();
+      // Start at the top, on the title: the browser would otherwise focus the first control it
+      // finds (the close button is disabled while preparing) and scroll the outcome out of view.
+      d.querySelector<HTMLElement>(".sw-sheet-title")?.focus();
+      d.scrollTop = 0;
+    } else if (!sheet && d.open) d.close();
   }, [sheet]);
 
   const prepare = useCallback(
@@ -295,11 +300,18 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
           </label>
         </div>
         {holdings ? (
-          <p className="sw-send-held">
+          <p className={`sw-send-held${fits ? "" : " is-short"}`}>
             {holdings.usdc.trusted === false
               ? "This wallet cannot hold USDC yet. Add USDC to it in your wallet first."
-              : `This wallet holds ${usdAligned(fromRaw(holdings.usdc.balanceRaw))} of USDC${spendable !== null && spendable < 10_000_000n ? ". Add USDC to it, then come back." : "."}`}
+              : spendable !== null && spendable < 10_000_000n
+                ? `This wallet holds ${usdAligned(fromRaw(holdings.usdc.balanceRaw))} of USDC. Add USDC to it, then come back.`
+                : fits
+                  ? `This wallet holds ${usdAligned(fromRaw(holdings.usdc.balanceRaw))} of USDC.`
+                  : `This wallet holds ${usdAligned(fromRaw(holdings.usdc.balanceRaw))} of USDC, less than ${usdLabel}. Choose a smaller amount.`}
           </p>
+        ) : account ? (
+          // Holds the line's place while the wallet is read, so nothing below it jumps.
+          <p className="sw-send-held is-reading">Reading what this wallet holds…</p>
         ) : null}
       </fieldset>
 
@@ -421,7 +433,9 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
         }}
       >
         <div className="sw-sheet-head">
-          <p className="sw-sheet-title">{sheet === "wallets" ? "Choose your wallet" : `Send ${usdLabel}`}</p>
+          <p className="sw-sheet-title" tabIndex={-1}>
+            {sheet === "wallets" ? "Choose your wallet" : `Send ${usdLabel}`}
+          </p>
           <button type="button" className="sw-sheet-close" onClick={() => setSheet(null)} aria-label="Close" disabled={busy}>
             <X size={18} strokeWidth={2} aria-hidden />
           </button>

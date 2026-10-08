@@ -11,6 +11,7 @@ export const TEAM: ReadonlyMap<string, string> = new Map([
   ["GBBF5IISOQAC5CY77KT7SSMQ6CQFMQXROUDKTXAKSHEL4AETJ3OVGSA5", "Sown's servers, testnet"],
   ["GBL2HPXJUXNQ4GAJFLLKF5ISERWN6GQCDHFI3GMTSYZQMUWIVJ2SR6P5", "the testnet battery's sender"],
   ["GCNSJWWL3CMKYKGBOBDO5P7UBOJH6YMQ3ZQENZFVJDKTWMMZEZTJIZLA", "the testnet battery's recipient"],
+  ["GD7CFMUBH75IIFCHAXTM3BGTVYD3DVBBRLYTBYCTCQ3CQICHCG33MM7P", "the build agent's test wallet in a browser, testnet"],
   // Mainnet: the founder's Freighter, the admin and the sponsor go here before the first send.
 ]);
 

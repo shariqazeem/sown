@@ -83,7 +83,28 @@ Face ID wallet, 15 s) back from the chain correctly.
 
 ### The app (`npm run dev`, port 3100), verified in a browser against testnet
 
-Run against the first contract on 8 Oct; the code paths are unchanged since.
+- **On the redeployed contract (9 Oct), at 375 px**: $5 sent from the test wallet keeping 10%
+  (the card, the confirm sheet, the receipt with the link), envelope 9:
+  `d0e66066c78b5c91615e2a22145c9c2371f92a2cac892fc342553d831459271c`; claimed from the claim page
+  into a Stellar wallet: `2354e843c3f7092d901a7056b6143e0e291a0009915a85516e482b18072e0e0f`.
+- **Every state at 375 px and 1440 px** (9 Oct): the send card (signed out, reading the wallet,
+  short of USDC, quoting, quoted), the confirm sheet (preparing, ready, sending), the receipt
+  with the link, the claim page (opening, open, claiming, claimed into a Stellar wallet, returned,
+  incomplete link, no such envelope), `/receipt` (waiting, claimed, returned), `/mine` (signed
+  out, holding), `/sent` (loading, a list), `/assets`, `/proof`, `/plan`, `/docs`, the menu, and
+  the not-found page. No page scrolls sideways at 375 px; every standalone target is 44 px.
+  Fixed on the way: the hero and three other sections lost their own top padding to the
+  section's; the confirm sheet opened scrolled past its outcome (the browser focused the first
+  enabled control); a short wallet disabled the button without saying why; the live line jumped
+  when the local money arrived; the amount field drew two focus rings; footer links and text
+  buttons were 21 px tall; a classic claim showed Face ID's icon and words, and "Try again" after
+  a failed classic claim started a Face ID claim; a stretched `/proof` section grew its label;
+  `/mine` printed the dollars as large as the keep; the receipt, the claim states and the
+  returned state had no page heading; `/proof` said a word the surfaces never say (the words test
+  now reads JSX text beside expressions too, and caught it); the test wallet in this browser is
+  declared as team.
+
+Run against the first contract on 8 Oct; the code paths are unchanged since:
 
 - **Send from the test wallet** (a Wallets Kit module, testnet only, behind
   `NEXT_PUBLIC_SOWN_TEST_WALLET=1`): the card, the confirm sheet (simulated fee, the least it can
@@ -106,7 +127,7 @@ Run against the first contract on 8 Oct; the code paths are unchanged since.
 
 ### Tests
 
-- **Offline suite**: 127 Vitest tests in 19 files, plus lint and typecheck, all clean (4 more skip:
+- **Offline suite**: 128 Vitest tests in 19 files, plus lint and typecheck, all clean (4 more skip:
   the live and mainnet-only ones). Among them: the relay's inspection against real recorded
   transactions and every near-miss; the claim message's bytes; the send arithmetic; the envelope
   decoder on real `get()` results; **two lists that drift**: every catalogue asset's contract
@@ -138,9 +159,9 @@ Run against the first contract on 8 Oct; the code paths are unchanged since.
 
 ## Next, in build-plan order
 
-1. **Every state at 375 px and 1440 px**, on the redeployed contract, which also re-runs the browser
-   paths above against it.
-2. **The README's GIF**: from the founder's film; a placeholder comment marks the spot.
+Everything in Day 3's code part is done. What remains needs the founder (below): the domain,
+mainnet funds, the deploy, the phone, the film. The README's GIF comes from the film; a
+placeholder comment marks the spot.
 
 ## Decisions (recorded in CLAUDE.md "Known drift")
 

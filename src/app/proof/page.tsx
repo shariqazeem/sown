@@ -112,7 +112,7 @@ export default async function ProofPage() {
                     <a href={accountUrl(p.net, p.servers.value.address)} className="mono">
                       {short(p.servers.value.address)}
                     </a>{" "}
-                    pay the network for recipients: their wallets, their claims, and the reserves a classic wallet needs. They hold {p.servers.value.xlm.toLocaleString("en-US", { maximumFractionDigits: 2 })} XLM, have paid{" "}
+                    pay the network for recipients: their wallets, their claims, and the XLM a classic wallet must set aside to hold them. They hold {p.servers.value.xlm.toLocaleString("en-US", { maximumFractionDigits: 2 })} XLM, have paid{" "}
                     {(Number(p.servers.value.feesPaidStroops) / 1e7).toLocaleString("en-US", { maximumFractionDigits: 4 })} XLM in fees over {p.servers.value.txs}
                     {p.servers.value.capped ? "+" : ""} transactions, and have set aside {p.servers.value.reservesHeld} XLM so classic wallets can hold what they claimed ({p.servers.value.sponsoring} entries; it comes back when a wallet lets go of one). They sign nothing they have not checked, and can move no envelope.
                   </>

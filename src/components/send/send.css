@@ -70,10 +70,21 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* The chip draws the focus ring; a second one on the field inside it would double it. */
+.sw-site .sw-send-chip.is-other input:focus-visible {
+  outline: none;
+}
 .sw-send-held,
 .sw-send-small {
   font-size: var(--fs-small);
   color: var(--ink-muted);
+}
+/* Not red: red is for money outcomes only. Full ink is enough to be read before the button. */
+.sw-send-held.is-short {
+  color: var(--ink);
+}
+.sw-send-held.is-reading {
+  color: var(--ink-faint);
 }
 .sw-send-math {
   font-size: var(--fs-small);
@@ -87,6 +98,12 @@
 .sw-send-live {
   min-height: 3.3em;
   line-height: 1.6;
+}
+@media (max-width: 520px) {
+  /* three lines on a phone once local money joins the dollars */
+  .sw-send-live {
+    min-height: 4.9em;
+  }
 }
 .sw-send-live strong {
   font-size: 1.15em;
@@ -155,6 +172,10 @@
   flex: 1;
   font-size: 1.125rem;
   font-weight: 600;
+}
+/* Focused only so a sheet opens at its top; it is not a control. */
+.sw-sheet-title:focus {
+  outline: none;
 }
 .sw-sheet-close {
   display: inline-flex;

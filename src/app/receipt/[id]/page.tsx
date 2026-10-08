@@ -89,6 +89,9 @@ export default async function ReceiptPage({ params, searchParams }: { params: Pr
   return (
     <SiteFrame send={!(sp.sent === "1" && e.state === "open")}>
       <section className="sw-sec sw-receipt">
+        <h1 className="sw-sr">
+          Envelope {id}: {usdAligned(fromRaw(sentTotal(e)))} sent, {e.keepIn > 0n ? `${bps(e.keepBps)} kept as ${units(e.keepOut)} ${ticker}` : "nothing kept"}, {e.state === "open" ? "waiting" : e.state}
+        </h1>
         <div className="sw-receipt-hero">
           <Envelope
             kicker={head.kicker}

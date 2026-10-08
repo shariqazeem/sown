@@ -189,7 +189,7 @@ export function Mine({ usdcSac, assets, explorer, testnet }: { usdcSac: string; 
               return (
                 <div key={k.key} className="sw-hold">
                   <p className="what">{row?.standIn ? "Kept, as the testnet stand-in" : `Kept as ${k.name}`}</p>
-                  <p className="amount">
+                  <p className="amount is-keep">
                     {units(k.balanceRaw)} <span className="sym">{k.ticker}</span>
                   </p>
                   <p className="value">

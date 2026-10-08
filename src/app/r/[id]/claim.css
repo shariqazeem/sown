@@ -1,5 +1,6 @@
 /* The claim: the envelope, then the one action. Phone first; side by side on a wide screen. */
-.sw-claim-sec {
+/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
+.sw-sec.sw-claim-sec {
   padding-top: var(--s-6);
 }
 .sw-claim {

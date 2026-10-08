@@ -55,7 +55,12 @@ function surfaceText(src: string): string[] {
     if (CODE_LITERALS.has(s) || /^(\/|https?:|#|\.|@|[a-z-]+\/)/.test(s) || /^[\w-]+(\s[\w-]+)*$/.test(s) && /-/.test(s)) continue;
     out.push(s);
   }
-  for (const m of code.matchAll(/>([^<>{}]*[A-Za-z][^<>{}]*)</g)) out.push(m[1]!);
+  // JSX text: any run between a tag or an expression and the next one. A run that reads as code
+  // (a declaration, an arrow, a comparison) is code between two braces, not words.
+  for (const m of code.matchAll(/[>}]([^<>{}]*[A-Za-z][^<>{}]*)[<{]/g)) {
+    if (/\b(const|let|return|await|import|export|function|if|else)\b|=>|===|!==|\?\?|&&|\|\|/.test(m[1]!)) continue;
+    out.push(m[1]!);
+  }
   return out;
 }
 
@@ -116,5 +121,10 @@ describe("the reader of surfaces", () => {
     expect(t).not.toContain("keeper");
     expect(t).not.toContain("crank");
     expect(t).not.toContain("tokens.css");
+  });
+  it("finds words in JSX text that sits beside an expression", () => {
+    const t = surfaceText(`return <p>They hold {n} XLM and the reserves {x} it needs.</p>;`).join("|");
+    expect(t).toContain("XLM and the reserves");
+    expect(t).toContain("it needs.");
   });
 });

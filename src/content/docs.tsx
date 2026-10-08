@@ -115,9 +115,9 @@ export const DOCS: readonly Doc[] = [
           months; measured on mainnet&apos;s rates on 8 October 2026, that is about 0.2 XLM. The confirm sheet shows the fee from the transaction&apos;s own simulation before the wallet opens.
         </p>
         <p>
-          <strong>The claim</strong> is paid by Sown&apos;s servers: the recipient&apos;s new wallet, the claim itself, and, for a classic wallet, the half XLM per asset it must set aside to hold
-          USDC and the keep. That deposit comes back when the wallet lets go of the asset. Sown&apos;s servers check each request against an exact shape before they sign, pay for an
-          envelope once, and cannot move an envelope.
+          <strong>The claim</strong> is paid by Sown&apos;s servers: the recipient&apos;s new wallet (about 0.2 XLM on mainnet), the claim itself (about 0.09 XLM), and, for a classic
+          wallet, the half XLM per asset it must set aside to hold USDC and the keep, plus the one XLM every Stellar account keeps when the wallet is brand new. Those deposits come back
+          when the wallet lets go of them. Sown&apos;s servers check each request against an exact shape before they sign, pay for an envelope once, and cannot move an envelope.
         </p>
         <p>
           <strong>Moving out</strong> of a wallet made with Face ID is paid by Sown&apos;s servers too, a few times a day. The <Link href="/proof">proof page</Link> shows what they hold and

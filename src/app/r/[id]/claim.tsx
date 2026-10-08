@@ -38,6 +38,9 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   const [sheet, setSheet] = useState(false);
   // Which wallet this page just claimed into: a passkey wallet opens at /mine, a classic one in its own app.
   const [into, setInto] = useState<{ kind: "passkey" | "classic"; address: string } | null>(null);
+  // The path in progress (or that just failed): "Try again" retries it, and a classic claim never
+  // wears Face ID's icon or words.
+  const [via, setVia] = useState<{ kind: "passkey" } | { kind: "classic"; wallet: WalletOption; address: string } | null>(null);
   const [claimTx, setClaimTx] = useState<string | null>("envelope" in read ? read.claimTx : null);
 
   useEffect(() => {
@@ -90,6 +93,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   const claimPasskey = async () => {
     if (!secret) return;
     setWhy(null);
+    setVia({ kind: "passkey" });
     setPhase("making");
     const made = await makeWallet(`Sown envelope ${id}`);
     if (!made.ok) {
@@ -140,6 +144,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
     }
     setSheet(false);
     const account = c.value.address;
+    setVia({ kind: "classic", wallet: w, address: account });
     setPhase("preparing");
     try {
       const post = (body: Record<string, unknown>) =>
@@ -213,6 +218,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
           printing={phase === "done"}
         />
         <div className="sw-claim-after">
+          <h1 className="sw-sr">Envelope {id}, claimed</h1>
           {passkeyHere ? (
             <>
               <Link href="/mine" className="sw-btn is-primary is-block">
@@ -261,7 +267,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
           when={returnWords(e)}
         />
         <div className="sw-claim-after">
-          <p className="sw-claim-say">{returnWords(e)}</p>
+          <h1 className="sw-claim-title">{returnWords(e)}</h1>
           <p className="sw-claim-under">Ask them to send again. A new send makes a new link.</p>
         </div>
       </div>
@@ -303,14 +309,33 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
           </>
         ) : (
           <>
-            <button type="button" className="sw-btn is-primary is-block" onClick={() => void claimPasskey()} disabled={busy}>
-              <Fingerprint size={18} strokeWidth={2} aria-hidden />
+            <h1 className="sw-sr">Your envelope, waiting for you to claim it</h1>
+            <button type="button" className="sw-btn is-primary is-block" onClick={() => void (via?.kind === "classic" ? claimClassic(via.wallet) : claimPasskey())} disabled={busy}>
+              {via?.kind === "classic" ? null : <Fingerprint size={18} strokeWidth={2} aria-hidden />}
               {phase === "making" ? "Making your wallet…" : phase === "claiming" ? "Claiming…" : phase === "preparing" ? "Preparing your wallet…" : phase === "approving" ? "Approve in your wallet…" : phase === "failed" ? "Try again" : "Claim with Face ID"}
             </button>
-            <p className="sw-claim-under">Your face or fingerprint makes a wallet that only you control. No app, no password, nothing to pay. Sown&apos;s servers pay the network.</p>
-            <button type="button" className="sw-textbtn sw-claim-alt" onClick={openWallets} disabled={busy}>
-              I already have a Stellar wallet
-            </button>
+            <p className="sw-claim-under">
+              {via?.kind === "classic"
+                ? `Into your Stellar wallet, ${short(via.address)}. Sown's servers pay the network.`
+                : "Your face or fingerprint makes a wallet that only you control. No app, no password, nothing to pay. Sown's servers pay the network."}
+            </p>
+            {via?.kind === "classic" && phase === "failed" ? (
+              <button
+                type="button"
+                className="sw-textbtn sw-claim-alt"
+                onClick={() => {
+                  setVia(null);
+                  setWhy(null);
+                  setPhase("idle");
+                }}
+              >
+                Claim with Face ID instead
+              </button>
+            ) : (
+              <button type="button" className="sw-textbtn sw-claim-alt" onClick={openWallets} disabled={busy}>
+                I already have a Stellar wallet
+              </button>
+            )}
           </>
         )}
         {why ? (

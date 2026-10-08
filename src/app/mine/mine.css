@@ -49,6 +49,10 @@
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
+/* The keep is the largest figure on any page it appears on (DESIGN, "Holding the line"). */
+.sw-hold .amount.is-keep {
+  font-size: calc(var(--fs-units-sm) * 1.35);
+}
 .sw-hold .amount .sym {
   font-size: 0.5em;
   font-weight: 500;

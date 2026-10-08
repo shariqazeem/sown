@@ -7,6 +7,9 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
   gap: var(--s-8);
   align-items: start;
+}
+/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
+.sw-sec.sw-hero {
   padding-top: var(--s-7);
 }
 .sw-hero-words {
@@ -26,6 +29,8 @@
   .sw-hero {
     grid-template-columns: 1fr;
     gap: var(--s-6);
+  }
+  .sw-sec.sw-hero {
     padding-top: var(--s-4);
   }
   .sw-hero-card {
@@ -107,9 +112,11 @@
 }
 .sw-asset-row .name {
   font-weight: 600;
+  line-height: 1.4;
 }
+/* The ticker and issuer wrap as one piece on a phone, never word by word. */
 .sw-asset-row .tick {
-  margin-left: var(--s-2);
+  display: inline-block;
   font-size: var(--fs-caption);
   font-weight: 400;
   color: var(--ink-faint);
@@ -124,7 +131,7 @@
   display: flex;
   justify-content: center;
 }
-.sw-front-net {
+.sw-sec.sw-front-net {
   padding-top: 0;
   padding-bottom: 0;
   font-size: var(--fs-caption);
