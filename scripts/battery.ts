@@ -15,6 +15,7 @@
  * Writes deployments/testnet-battery.json with every transaction hash.
  */
 import { writeFileSync } from "node:fs";
+import http from "node:http";
 import { join } from "node:path";
 import { Address, Asset, BASE_FEE, Keypair, Operation, TransactionBuilder, nativeToScVal, rpc, scValToNative } from "@stellar/stellar-sdk";
 import { MemoryStorage, SmartAccountKit } from "smart-account-kit";
@@ -24,7 +25,7 @@ import { claimKey, newSecret, signClaim } from "@/lib/envelope/claim";
 import { readEnvelope } from "@/lib/envelope/read";
 import { KIT } from "@/lib/passkey/config";
 import { quote } from "@/lib/quote";
-import { type RelayDeps, relayClaim, relayPasskeyClaim, relayTrustlines } from "@/lib/relay/handle";
+import { type RelayDeps, relayClaim, relayMove, relayPasskeyClaim, relayTrustlines } from "@/lib/relay/handle";
 import { resetLimits } from "@/lib/relay/limit";
 import { DAY, prepareSend } from "@/lib/send/build";
 import { baseNetwork } from "@/lib/stellar/network";
@@ -134,17 +135,28 @@ async function main() {
   // 3. A claim into a passkey wallet made on the spot.
   const b = await send(sender, 5, 1_000);
   step("send 5 USDC, keep 10%", { id: b.id, tx: b.hash, seconds: b.seconds.toFixed(1) });
+  // The kit's relayer endpoint, exactly as /api/relay/kit runs it: shape 4 and nothing else.
+  const kitRelay = http.createServer(async (req, res) => {
+    let raw = "";
+    for await (const c of req) raw += c;
+    const r = await relayMove(deps, JSON.parse(raw) as Record<string, unknown>, "battery");
+    res.setHeader("content-type", "application/json");
+    res.end(JSON.stringify(r.ok ? { success: true, data: { hash: r.value.tx, status: "SUCCESS" } } : { success: false, error: r.why }));
+  });
+  await new Promise<void>((r) => kitRelay.listen(0, "127.0.0.1", () => r()));
+  const storage = new MemoryStorage();
   const passkey = softPasskey("http://localhost:3100", "localhost");
   const kit = new SmartAccountKit({
     rpcUrl: net.rpcUrl,
     networkPassphrase: net.passphrase,
     accountWasmHash: KIT.testnet.accountWasmHash,
     webauthnVerifierAddress: KIT.testnet.webauthnVerifier,
-    storage: new MemoryStorage(),
+    storage,
     rpId: "localhost",
     rpName: "Sown",
     allowedOrigins: [passkey.origin],
     webAuthn: passkey.webAuthn as never,
+    relayerUrl: `http://127.0.0.1:${(kitRelay.address() as { port: number }).port}`,
   });
   const t3 = Date.now();
   const made = await kit.createWallet("Sown", "battery", { autoSubmit: false });
@@ -170,6 +182,26 @@ async function main() {
   expect(passkey.prompts() === 1, "one passkey prompt");
   expect(eb.ok && eb.value.state === "claimed" && eb.value.claimedBy === made.contractId, "the envelope names the passkey wallet");
   expect(eb.ok && wUsdc === eb.value.cash && wXlm === eb.value.keepOut, "the passkey wallet holds both parts");
+
+  // 3b. Move out of that wallet: reconnect from the stored birth (no prompt), one prompt to sign.
+  await storage.update(made.credentialId, {
+    contractId: made.contractId,
+    deploymentStatus: "deployed",
+    deploymentTransactionHash: viaPasskey.value.deployTx,
+    creationTransactionHash: viaPasskey.value.deployTx,
+    creationLedger: viaPasskey.value.deployLedger,
+  });
+  await kit.connectWallet({ credentialId: made.credentialId, contractId: made.contractId });
+  const promptsBefore = passkey.prompts();
+  const target = keypair("sown-recipient").publicKey();
+  const t3b = Date.now();
+  const moved = await kit.transfer(keep.sac, target, 1);
+  if (!moved.success) throw new Error(`move: ${moved.error.message}`);
+  const wXlmAfter = await balanceOf(keep.sac, made.contractId);
+  step("moved 1 XLM out of the Face ID wallet, paid by Sown's servers", { tx: moved.hash, seconds: ((Date.now() - t3b) / 1000).toFixed(1), prompts: passkey.prompts() - promptsBefore, left: u7(wXlmAfter) });
+  expect(passkey.prompts() - promptsBefore === 1, "one prompt to move, none to reconnect");
+  expect(wXlmAfter === wXlm - 10_000_000n, "exactly 1 XLM left the wallet");
+  kitRelay.close();
 
   // 4. Take it back; a stranger cannot before the date.
   const c = await send(sender, 2, 1_000);
