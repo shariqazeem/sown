@@ -188,3 +188,84 @@ Liquidity figures are the API's `liquidity_usd` divided by 10⁷.
 3. Whether OpenZeppelin Channels mainnet keys carry a usable fee limit for a demo. Not needed: Sown's own sponsor account pays on mainnet.
 4. The RedStone USDY/USD feed address, if the receipt is to show a "vs oracle" line. Optional.
 5. The hackathon's submission form fields and cutoff time. The founder must read them on the platform.
+
+## 13. Day 0, measured (2026-10-08, by the build agent)
+
+Every figure here was produced by a script in this repository and can be re-run.
+
+### Smoke 1 — the Smart Account Kit 0.8.0 with stellar-sdk 16.3.1 on Protocol 29 (`scripts/smoke/kit-testnet.ts`)
+
+| Step | Result |
+| --- | --- |
+| `createWallet` with a software P-256 passkey, deploy posted as `{ func, auth }` to an in-process relay that pays with Sown's testnet sponsor | landed in 8.8 s, wallet `CDBTEAVSV6F2XWDVWZ4IYOERAZHXDYUXXOALXTRFZOKLMVRF7A5JSCPY`, tx `e02290cbb468639345e5b7b3071707f002bca9da09f2325a2cee3867078db5c6` |
+| sponsor funds the wallet with 5 XLM | tx `4f655b4a209e55cf1078ce7d12d7d963508055aeab38befb6e881fa7a997d935` |
+| `kit.transfer(XLM, G…, 1)` signed by the passkey, submitted by the relay | landed in 10.0 s, tx `82e48f0ec931eeedfcbd6fc49b93b912465c9a8a003b636b360b4cffaae91777`; the recipient's balance moved by exactly 1 XLM |
+| passkey prompts | 2 (one registration, one assertion); no XDR or auth error |
+
+**Verdict: the kit works on Protocol 29. Passkeys are not a cut candidate.** The deploy the kit
+builds (decoded from the transaction above): `CreateContractV2` from the shared deployer
+`GAAH4OT…WQ4N`, account wasm `1b5f4534…785a`, constructor args `[[External(CC7EKIHQ…OM3F,
+65-byte P-256 key ‖ credential id)], {}]`, one auth entry by the deployer for that same creation.
+`src/lib/relay/inspect.ts` accepts exactly that and nothing else.
+
+### Smoke 2 — Aquarius from a G-account, and the auth tree (`scripts/smoke/aquarius-testnet.ts`)
+
+Testnet's USDC/XLM pool is `CD3LFMMLBQ6RBJUD3Z2LFDFE6544WDRMWHEZYPI5YDVESYRSO2TT32BX`
+(constant product, 0.30%, tokens `[0] USDC CAZRY5GS…6LF5` (Aquarius's test USDC, issuer
+`GAHPYWLK…LAGER`), `[1] XLM CDLZFC3S…CYSC`). Circle's testnet USDC has no Aquarius pool against
+XLM, so Sown's testnet runs on Aquarius's test USDC.
+
+| Step | Result |
+| --- | --- |
+| trustline to `USDC:GAHPYWLK…` | `cf16e21969dd3d5ae0916879984cefc50247566167ec9f73290052d117d42ac5` |
+| 3,000 XLM → 33.96 USDC | `97d726ae4939ca9b9ab39cce738b48dff1ec0ddc3e24db1b69d1ff250fb022f7` |
+| `estimate_swap(0, 1, 1 USDC)` | 89.7003417 XLM |
+| 1 USDC → 89.7003417 XLM (min 88.8033382) | `7aa466e69696f28196c91cafac4d0194f4de8ef317cc0b1f1656beeef56046fb` |
+
+The auth tree the simulation records for `swap(user = G-account, 0, 1, 10000000, 888033382)`:
+
+```text
+CD3LFMML….swap(user, 0, 1, 10000000, 888033382)        credentials: source account
+  CAZRY5GS….transfer(user, CD3LFMML…, 10000000)
+```
+
+**The pool pulls with `transfer(user, pool, in_amount)`, not `transfer_from`.** So when `user`
+is the Sown contract, `swap`'s own `user.require_auth()` is satisfied by direct invocation and
+the contract pre-authorises exactly `usdc.transfer(contract, pool, keep_in)` with
+`authorize_as_current_contract` (the comment at the top of `contracts/sown/src/lib.rs`). The
+testnet battery's sends confirm it on chain.
+
+**Instruction headroom is required.** The first USDC→XLM swap was simulated at 3,377,838
+instructions and spent 3,378,198 on the ledger seconds later: `invokeHostFunctionResourceLimitExceeded`
+(tx `6bc95adad78caa31989192f24c8f472cbaade7714d5b08a5641a2b3f961d1727`). Every Sown simulation
+that will be submitted now asks the RPC for 1,000,000 extra instructions (`INSTRUCTION_LEEWAY`),
+about 2,500 stroops.
+
+### Smoke 3 — the three mainnet pools by simulation (`scripts/smoke/mainnet-pools.ts`)
+
+Mainnet ledger 64,833,322, protocol 29, 2026-10-08 09:40 UTC. In all three pools USDC is index 1
+and the keep asset index 0, so `set_asset(asset, pool, 1, 0, true)`.
+
+| Pool | Type, fee | Reserves | 1 USDC → | 10 USDC → | 100 USDC → | Implied price |
+| --- | --- | --- | --- | --- | --- | --- |
+| USDY/USDC `CAFHLHGZ…HUSM` | constant product, 0.10% | 893,905.50 USDY / 1,013,371.94 USDC | 0.8812270 USDY | 8.8121918 | 88.1141007 | $1.134781 → $1.134892 |
+| USTRY/USDC `CCX2TYR4…2MIA` | constant product, 0.30% | 1,018,726.88 USTRY / 1,095,689.99 USDC | 0.9269681 USTRY | 9.2696060 | 92.6884700 | $1.078786 → $1.078883 |
+| CETES/USDC `CCKGQSQG…L2AD` | constant product, 0.10% | 17,685,067.53 CETES / 1,163,145.63 USDC | 15.1892994 CETES | 151.8918206 | 1,518.8008056 | $0.065836 → $0.065841 |
+
+### What a send and a claim cost (`deployments/testnet-battery.json`, `scripts/lib/rent-rate.ts`)
+
+| Transaction | Fee charged (testnet) | Of which rent |
+| --- | --- | --- |
+| a send (swap + envelope extended to the maximum TTL, 3,110,400 ledgers ≈ 180 days) | 1.1182866 XLM | 1.1136982 XLM |
+| a claim into a classic wallet | 0.0651671 XLM | 0.0624270 XLM |
+| a passkey wallet's deployment | 0.0562426 XLM | 0.0533757 XLM |
+| a claim into a passkey wallet | 0.1654315 XLM | 0.1627876 XLM |
+| a refund by the sender | 0.0086224 XLM | 0.0059066 XLM |
+
+Rent is the cost, compute is not (a send's non-refundable fee is 0.004 XLM). The rate depends on
+each network's live Soroban state size: testnet holds 3.356 GB of a 4.0 GB target (5,651 stroops
+per KB, ≈ 0.0080 XLM per KB per day); **mainnet holds 1.855 GB of a 3.0 GB target and sits at the
+floor (1,000 stroops per KB, ≈ 0.00142 XLM per KB per day)**. Mainnet also forces at least 120
+days (2,073,600 ledgers) on any new persistent entry. So a mainnet send's envelope (~0.77 KB)
+costs about 0.13 XLM of rent for the forced 120 days and about 0.20 XLM at the maximum the spec
+asks for; the confirm sheet shows the simulated fee, never the design's "about $0.001".

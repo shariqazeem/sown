@@ -1,0 +1,5 @@
+{
+  "network": "mainnet",
+  "contractId": null,
+  "note": "Not deployed yet. The founder runs `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet`, which overwrites this file."
+}

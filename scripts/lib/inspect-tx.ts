@@ -1,3 +1,5 @@
+// Debugging aid: print a transaction's declared Soroban resources and its diagnostic events.
+// npx tsx scripts/lib/inspect-tx.ts <hash>   (testnet)
 import { rpc, xdr, scValToNative } from "@stellar/stellar-sdk";
 const hash = process.argv[2]!;
 const server = new rpc.Server("https://soroban-testnet.stellar.org");

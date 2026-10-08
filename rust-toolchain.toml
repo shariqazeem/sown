@@ -1,0 +1,6 @@
+# soroban-sdk 28 requires rustc >= 1.91 and stellar-cli refuses exactly 1.91.0 for wasm; pinned here so the machine's other projects keep theirs.
+[toolchain]
+channel = "1.91.1"
+targets = ["wasm32v1-none"]
+components = ["rustfmt", "clippy"]
+profile = "minimal"

@@ -1,0 +1,84 @@
+{
+  "network": "testnet",
+  "contract": "CBNZK4NDWZZD5YBLK4GTUICA2RF7PIXL7RHADRVQSTYF7EQ4OSCGMOFB",
+  "at": "2026-10-08T10:06:42.969Z",
+  "steps": [
+    {
+      "name": "bought test USDC for the sender",
+      "usdc": "32.5556593",
+      "tx": "2627f107831064be46d3a85ec5b0a22a6152b2519d674ee0c05d10fd02fae5b9"
+    },
+    {
+      "name": "send 10 USDC, keep 10%",
+      "id": "0",
+      "tx": "8e574b773c437c897f067598106a87bd8f7d513fd2807965841c1a8e4cbf568f",
+      "seconds": "4.2",
+      "fee_stroops": "12244178",
+      "cash": "9.0000000",
+      "keep_in": "1.0000000",
+      "keep_out_xlm": "93.5372132",
+      "quoted": "93.5372132",
+      "least": "92.6018410"
+    },
+    {
+      "name": "classic wallet created with 0 XLM and its USDC trustline sponsored",
+      "account": "GCDAE4EU4MVPKXDJLHXLIDZYOAN67XZ2DND2ZKYFPGSVULO5ZRTGCD3I",
+      "tx": "67c3f71bdbc003735386d41ef24b3a884fa656176faca98db6d12ceab6a1cd0c"
+    },
+    {
+      "name": "claimed into the classic wallet, paid by Sown's servers",
+      "tx": "fcaff49b6e3393595611403339105caa2fa027e4be66c3bd5aa59955b1856412",
+      "seconds": "11.2",
+      "usdc": "9.0000000",
+      "xlm": "93.5372132"
+    },
+    {
+      "name": "a second claim is refused",
+      "why": "This envelope was already claimed."
+    },
+    {
+      "name": "send 5 USDC, keep 10%",
+      "id": "1",
+      "tx": "e61df42cde4687402072a85c2c8357018394a96c3e213efcbd078766d4049bd0",
+      "seconds": "3.1"
+    },
+    {
+      "name": "claimed into a new passkey wallet: one Face ID, Sown's servers paid both transactions",
+      "wallet": "CAAH2CL2VCZMDXTBT722FWDKYSPE6MPHQHTKTBO4JUGO2WEQNT2GBSVT",
+      "deployTx": "7ab7561399537d928a9a98847981dc0b0687c09b6a2ad53e6b819028c2bde8f3",
+      "claimTx": "222d5726ad18c172c33e18da7dcda67b33ad4f3a73bdf59ba416b464ce40f282",
+      "seconds": "12.6",
+      "passkeyPrompts": 1,
+      "usdc": "4.5000000",
+      "xlm": "46.7217228"
+    },
+    {
+      "name": "a stranger cannot return it before the date",
+      "refused": true,
+      "why": "contract error #8"
+    },
+    {
+      "name": "the sender took it back",
+      "id": "2",
+      "sendTx": "31ed4d45b580b1da89f9e77e6c6d7fd106bdd5213aca0ea6f5e3912aa7b8c41d",
+      "refundTx": "9a50480f826f07d22e1fb947686765d815f16de90b1b4d663076b322126a0cc4",
+      "state": "returned"
+    },
+    {
+      "name": "a wrong link is refused before anything is paid",
+      "id": "3",
+      "why": "This link does not open this envelope. Ask the sender to share it again."
+    },
+    {
+      "name": "still held cannot be measured before 30 days",
+      "refused": true,
+      "why": "contract error #8"
+    }
+  ],
+  "openEnvelope": {
+    "id": "3",
+    "note": "left open for the claim page; its link is not stored"
+  },
+  "count": 4,
+  "failures": 0
+}
