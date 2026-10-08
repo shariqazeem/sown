@@ -139,7 +139,7 @@ export function Mine({ usdcSac, assets, explorer, testnet }: { usdcSac: string; 
           {finding ? "Looking for your wallet…" : "Continue with Face ID"}
         </button>
         {why ? <p className="sw-note is-warn">{why}</p> : null}
-        <p className="sw-body">Claimed on another phone? Your wallet is found by your passkey, which your phone keeps in sync. Nothing here needs a password or a seed phrase.</p>
+        <p className="sw-body">Claimed on another phone? Your wallet is found by the same face or fingerprint, which your phone keeps in sync. Nothing here needs a password.</p>
       </div>
     );
   }
@@ -295,7 +295,7 @@ export function Mine({ usdcSac, assets, explorer, testnet }: { usdcSac: string; 
       </section>
 
       <p className="sw-mine-note">
-        This wallet is yours: it opens with your face on this phone. To use it on another phone, open Sown there and continue with the same passkey. No seed phrase exists to lose.{" "}
+        This wallet is yours: it opens with your face on this phone. To use it on another phone, open Sown there and continue with the same face or fingerprint.{" "}
         <Link href="/docs/the-envelope" className="sw-link">
           How it works
         </Link>

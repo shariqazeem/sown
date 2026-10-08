@@ -6,14 +6,14 @@ for (const url of ["https://soroban-testnet.stellar.org", "https://mainnet.sorob
   const r = await server.getLedgerEntries(...ids.map((id) => xdr.LedgerKey.configSetting(new xdr.LedgerKeyConfigSetting({ configSettingId: id }))));
   let low = 0n, high = 0n, target = 0n, growth = 0n, size = 0n, denom = 0n;
   for (const e of r.entries) {
-    const cs: any = e.val.configSetting();
+    const cs = e.val.configSetting();
     const n = cs.switch().name;
     if (n === "configSettingContractLedgerCostV0") {
       const c = cs.contractLedgerCost();
       low = BigInt(c.rentFee1KbSorobanStateSizeLow().toString()); high = BigInt(c.rentFee1KbSorobanStateSizeHigh().toString()); target = BigInt(c.sorobanStateTargetSizeBytes().toString()); growth = BigInt(c.sorobanStateRentFeeGrowthFactor().toString());
     } else if (n === "configSettingLiveSorobanStateSizeWindow") {
-      const w: any[] = cs.liveSorobanStateSizeWindow();
-      size = w.reduce((a: bigint, v: any) => a + BigInt(v.toString()), 0n) / BigInt(w.length);
+      const w = cs.liveSorobanStateSizeWindow();
+      size = w.reduce((a: bigint, v: { toString(): string }) => a + BigInt(v.toString()), 0n) / BigInt(w.length);
     } else if (n === "configSettingStateArchival") {
       denom = BigInt(cs.stateArchivalSettings().persistentRentRateDenominator().toString());
     }

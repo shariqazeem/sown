@@ -16,7 +16,7 @@ if ("envelopeXdr" in got) {
     console.log("footprint RO", r.footprint().readOnly().length, "RW", r.footprint().readWrite().length);
   }
 }
-const diag = (got as any).diagnosticEventsXdr as xdr.DiagnosticEvent[] | undefined;
+const diag = (got as unknown as { diagnosticEventsXdr?: xdr.DiagnosticEvent[] }).diagnosticEventsXdr;
 for (const d of diag ?? []) {
   const e = d.event();
   const body = e.body().v0();

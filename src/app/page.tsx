@@ -71,7 +71,7 @@ export default async function Home() {
       <section className="sw-sec sw-two">
         <div>
           <h2 className="sw-h2">What they can keep</h2>
-          <p className="sw-body">Tokenized government debt that already trades on Stellar. What each issuer can do is read from the ledger, not from a brochure.</p>
+          <p className="sw-body">Government debt that already trades on Stellar, held as a balance in their own wallet. What each issuer can do is read from the ledger, not from a brochure.</p>
           <p className="sw-body">
             <Link href="/assets" className="sw-link">
               Every asset, with its issuer&apos;s powers
