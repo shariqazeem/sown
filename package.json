@@ -21,6 +21,7 @@
     "smoke:mainnet": "tsx scripts/smoke-mainnet.ts",
     "measure": "tsx scripts/measure.ts",
     "preflight": "tsx scripts/preflight.ts",
+    "keep-alive": "tsx scripts/keep-alive.ts",
     "smoke:day0": "tsx scripts/smoke/aquarius-testnet.ts && tsx scripts/smoke/mainnet-pools.ts && tsx scripts/smoke/kit-testnet.ts"
   },
   "dependencies": {

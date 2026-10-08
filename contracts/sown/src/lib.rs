@@ -203,10 +203,11 @@ fn config(env: &Env) -> Config {
     env.storage().instance().get(&Key::Config).unwrap()
 }
 
-fn bump_instance(env: &Env) {
-    let max = env.storage().max_ttl();
-    env.storage().instance().extend_ttl(max / 2, max);
-}
+// No function extends the contract's own instance or code. Extending an instance also extends
+// its code, and code rent is charged on its in-memory size (measured on testnet: 154.9 XLM to
+// carry 15 KB of code to the maximum TTL). A sender or a recipient must never pay that, so
+// whoever runs Sown keeps the instance and code alive from outside, with an ExtendFootprintTTL
+// operation (scripts/keep-alive.ts). Each envelope still extends its own entry (`save`).
 
 fn load(env: &Env, id: u64) -> Result<Envelope, Error> {
     env.storage().persistent().get(&Key::Env(id)).ok_or(Error::NotFound)
@@ -233,7 +234,6 @@ impl Sown {
             &Config { admin, usdc, min_send: MIN_SEND, min_hold: MIN_HOLD, max_hold: MAX_HOLD },
         );
         env.storage().instance().set(&Key::Count, &0u64);
-        bump_instance(&env);
     }
 
     /// Add or disable a keep asset for future sends. Touches no envelope: an envelope carries
@@ -250,7 +250,6 @@ impl Sown {
             }
         }
         env.storage().instance().set(&Key::Asset(asset), &KeepAsset { pool, in_idx, out_idx, enabled });
-        bump_instance(&env);
         Ok(())
     }
 
@@ -342,7 +341,6 @@ impl Sown {
             measured_balance: 0,
         };
         save(&env, &e);
-        bump_instance(&env);
         Sent { id, sender, cash, keep_asset, keep_in, keep_out }.publish(&env);
         Ok(id)
     }
@@ -368,7 +366,6 @@ impl Sown {
         e.claimed_at = env.ledger().timestamp();
         e.claimed_ledger = env.ledger().sequence();
         save(&env, &e);
-        bump_instance(&env);
         Claimed { id, to }.publish(&env);
         Ok(())
     }
@@ -397,7 +394,6 @@ impl Sown {
         e.claimed_at = now;
         e.claimed_ledger = env.ledger().sequence();
         save(&env, &e);
-        bump_instance(&env);
         Refunded { id, sender: e.sender.clone() }.publish(&env);
         Ok(())
     }
@@ -421,7 +417,6 @@ impl Sown {
         e.measured_at = now;
         e.measured_balance = balance;
         save(&env, &e);
-        bump_instance(&env);
         Measured { id, balance }.publish(&env);
         Ok(balance)
     }

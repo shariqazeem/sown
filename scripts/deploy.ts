@@ -2,7 +2,7 @@
  * DEPLOY THE SOWN CONTRACT, register its keep assets, and prove the code on chain is ours.
  *
  *   npm run contract:deploy:testnet      # sown-admin from .keys/, XLM stand-in keep asset
- *   SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet
+ *   SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet [-- --extend-days 180]
  *
  * Steps: upload artifacts/sown.wasm, create the contract with __constructor(admin, usdc),
  * set_asset for each catalogue row, then dump the code back from the ledger and compare its
@@ -20,6 +20,7 @@ import { codeOf } from "@/lib/stellar/code";
 import { type NetworkName, baseNetwork } from "@/lib/stellar/network";
 import { invokeAs, read } from "@/lib/stellar/soroban";
 import { ROOT, keypair, keypairFromEnv } from "./lib/keys";
+import { extendContract } from "./keep-alive";
 import { submitOp } from "./lib/submit-op";
 
 async function main() {
@@ -65,6 +66,11 @@ async function main() {
     console.log(`  set_asset ${a.ticker}: ${r.value.hash}`);
   }
 
+  // The contract never extends its own life (a user would pay the code's rent); its runner does.
+  // Mainnet already gives new entries 120 days; testnet gives 7, so testnet extends by default.
+  const arg = process.argv.includes("--extend-days") ? Number(process.argv[process.argv.indexOf("--extend-days") + 1]) : which === "testnet" ? 60 : 0;
+  const extended = arg > 0 ? await extendContract(net, admin, contractId, arg) : { hash: null, costStroops: 0 };
+
   const onChain = await codeOf(net, contractId);
   if (!onChain.ok) throw new Error(onChain.why);
   const same = onChain.value.sha256 === sha256;
@@ -83,6 +89,7 @@ async function main() {
     assets,
     uploadTx: upload.hash,
     deployTx: created.hash,
+    extendTx: extended.hash,
     ledger: created.ledger,
     deployedAt: new Date(created.createdAt * 1000).toISOString(),
     config: cfg.ok ? JSON.parse(JSON.stringify(cfg.value, (_k, v) => (typeof v === "bigint" ? v.toString() : v))) : null,

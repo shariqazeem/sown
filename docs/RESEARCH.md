@@ -269,3 +269,19 @@ floor (1,000 stroops per KB, ≈ 0.00142 XLM per KB per day)**. Mainnet also for
 days (2,073,600 ledgers) on any new persistent entry. So a mainnet send's envelope (~0.77 KB)
 costs about 0.13 XLM of rent for the forced 120 days and about 0.20 XLM at the maximum the spec
 asks for; the confirm sheet shows the simulated fee, never the design's "about $0.001".
+
+### Contract code is rented on its in-memory size (`npm run preflight`, 8 October)
+
+| Measurement | Result |
+| --- | --- |
+| testnet upload of the 15 KB wasm, which gives the code entry testnet's 7-day minimum | rent charged 6.25 XLM (tx `d26dd784…`), about 7× what 15,472 bytes at testnet's rate would cost: code rent uses the compiled module's size |
+| the first constructor's `extend_ttl(max/2, max)` on the instance, which also extends the code, to 180 days | rent charged **154.9 XLM** on testnet (tx `ea695225…`) |
+| the same upload, simulated on mainnet (rent 1,000 stroops per KB, the floor; new entries live at least 120 days) | **21.58 XLM**, about $4.15 at Aquarius's XLM price |
+| one Face ID wallet's deployment, simulated on mainnet | 0.198 XLM |
+| keeping instance and code alive, from testnet's own `ExtendFootprintTTL` (tx `3a6516a0…`, 7 → 60 days, 56.4 test XLM) at mainnet's rate | about 4.7 XLM per 30 days |
+
+Rent per entry, as soroban-env-host computes it: the extension at the new size, plus any growth in
+size over the life already paid for (a claim grows the envelope by 44 bytes with about 180 days
+left, which is nearly all of a claim's rent). Modelled that way, the battery's send, claims and
+refund match the rent testnet charged within 0.1–4.2%; repriced at mainnet's rate: a send about
+0.28 XLM, a claim into a Face ID wallet about 0.087 XLM, into a classic wallet about 0.014 XLM.

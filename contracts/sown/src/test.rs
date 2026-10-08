@@ -6,7 +6,7 @@ use super::*;
 use ed25519_dalek::{Signer, SigningKey};
 use soroban_sdk::{
     contract, contractimpl, contracttype,
-    testutils::{storage::Persistent as _, Address as _, Events as _, Ledger as _, MockAuth, MockAuthInvoke},
+    testutils::{storage::Instance as _, storage::Persistent as _, Address as _, Events as _, Ledger as _, MockAuth, MockAuthInvoke},
     token::{StellarAssetClient, TokenClient},
     Address, BytesN, Env, Event as _, IntoVal, Vec,
 };
@@ -526,6 +526,26 @@ fn an_envelope_lives_at_the_network_maximum_ttl() {
     let ttl = w.env.as_contract(&w.sown, || w.env.storage().persistent().get_ttl(&Key::Env(id)));
     let max = w.env.as_contract(&w.sown, || w.env.storage().max_ttl());
     assert_eq!(ttl, max);
+}
+
+#[test]
+fn no_send_claim_or_refund_extends_the_contracts_own_life() {
+    // The instance and its code are kept alive from outside; a user's call must never pay
+    // the code's rent by extending them.
+    let w = World::new();
+    let sender = w.funded_sender(300 * USDC_1);
+    let key = signing_key(22);
+    let before = w.env.as_contract(&w.sown, || w.env.storage().instance().get_ttl());
+    w.later(86_400 * 3);
+    let a = w.send(&sender, 100 * USDC_1, 1_000, &key);
+    let to = Address::generate(&w.env);
+    w.client().claim(&a, &to, &w.sig(&key, a, &to));
+    let b = w.send(&sender, 100 * USDC_1, 1_000, &key);
+    w.env.mock_all_auths();
+    w.client().refund(&b, &sender);
+    let after = w.env.as_contract(&w.sown, || w.env.storage().instance().get_ttl());
+    let max = w.env.as_contract(&w.sown, || w.env.storage().max_ttl());
+    assert!(after <= before && after < max / 2, "a user's call extended the instance: {before} -> {after} (max {max})");
 }
 
 #[test]
