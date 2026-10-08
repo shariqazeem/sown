@@ -1,0 +1,25 @@
+# secrets and local state — never in git
+.env
+.env.*
+!.env.example
+.keys/
+var/
+
+# dependencies and build output
+node_modules/
+.next/
+.next-build/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# the contract's build output (the wasm and its hash are copied to deployments/ and artifacts/)
+target/
+contracts/**/test_snapshots/
+
+# OS and editor
+.DS_Store
+*.log
+.vercel
