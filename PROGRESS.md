@@ -261,9 +261,10 @@ placeholder comment marks the spot.
 7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
    Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
    events after about a week) so `/proof` prints it.
-8. **A real phone on testnet first**: envelope 11 on the live testnet site is open, with a name
+8. **A real phone on testnet first**: envelope 12 on the live testnet site is open, with a name
    and a note, for exactly this (its link is in the 9 Oct session's last message, and in the
-   sender's browser storage; a claim link is never written into the repository). Open it on a
+   sender's browser storage; a claim link is never written into the repository; envelope 11 was
+   claimed by the film's recorder). Open it on a
    phone, tap "Claim with Face ID", and the gift should say "Stays yours · in your wallet". For
    more: `npx tsx scripts/dev-send.ts 5 10` prints a fresh link, or send one from the card with
    "Try it with a test wallet".
