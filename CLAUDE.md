@@ -12,14 +12,26 @@
 
 ## 0. Start here
 
+**Where it stands (9 Oct 2026).** Everything that does not need the founder is built and verified
+on testnet (the contract, every path in the battery, the mainnet smoke run on testnet, every
+screen at 375 and 1440 px, 128 offline and 23 contract tests). It is **live for testing** at
+https://sown.80.225.209.190.sslip.io (testnet) and **public** at
+https://github.com/shariqazeem/sown (MIT). What remains is the founder's: the deadline hour, a
+final domain, mainnet funding and deploy, the two film takes, the submission — in order, with
+commands, in `PROGRESS.md`. The film draft and its workshop: §13.
+
 Read in this order, then say what you are building:
 
 1. this file
-2. `docs/IDEA.md` — why Sown, what lost, the one-sentence pitch, the competitive landscape
-3. `docs/BUILD-PLAN.md` — the four days, what ships in what order, the cut lines, the risks
-4. `docs/DESIGN.md` — every screen, every state, the words, and the webgold files to copy
-5. `docs/DEMO-AND-PITCH.md` — the film, the submission text, the launch posts
-6. `docs/RESEARCH.md` — the sources
+2. `CLAUDE.local.md` — **not in git**, on the founder's machine only: the VM, the deployment, the
+   film workshop's files and commands, how the founder works. Read it before anything that
+   deploys, records or renders
+3. `PROGRESS.md` — what works (every transaction), what is next, what is blocked on the founder
+4. `docs/IDEA.md` — why Sown, what lost, the one-sentence pitch, the competitive landscape
+5. `docs/BUILD-PLAN.md` — the four days, what ships in what order, the cut lines, the risks
+6. `docs/DESIGN.md` — every screen, every state, the words, and the webgold files to copy
+7. `docs/DEMO-AND-PITCH.md` — the film, the submission text, the launch posts
+8. `docs/RESEARCH.md` — the sources
 
 Reference code you may read but **never modify**: `/Users/macbookair/projects/webgold` (Scrip,
 the founder's Solana product; the design system and the receipt patterns come from there) and
@@ -367,6 +379,24 @@ npm run preflight                 # what a deploy and a hundred sponsored claims
 | Cash out | links to MoneyGram-connected wallets and the anchor directory | — | — |
 | The worked example on `/` | arithmetic, labelled | | |
 
+## 13. Deployed, and the film
+
+**Testnet, live for testing**: https://sown.80.225.209.190.sslip.io — the founder's VM, behind
+nginx with a certbot certificate, the app under pm2 (`deploy/ecosystem.vm.cjs`), "Test wallet in
+this browser" switched on so a send can be tried without installing a wallet. A Face ID wallet is
+bound to the hostname it was made on, so wallets made there stay there; **mainnet needs the final
+domain first**. Access, the exact deploy commands and what else runs on that VM (never touch it):
+`CLAUDE.local.md`.
+
+**The film**: the workshop lives outside the repo (`../sown-video`, recordings are large). A
+106-second draft (`../sown-video/out/pitch.mp4`) was built on 9 Oct from the live testnet site,
+after `docs/DEMO-AND-PITCH.md`: the opening facts, the send card on a phone, a marked slot for the
+founder's phone claim, the receipt with callouts, the issuer flags, the proof page, the 2027 rail,
+the close. When the founder's takes exist (R1 the laptop send, P1 the phone claim, both on mainnet
+on the final domain), they replace the stand-ins and the board is rendered again; the commands and
+file names are in `CLAUDE.local.md`. Captions obey the same words as every surface
+(`src/lib/words.test.ts`).
+
 ---
 
 ## Known drift
@@ -389,3 +419,4 @@ npm run preflight                 # what a deploy and a hundred sponsored claims
 | §4 the cache holds `envelopes` (the decoded entry and its hashes), `measurements` and `fx`; "with `SOWN_DB` unset every page reads the chain" | one table, **`envelope_txs`** (contract, envelope, kind → hash, ledger, time): only the transaction hashes RPC forgets after its event retention. Envelopes and measurements are read from the contract on every request; rates are held in memory for an hour. The cache is **on by default** (`var/sown.<network>.db`); `SOWN_DB=""` turns it off | The envelope is the record: a cached copy could only disagree with the chain. Keyed by contract since 9 October: the testnet redeploy numbered envelopes from 0 again, and receipts showed the first contract's transactions under the same numbers (test: `src/lib/db/cache.test.ts`) |
 | BUILD-PLAN Day 2: `npm run smoke:mainnet` is "$1 send from Freighter keeping 10% into USDY, claimed on a phone with Face ID. Timed" | two parts. `npm run smoke:mainnet` sends $1 from a key (`SOWN_SMOKE_SENDER_SECRET`), claims it with a **software** passkey through the relay's own checks, moves both parts back to the sender, and writes every hash and timing to `deployments/mainnet-smoke.json` (`--dry` first: read only). The filmed run (Freighter, a phone) is then recorded from the chain with `--record <id>`; `/proof` prints both. Proven with the same code on testnet (`--network testnet`, `deployments/testnet-smoke.json`) | A script cannot hold a phone, and a person should not be the first to find out whether mainnet works. Moving the dollar back keeps the smoke from leaving money in a wallet whose key lives in a script; the key is kept under `.keys/` until the wallet is empty |
 | §5 the client submits the signed send, then `/api/send/record` receives the hash | `/api/send/record` receives the **signed transaction**, checks it is exactly one `send` on the Sown contract from its own source, submits it, waits, and caches the envelope | One path for every wallet and every RPC: mainnet's public RPC's CORS policy is not documented, and a hash alone cannot be verified until it lands |
+| §11 "Definition of done" begins with the mainnet send and claim | on 9 Oct the app was deployed **on testnet** to the founder's VM for real-phone testing (§13), and the repository was published with an MIT `LICENSE` (the README and `package.json` already said MIT; the file was missing). Mainnet is unchanged: the founder's deploy, on the final domain | The founder asked to test on a phone before mainnet, and a Face ID wallet is bound to its hostname, so the testnet host is a stand-in that cannot carry over |

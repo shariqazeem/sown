@@ -24,3 +24,6 @@ contracts/**/test_snapshots/
 *.log
 .vercel
 ecosystem.config.cjs
+
+# the local handover: the VM, deployment, the film workshop (never in git)
+CLAUDE.local.md
