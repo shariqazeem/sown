@@ -39,6 +39,13 @@ stocks that do not exist on Stellar yet, fix the face and get on mainnet).
   `bb43a1f175d17dd515dd689c6578da5306df9e0432872d36780c0debd986077e` (ledger 5,111,868). The
   gift read "Shariq sent you · PKR 1,385 · "A real-phone test. Keep it or send it back."", then
   "Claimed on Stellar, just now · Stays yours · in your wallet", with "Your wallet" in the nav.
+- **Envelope 13, claimed by the founder on an iPhone with Face ID** (10 Oct, 23:10 UTC on the
+  9th): the link opened on the phone, "Add passkey", Face ID, and the gift read "Claimed on
+  Stellar, just now · Stays yours · in your wallet"; `/mine` then showed $4.50 USDC and the keep
+  in the wallet `CBKV3NIOOOMHBJNVSPVMY3DFNJSNIRSVTIH4BEGU5KXMVBKWZPSUPUB3`, with "Move to a
+  wallet" and "Cash out". Send `92344ed84d97d47fb188eb2d310483d8741d82d210161adade4427d3dc6001b6`,
+  claim `3b14fd1be09e9f54d648a86201ab47faaca395691246fb8e50303f085b8b8c9c` (ledger 5,112,768).
+  This is the definition of done's "claimed on a phone", on testnet.
 - **The film, draft 2** (`../sown-video/out/pitch.mp4`, 110 s): recorded from the live site in
   the new design; the claim scene is that real claim. The founder's two takes (R1, P1 on mainnet)
   still replace scenes 2 and 3 when they exist (`docs/DEMO-AND-PITCH.md`).
