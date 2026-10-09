@@ -32,6 +32,13 @@ stocks that do not exist on Stellar yet, fix the face and get on mainnet).
   wallet `CCSEA6N5DOB5QAXB7UF32ATS3RO32AW6PWI3TD2DFXURTZL7EM33NF7I`, deployed and submitted by
   Sown's servers: claim `11acafdbecab8c1140df7f90e0c7709d33ef87344909689e0b19d6dad37660bc`,
   21 seconds from the tap to "Stays yours · in your wallet" on screen.
+- **Envelope 12, claimed by the founder on a MacBook with Touch ID** (10 Oct, 21:55 UTC on the
+  9th): a real passkey on a real device, on the live testnet site, into wallet
+  `CCBJLUHHFEVWVE7WOHBJWV7FZ5WLZXUI6GDP3IFVYJLXQC5NSKFVQP6D`; send
+  `22d4da43464571f07aaab9cc783f43ddeb08a047deb14cf80cda9eeaa4d1b751`, claim
+  `bb43a1f175d17dd515dd689c6578da5306df9e0432872d36780c0debd986077e` (ledger 5,111,868). The
+  gift read "Shariq sent you · PKR 1,385 · "A real-phone test. Keep it or send it back."", then
+  "Claimed on Stellar, just now · Stays yours · in your wallet", with "Your wallet" in the nav.
 - **The film, draft 2** (`../sown-video/out/pitch.mp4`, 110 s): recorded from the live site in
   the new design; the claim scene is that real claim. The founder's two takes (R1, P1 on mainnet)
   still replace scenes 2 and 3 when they exist (`docs/DEMO-AND-PITCH.md`).
@@ -261,10 +268,10 @@ placeholder comment marks the spot.
 7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
    Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
    events after about a week) so `/proof` prints it.
-8. **A real phone on testnet first**: envelope 12 on the live testnet site is open, with a name
-   and a note, for exactly this (its link is in the 9 Oct session's last message, and in the
-   sender's browser storage; a claim link is never written into the repository; envelope 11 was
-   claimed by the film's recorder). Open it on a
+8. **A real phone on testnet first**: the founder claimed envelope 12 on a MacBook with Touch ID
+   (10 Oct). A fresh open envelope for the phone is made from the card with "Try it with a test
+   wallet"; its link is given in chat and lives in the sender's browser storage (a claim link is
+   never written into the repository). Open it on a
    phone, tap "Claim with Face ID", and the gift should say "Stays yours · in your wallet". For
    more: `npx tsx scripts/dev-send.ts 5 10` prints a fresh link, or send one from the card with
    "Try it with a test wallet".
