@@ -4,6 +4,13 @@
 > opens on `https://stellar.expert/explorer/testnet/tx/<hash>`. Last updated Fri 9 Oct 2026,
 > 04:15 PKT (23:15 UTC on the 8th).
 
+## Live for testing (9 Oct)
+
+**https://sown.80.225.209.190.sslip.io** — the testnet app on the founder's VM (pm2 `sown` on
+:3400 behind nginx, certificate by certbot; `deploy/ecosystem.vm.cjs`). "Test wallet in this
+browser" is on, so a send can be tried without installing Freighter. A Face ID wallet made there
+stays bound to that hostname; mainnet waits for the final domain.
+
 ## What works (testnet unless marked)
 
 ### Day 0 — verified before building
