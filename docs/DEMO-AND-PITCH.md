@@ -5,36 +5,33 @@
 > checkable on stellar.expert. Nothing staged, nothing simulated on mainnet. If a scene cannot
 > be real by Saturday morning, it is cut, never faked.
 
-## The film — 2:30, silent with captions, 1080p, phone frames real
+## The film — about 1:50, silent with captions, 1080p, in Sown's own design
 
-Two cameras: the laptop screen (recorded with the OS recorder) and the recipient's phone
-(recorded on the phone itself with screen recording, Face ID prompt included). The agent
-records the receipt and proof pages with Playwright at 1440 px for the clean inserts.
+Draft 2 (9 Oct, `../sown-video/motion/boards/pitch.mjs`) is built from recordings of the live
+testnet site in the new design: evergreen type scenes, the card and the claim page in a phone
+frame, the receipt in a window, the assets and proof pages in a browser frame, the split bar,
+the close. Every figure on screen is re-read from the live page when the board is built.
 
-| # | Time | Shot | Caption (sentence case, ≤ 2 lines) |
+| # | Time | Scene | Caption (sentence case, ≤ 2 lines) |
 | --- | --- | --- | --- |
-| 1 | 0:00–0:06 | Black. One line fades in on paper. | "Money sent home is spent the week it arrives." |
-| 2 | 0:06–0:12 | Same frame, second line. | "$728.6 billion went home last year. Almost none of it stayed." (IFAD, 2025) |
-| 3 | 0:12–0:20 | Laptop: `/` loads. The card. The cursor taps $50, then 10%. The live line updates. | "Send $50. Keep 10% as US Treasuries." |
-| 4 | 0:20–0:32 | The confirm sheet: the outcome, the least it can become, the issuer line, the trust line. Click "Approve $50 in wallet". Freighter opens; approve. | "One signature. The slice is bought inside the same transaction on Aquarius." |
-| 5 | 0:32–0:40 | The receipt prints. The link appears with "Share on WhatsApp". Click it; WhatsApp opens with the link in a chat with "Ammi". | "The envelope waits on Stellar. She needs no wallet, no app, nothing." |
-| 6 | 0:40–0:48 | Phone: WhatsApp, the link arrives. Tap. The claim page: the dashed envelope, "$45.00 to spend · 4.38 USDY, yours". | "She taps." |
-| 7 | 0:48–1:00 | Phone: "Claim with Face ID". One Face ID prompt. "Making your wallet…", then "Claiming…". The receipt prints: "Claimed on Stellar". | "Her face makes a wallet only she controls. Sown's servers pay the network." |
-| 8 | 1:00–1:10 | Phone: `/mine`: $45.00 USDC (₨12,580) · 4.38 USDY ≈ $5.00, US Treasuries (Ondo). "Cash out" row visible. | "Dollars to spend at MoneyGram-connected wallets. Treasuries that stay." |
-| 9 | 1:10–1:25 | Laptop: stellar.expert for the send transaction: the Sown contract, the Aquarius pool call, USDC in, USDY out; then the claim transaction into a C-address. | "Every figure is on the ledger: the swap, the envelope, the claim." |
-| 10 | 1:25–1:38 | Laptop: `/receipt/<id>` scrolled slowly: Sent, Kept, Price on Aquarius, At the least, Claimed by a wallet made with Face ID, Still held "measured on 3 Nov". | "A receipt for both. In 30 days, anyone can measure whether it is still held." |
-| 11 | 1:38–1:50 | Laptop: `/assets`: the three rows, the flags as chips, the issuer's words. Hover "issuer can take back". | "What the issuer can do is read from the chain, on every row. No yield promised." |
-| 12 | 1:50–2:02 | Laptop: `/plan`: "Send again every month" → the `.ics` downloads. Then a quick cut to `/proof` on ink: contract id, sha256, the sponsor's balance, counts. | "Every month, if they like. The proof page reads the chain, not our database." |
-| 13 | 2:02–2:14 | Paper. Three lines appear one by one. | "Today: US Treasuries and Mexican CETES, live on Stellar." / "2027: DTC-tokenized stocks and ETFs on the same rail." / "Same send. Same receipt." |
-| 14 | 2:14–2:24 | The wordmark. The URL. The mainnet contract id in mono. | "Sown. Send money home. Part of it stays theirs." |
-| 15 | 2:24–2:30 | Black. | "Built on Stellar for Find Your Way, October 2026. Unaudited. Not for US persons." |
+| 0 | 0:00–0:07 | Evergreen. One line. | "Money sent home is spent the week it arrives." |
+| 1 | 0:07–0:13 | Evergreen. | "$728.6 billion went home last year. Almost none of it stayed." (IFAD, 2026) |
+| 2 | 0:13–0:31 | Phone: the send card, $50, 20%, 10%, the split bar moving. Callouts. **Slot R1.** | "Send dollars home in USDC on Stellar" · "Keep 10% as US Treasuries" · "One signature" · "The rest arrives as dollars to spend" |
+| 3 | 0:31–0:45 | Phone: the claim page of a waiting envelope with a note: "Shariq sent you ₨1,385 · For Ammi. School fees, with love". Callouts. **Slot P1** (the founder's phone take with the Face ID prompt replaces this). | "A link in WhatsApp, or a QR" · "Who sent it, and why: the note is sealed on the ledger" · "One Face ID makes her a wallet" · "Sown's servers pay the network" |
+| 4 | 0:45–1:03 | The receipt of envelope 6 (claimed by a wallet made with Face ID). Callouts. | "What was sent and what was kept" · "The least it could become, before anyone signed" · "Claimed by a wallet made with Face ID" · "Still held? Measured on chain at 30 days" |
+| 5 | 1:03–1:15 | `/assets` scrolled slowly. | "Read from each issuer's account on the chain. No return is promised." |
+| 6 | 1:15–1:27 | `/proof` scrolled slowly. | "The contract's hash, what Sown's servers hold and pay, every envelope. Unaudited, and it says so." |
+| 7 | 1:27–1:39 | Evergreen. The split bar fills, green then gold. | "Today: US Treasuries and Mexican CETES, live on Stellar." / "Planned for 2027: stocks and ETFs held at DTC, on Stellar." / "Same send. Same receipt." |
+| 8 | 1:39–1:50 | The close: the sprout, the wordmark, the line, the address. | "Send money home. Part of it stays theirs." · "Built on Stellar for Find Your Way, October 2026. Unaudited. Not for US persons." |
 
-Recording list for the founder (silent, one take each, 1440 × 900 browser, no bookmarks bar):
-R1 `/` → send $50 keep 10% → confirm → Freighter approve → receipt → Share on WhatsApp.
-R2 stellar.expert: the send tx, the claim tx (addresses copied from `/receipt`).
-R3 `/assets` hover, `/plan` click, `/proof` scroll.
-Phone (the recipient, screen recording on): P1 WhatsApp → link → claim page → Face ID once →
-receipt → "Open your wallet" → `/mine`.
+Recording list for the founder (silent, one take each; on mainnet, on the final domain):
+R1 laptop, 1440 × 900, no bookmarks bar: `/` → $50 → keep 10% → add a name and a note →
+"Send $50" → the confirm sheet → Freighter approve → the receipt with the QR → "Share on WhatsApp".
+P1 the recipient's phone, screen recording on: WhatsApp → the link → the claim page ("… sent
+you", the note) → "Claim with Face ID" → the one Face ID prompt → "Stays yours · in your
+wallet" → "Open your wallet" → `/mine`.
+R2 stellar.expert: the send transaction (the Sown contract, the Aquarius pool, USDC in, USDY
+out), then the claim into a C-address.
 
 ## The pitch, as a judge hears it (90 seconds, for the form and for a stage)
 
@@ -101,7 +98,7 @@ Send money home. Part of it stays theirs: US Treasuries in their own wallet, cla
 **Description (≤ 1,500 chars)**
 
 ```
-Sown turns part of every remittance into ownership. A sender sends USDC on Stellar and chooses a keep (10% by default). In the same Soroban transaction the slice is swapped on Aquarius into US Treasuries (Ondo USDY), US Treasury notes (Etherfuse USTRY) or Mexican CETES and placed, with the cash, in an envelope held by the Sown contract. The recipient taps a link; their face makes a wallet (an OpenZeppelin smart account via Stellar's Smart Account Kit); Sown's servers pay the network; the envelope hands over dollars to spend and Treasuries that stay, in a wallet only they control. Every send and claim is a receipt read from the ledger, and 30 days after a claim anyone can measure whether the keep is still held. Live on mainnet: contract [C…], a real envelope [receipt link], claimed on a phone by someone with no wallet a minute earlier. Stellar made it: real tokenized government debt with ~$2M of Aquarius depth per asset, passkey accounts, fee sponsorship, invoker-contract auth for the pool call, persistent storage for the receipt, and MoneyGram-connected wallets to cash out. Unaudited; not for US persons; issuer powers shown on every row from on-chain flags.
+Sown turns part of every remittance into ownership. A sender sends USDC on Stellar and chooses a keep (10% by default). In the same Soroban transaction the slice is swapped on Aquarius into US Treasuries (Ondo USDY), US Treasury notes (Etherfuse USTRY) or Mexican CETES and placed, with the cash, in an envelope held by the Sown contract. The sender can add a name and a note; they travel inside the link and the send seals their hash on the ledger. The recipient taps the link (or scans a QR): "Shariq sent you ₨27,950 · for school fees", what is theirs to spend and what stays theirs, one button. Their face makes a wallet (an OpenZeppelin account via Stellar's Smart Account Kit); Sown's servers pay the network; the envelope hands over dollars to spend and Treasuries that stay, in a wallet only they control. Every send and claim is a receipt read from the ledger, and 30 days after a claim anyone can measure whether the keep is still held. Live on mainnet: contract [C…], a real envelope [receipt link], claimed on a phone by someone with no wallet a minute earlier. Stellar made it: real tokenized government debt with ~$2M of Aquarius depth per asset, passkey accounts, fee sponsorship, invoker-contract auth for the pool call, persistent storage for the receipt, and MoneyGram-connected wallets to cash out. Unaudited; not for US persons; issuer powers shown on every row from on-chain flags.
 ```
 
 **Stellar features used (≤ 500 chars)**
