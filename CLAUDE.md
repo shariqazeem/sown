@@ -304,19 +304,22 @@ they paste), "Cash out" (links to MoneyGram-connected Stellar wallets and anchor
 
 ## 8. Design system
 
-Scrip's, adapted (`docs/DESIGN.md`): paper `#f7f5ef` on every consumer screen, ink only on
-`/proof`; one accent `#2b4acb`; green and red for money outcomes only; Instrument Sans for
-words, IBM Plex Mono for figures, Fraunces for the wordmark only. The **envelope is the stub**:
-the receipt's shape (perforated top edge, ruled rows, the keep units as the largest figure)
-drawn at the same five sizes. Copy `webgold/src/styles/tokens.css` verbatim and alias; never
-redeclare a palette value; no Tailwind utility classes; no emoji; sentence case; one primary
-button per screen; a trust line above every signature.
+**Sown's own, since 9 Oct 2026** (`docs/DESIGN.md`; the 8 Oct build copied Scrip's paper-and-
+ledger system, and the founder asked for a product that looks like its own). The subject is a
+seed: warm sand ground, evergreen ink and brand, a bright leaf on dark ground, **gold for the
+part that stays**. Instrument Serif for headlines, Manrope for words and figures, DM Mono for
+hashes. Rounder shapes, pill buttons, app-like cards, an evergreen hero on the front door.
+**The one picture of the product is the split**: a bar, green to spend, gold stays, drawn live on
+the send card from the pool's quote. `src/styles/tokens.css` is the only place a value is
+defined; no Tailwind utilities; no emoji; sentence case; one primary button per screen; a trust
+line above every signature. Green and gold never decorate.
 
 **Words on surfaces** (consumer → code): keep → `keep_bps`/`keep_out`; the envelope → `Envelope`;
 claim → `claim`; take it back → `refund` (by the sender); returned by itself → `refund` (after
 `return_at`); still held → `measure`; Sown's servers → the relay; your wallet → the smart
-account; US Treasuries (Ondo USDY) → `USDY`. Never: token, yield, APY, relayer, sponsor,
-trustline, reserve, gas, smart contract (say "the Sown contract" on `/proof` only), seed phrase.
+account; US Treasuries (Ondo USDY) → `USDY`; a note "sealed on the ledger" → `memo`. Never:
+token, yield, APY, relayer, sponsor, trustline, reserve, gas, smart contract (say "the Sown
+contract" on `/proof` only), seed phrase.
 
 ## 9. Standing policies
 
@@ -420,3 +423,8 @@ file names are in `CLAUDE.local.md`. Captions obey the same words as every surfa
 | BUILD-PLAN Day 2: `npm run smoke:mainnet` is "$1 send from Freighter keeping 10% into USDY, claimed on a phone with Face ID. Timed" | two parts. `npm run smoke:mainnet` sends $1 from a key (`SOWN_SMOKE_SENDER_SECRET`), claims it with a **software** passkey through the relay's own checks, moves both parts back to the sender, and writes every hash and timing to `deployments/mainnet-smoke.json` (`--dry` first: read only). The filmed run (Freighter, a phone) is then recorded from the chain with `--record <id>`; `/proof` prints both. Proven with the same code on testnet (`--network testnet`, `deployments/testnet-smoke.json`) | A script cannot hold a phone, and a person should not be the first to find out whether mainnet works. Moving the dollar back keeps the smoke from leaving money in a wallet whose key lives in a script; the key is kept under `.keys/` until the wallet is empty |
 | §5 the client submits the signed send, then `/api/send/record` receives the hash | `/api/send/record` receives the **signed transaction**, checks it is exactly one `send` on the Sown contract from its own source, submits it, waits, and caches the envelope | One path for every wallet and every RPC: mainnet's public RPC's CORS policy is not documented, and a hash alone cannot be verified until it lands |
 | §11 "Definition of done" begins with the mainnet send and claim | on 9 Oct the app was deployed **on testnet** to the founder's VM for real-phone testing (§13), and the repository was published with an MIT `LICENSE` (the README and `package.json` already said MIT; the file was missing). Mainnet is unchanged: the founder's deploy, on the final domain | The founder asked to test on a phone before mainnet, and a Face ID wallet is bound to its hostname, so the testnet host is a stand-in that cannot carry over |
+| §5 `memo: BytesN<32>`, "sha256 of the sender's reason, or zero"; `/api/send/prepare` always sent zeros | **used since 9 Oct**: the sender may add a name (40 chars) and a note (140). They ride in the link's fragment after the secret (`#<secret>.<note>`, `src/lib/envelope/note.ts`), never through a server; the card sends `memo = sha256(canonical JSON of the note)` and the claim page shows the note only when the envelope's memo is its hash. The public receipt says a note was sealed, never its words. `decodeSecret` reads the part before the first "." | A gift should say who it is from and why; the ledger's word on it costs nothing. Proven: envelope 10 on testnet |
+| §8 "Scrip's design system, adapted"; DESIGN "copy `tokens.css` verbatim" | Sown's own system (§8 above, `docs/DESIGN.md`); `src/lib/og/palette.ts` names the new tokens | The founder's call on 9 Oct: a product that looks like its own, premium and usable by anyone |
+| §7 `/receipt/[id]?sent=1` shows the link with copy and WhatsApp | also a QR code of the link, so a phone in the room can claim with Face ID while the sender watches | Judges and recipients are often in the same room as the laptop |
+| §7 `/` the send card and how it works | the front door also carries "why this only works on Stellar" (six cards), "stocks and ETFs held at DTC, expected 2027" as a dashed next row under what they keep, and on testnet a one-tap test wallet that funds itself | The judge's first five seconds, and the honest stocks story on a surface, not only in the film |
+

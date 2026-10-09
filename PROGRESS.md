@@ -2,7 +2,31 @@
 
 > Kept by the build agent. Every "works" line names the transaction that proves it; each hash
 > opens on `https://stellar.expert/explorer/testnet/tx/<hash>`. Last updated Fri 9 Oct 2026,
-> 04:15 PKT (23:15 UTC on the 8th).
+> 16:00 PKT (11:00 UTC).
+
+## 9 Oct, afternoon: Sown's own design, the note, the QR
+
+The founder read the first build and asked for a product that looks like its own, premium and
+usable by anyone, after an assessment of the field (47 submissions on the platform; the deadline
+confirmed as **13 Oct 04:59 PKT = 12 Oct 23:59 UTC**; verdict: keep the idea, do not pivot to
+stocks that do not exist on Stellar yet, fix the face and get on mainnet).
+
+- **The design system is Sown's** (`docs/DESIGN.md`, `src/styles/tokens.css`): evergreen, sand,
+  gold for the part that stays; Instrument Serif, Manrope, DM Mono. Every page re-skinned; the
+  front door, the send card, the claim page, the receipt's link sheet and the share images redrawn.
+- **The split**, drawn live on the send card from the pool's quote, is the product's one picture.
+- **A name and a note** ride in the link after the secret; the send seals their sha256 as the
+  envelope's memo (the field existed, always zero until now); the claim page shows them only when
+  the ledger's memo matches (`src/lib/envelope/note.ts`, 6 tests).
+- **A QR code** on the receipt's link sheet, for the phone in the room.
+- **"Try it with a test wallet"** on the card itself (testnet): one tap, the wallet funds itself.
+- **Proven in a browser on testnet, envelope 10** (`CCKMIXT4…HQSB`): $5 keeping 10% from the test
+  wallet `GA2V…VEDU` with the name "Shariq" and the note "For school fees, with love", send
+  `a0acc0442ca2300a8d5d6ed2f0ffd06929d32b76e3fa8dd0c552acc378f731be` (ledger 5,103,521, memo
+  `aef71881…eeb684`); the receipt showed the seal and the QR; the claim page showed "Shariq sent
+  you · PKR 1,385 · "For school fees, with love""; claimed into the same test wallet through the
+  relay, `a11714a36d0b06c5a77221f70a83ff06bacd351a34e5f1ae1b4d6f97c090c269` (ledger 5,103,551).
+- Lint, typecheck and the offline suite green: 137 tests (was 128).
 
 ## Live for testing (9 Oct)
 

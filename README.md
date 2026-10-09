@@ -37,7 +37,9 @@ too. Claiming with Face ID needs a device with a passkey; any Stellar wallet can
    the sender saw before signing; both parts placed in an **envelope**.
 2. **The envelope** — an entry in the contract holding the cash and the keep for whoever holds
    the link's key, with a return date. The link carries an ed25519 key in its fragment; the
-   contract holds only its public half, so the secret never reaches a server or the ledger.
+   contract holds only its public half, so the secret never reaches a server or the ledger. A
+   name and a note can ride in the same fragment: the send seals their sha256 into the envelope,
+   and the claim page shows them only if the ledger's seal matches (`src/lib/envelope/note.ts`).
 3. **The claim** — the recipient signs which wallet receives it (`ed25519_verify` over the
    contract, the envelope and the destination, so a claim cannot be redirected). With Face ID,
    the Smart Account Kit makes an OpenZeppelin smart account bound to their passkey, and Sown's
