@@ -251,8 +251,12 @@ placeholder comment marks the spot.
 7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
    Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
    events after about a week) so `/proof` prints it.
-8. **A real phone on testnet first**, if there is time: `npx tsx scripts/dev-send.ts 5 10` prints a
-   fresh testnet link to claim with real Face ID on the final domain.
+8. **A real phone on testnet first**: envelope 11 on the live testnet site is open, with a name
+   and a note, for exactly this (its link is in the 9 Oct session's last message, and in the
+   sender's browser storage; a claim link is never written into the repository). Open it on a
+   phone, tap "Claim with Face ID", and the gift should say "Stays yours · in your wallet". For
+   more: `npx tsx scripts/dev-send.ts 5 10` prints a fresh link, or send one from the card with
+   "Try it with a test wallet".
 9. **Keep it alive**: by about 120 days after the deploy, `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run keep-alive -- --network mainnet --days 180`
    (about 4.8 XLM per 30 days extended); and
    `SOWN_MEASURER_SECRET=S… SOWN_MAINNET=yes npm run measure -- --network mainnet` on a cron from
