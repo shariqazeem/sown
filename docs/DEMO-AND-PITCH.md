@@ -110,7 +110,7 @@ Soroban contract with a cross-contract Aquarius swap authorised via authorize_as
 **What is real (≤ 300 chars)**
 
 ```
-Mainnet: the contract, USDC, USDY/USTRY/CETES, Aquarius, passkey accounts, the receipts. Testnet: the battery (keep asset is a labelled stand-in; no RWAs exist on testnet). Nothing simulated on mainnet. Cash-out is linked, not integrated.
+Mainnet: the contract, USDC, USDY/USTRY/CETES, Aquarius, passkey accounts, the receipts, the note sealed on the ledger. Testnet: the battery and the live site (the keep is a labelled stand-in; no RWAs exist on testnet). Nothing simulated on mainnet. Cash-out is linked, not integrated.
 ```
 
 **Links**: repo · live app · demo video · mainnet contract on stellar.expert · one receipt.
