@@ -183,7 +183,8 @@
   font-weight: 700;
   white-space: nowrap;
 }
-@media (max-width: 760px) {
+/* Below 900 px the links fold into the menu: a tablet, a phone, or a page laid out at 2× zoom. */
+@media (max-width: 900px) {
   .sw-nav .is-wide {
     display: none;
   }
