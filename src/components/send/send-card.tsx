@@ -410,9 +410,9 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
               {quoteWhy ? (
                 <span className="why">{quoteWhy}</span>
               ) : unitsOut ? (
-                <>
+                <span className={`num${unitsOut.replace(/[^0-9]/g, "").length > 7 ? " is-long" : ""}`}>
                   {unitsOut} <span className="sym">{asset.ticker}</span>
-                </>
+                </span>
               ) : fresh ? (
                 "nothing kept"
               ) : (

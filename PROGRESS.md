@@ -26,6 +26,16 @@ stocks that do not exist on Stellar yet, fix the face and get on mainnet).
   `aef71881…eeb684`); the receipt showed the seal and the QR; the claim page showed "Shariq sent
   you · PKR 1,385 · "For school fees, with love""; claimed into the same test wallet through the
   relay, `a11714a36d0b06c5a77221f70a83ff06bacd351a34e5f1ae1b4d6f97c090c269` (ledger 5,103,551).
+- **Envelope 11 on the live site, claimed with a Face ID wallet, on film**: sent from the live
+  site's test wallet with the note "For Ammi. School fees, with love" from "Shariq", then claimed
+  by the film recorder through a real WebAuthn ceremony (a virtual platform authenticator) into
+  wallet `CCSEA6N5DOB5QAXB7UF32ATS3RO32AW6PWI3TD2DFXURTZL7EM33NF7I`, deployed and submitted by
+  Sown's servers: claim `11acafdbecab8c1140df7f90e0c7709d33ef87344909689e0b19d6dad37660bc`,
+  21 seconds from the tap to "Stays yours · in your wallet" on screen.
+- **The film, draft 2** (`../sown-video/out/pitch.mp4`, 110 s): recorded from the live site in
+  the new design; the claim scene is that real claim. The founder's two takes (R1, P1 on mainnet)
+  still replace scenes 2 and 3 when they exist (`docs/DEMO-AND-PITCH.md`).
+- **The README** carries the send card as a GIF (`docs/sown-send.gif`).
 - Lint, typecheck and the offline suite green: 137 tests (was 128).
 
 ## Live for testing (9 Oct)

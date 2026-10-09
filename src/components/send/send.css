@@ -197,6 +197,13 @@
   font-size: 1.7rem;
   color: var(--gold-ink);
 }
+/* a figure never breaks mid-number; a long one (the testnet stand-in's thousands) steps down a size */
+.sw-split-legend .stay .v .num {
+  white-space: nowrap;
+}
+.sw-split-legend .stay .v .num.is-long {
+  font-size: 0.78em;
+}
 .sw-split-legend .stay .v .sym {
   font-size: 0.55em;
   font-weight: 700;
