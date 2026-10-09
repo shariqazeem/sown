@@ -1,29 +1,24 @@
-/* The claim: the envelope, then the one action. Phone first; side by side on a wide screen. */
-/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
+/* The claim: the gift, then the one action. One centred column; phone first. Tokens only. */
 .sw-sec.sw-claim-sec {
   padding-top: var(--s-6);
 }
 .sw-claim {
   display: grid;
-  grid-template-columns: minmax(0, 440px) minmax(0, 420px);
-  gap: var(--s-7);
-  align-items: start;
-  justify-content: center;
+  gap: var(--s-5);
+  max-width: 520px;
+  margin: 0 auto;
 }
 .sw-claim-words {
-  grid-column: 1 / -1;
   max-width: var(--measure);
 }
 .sw-claim-after {
   display: grid;
   gap: var(--s-4);
-  padding-top: var(--s-5);
 }
 .sw-claim-title {
+  font-family: var(--font-display);
   font-size: var(--fs-h2);
-  line-height: var(--lh-h2);
-  letter-spacing: var(--tracking-h2);
-  font-weight: 600;
+  line-height: 1.1;
 }
 .sw-claim-say {
   line-height: 1.55;
@@ -32,9 +27,14 @@
   font-size: var(--fs-small);
   color: var(--ink-muted);
   line-height: 1.55;
+  text-align: center;
+}
+.sw-claim-go {
+  min-height: 60px;
+  font-size: 1.125rem;
 }
 .sw-claim-alt {
-  justify-self: start;
+  justify-self: center;
   min-height: 44px;
   font-size: var(--fs-small);
 }
@@ -43,21 +43,203 @@
   gap: var(--s-2);
   padding-top: var(--s-4);
   border-top: 1px solid var(--border);
-  font-size: var(--fs-small);
+  font-size: var(--fs-caption);
   color: var(--ink-muted);
   line-height: 1.55;
 }
-@media (max-width: 900px) {
-  .sw-claim {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-4);
-    justify-items: stretch;
+.sw-claim .sw-skel-env {
+  max-width: none;
+}
+
+/* ── the gift ─────────────────────────────────────────────────────── */
+.sw-gift {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
+}
+.sw-gift.is-printing {
+  animation: sw-gift-land var(--dur-3) var(--ease-spring) both;
+}
+@keyframes sw-gift-land {
+  from {
+    transform: translateY(16px) scale(0.985);
+    opacity: 0;
   }
-  .sw-claim-after {
-    padding-top: 0;
+  to {
+    transform: none;
+    opacity: 1;
   }
-  .sw-claim .sw-env,
-  .sw-claim .sw-skel-env {
-    max-width: none;
+}
+.sw-gift-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface-inverse);
+  color: var(--ink-inverse);
+}
+.sw-gift.is-returned .sw-gift-head {
+  background: var(--bg-deep);
+  color: var(--ink-muted);
+}
+.sw-gift-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+}
+.sw-gift-kicker .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--gold);
+  animation: sw-gift-pending 1.6s var(--ease-out) infinite;
+}
+.sw-gift.is-claimed .sw-gift-kicker .dot {
+  background: var(--leaf);
+  animation: none;
+}
+.sw-gift.is-returned .sw-gift-kicker .dot {
+  background: var(--ink-faint);
+  animation: none;
+}
+@keyframes sw-gift-pending {
+  0%,
+  100% {
+    opacity: 1;
   }
+  50% {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-gift-kicker .dot {
+    animation: none;
+  }
+}
+.sw-gift-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  --leaf-mark: var(--leaf);
+}
+.sw-gift-body {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-6) var(--s-5) var(--s-5);
+}
+@media (max-width: 420px) {
+  .sw-gift-body {
+    padding: var(--s-5) var(--s-4) var(--s-4);
+  }
+}
+.sw-gift-from {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.sw-gift-amount {
+  display: grid;
+  gap: 2px;
+}
+.sw-gift-amount .big {
+  font-size: var(--fs-units);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+.sw-gift-amount .usd {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.sw-gift-note {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.sw-gift-parts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+  margin-top: var(--s-2);
+}
+@media (max-width: 400px) {
+  .sw-gift-parts {
+    grid-template-columns: 1fr;
+  }
+}
+.sw-gift-parts .part {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+  background: var(--surface-soft);
+}
+.sw-gift-parts .part.is-stay {
+  background: var(--gold-soft);
+}
+.sw-gift-parts .k {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.sw-gift-parts .k .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--leaf-deep);
+}
+.sw-gift-parts .is-stay .k {
+  color: var(--gold-ink);
+}
+.sw-gift-parts .is-stay .k .dot {
+  background: var(--gold);
+}
+.sw-gift-parts .v {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+/* the keep's units: the largest figure in the parts */
+.sw-gift-parts .is-stay .v {
+  color: var(--gold-ink);
+  font-size: 1.7rem;
+}
+.sw-gift-parts .v .sym {
+  font-size: 0.55em;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.sw-gift-parts .sub {
+  font-size: var(--fs-caption);
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+.sw-gift-when {
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+.sw-gift-when .sw-link {
+  font-weight: 600;
+}
+.sw-gift.is-returned .sw-gift-amount .big,
+.sw-gift.is-returned .sw-gift-parts .v {
+  color: var(--ink-muted);
 }

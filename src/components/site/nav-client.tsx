@@ -34,6 +34,7 @@ export function NavWallet() {
 
 const MENU = [
   { href: "/#send", label: "Send" },
+  { href: "/#how", label: "How it works" },
   { href: "/sent", label: "Your sends" },
   { href: "/mine", label: "Your wallet" },
   { href: "/assets", label: "Assets" },

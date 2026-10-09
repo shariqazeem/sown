@@ -1,13 +1,14 @@
 /**
- * site.css — the page frame every surface shares: the paper nav, a reading column, ruled
- * sections, fact rows, buttons, the footer. Aliases only; every value is a token. Ink (the
- * dark ground) is `.sw-ink`, used by /proof and nowhere else.
+ * site.css — the frame every surface shares: the nav, a reading column, sections, cards, fact
+ * rows, buttons, chips, notes, the footer. Aliases only; every value is a token. Two grounds:
+ * sand (every consumer page) and evergreen (`.sw-ink`, used by /proof, and the hero of the
+ * front door through `.is-hero`).
  */
 .sw-site {
   --line: var(--border);
   --line-strong: var(--border-strong);
   --gutter: clamp(16px, 4.5vw, 64px);
-  --leaf: var(--accent);
+  --leaf-mark: var(--leaf);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,8 +24,10 @@
 .sw-site a:focus-visible,
 .sw-site button:focus-visible,
 .sw-site summary:focus-visible,
-.sw-site input:focus-visible {
-  outline: 2px solid var(--accent);
+.sw-site input:focus-visible,
+.sw-site textarea:focus-visible,
+.sw-site select:focus-visible {
+  outline: 2px solid var(--leaf-deep);
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
@@ -32,13 +35,12 @@
   display: inline-flex;
   align-items: center;
 }
-/* the wordmark: Fraunces, in exactly one place */
+/* the wordmark: Instrument Serif, upright, with the sprout */
 .sw-wordmark {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 1;
-  font-variation-settings: "opsz" 144, "SOFT" 30;
 }
 .sw-local {
   color: var(--ink-muted);
@@ -58,11 +60,11 @@
   z-index: 40;
   display: flex;
   align-items: center;
-  gap: var(--s-2);
+  gap: var(--s-1);
   width: 100%;
-  max-width: 1120px;
+  max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--s-3) var(--gutter);
+  padding: var(--s-4) var(--gutter);
 }
 .sw-nav-brand {
   display: inline-flex;
@@ -76,15 +78,16 @@
   align-items: center;
   min-height: 44px;
   padding: 0 var(--s-3);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   color: var(--ink-muted);
   font-size: var(--fs-small);
-  font-weight: 500;
-  transition: color var(--dur-1) var(--ease-out);
+  font-weight: 600;
+  transition: color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
 }
 .sw-nav-link:hover,
 .sw-nav-link[aria-current="page"] {
   color: var(--ink);
+  background: rgba(16, 38, 28, 0.05);
 }
 .sw-nav-wallet {
   display: inline-flex;
@@ -92,39 +95,40 @@
   gap: var(--s-2);
   min-height: 44px;
   padding: 0 var(--s-4);
-  margin-left: var(--s-1);
+  margin-left: var(--s-2);
   border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--ink);
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
+  transition: border-color var(--dur-1) var(--ease-out);
 }
 .sw-nav-wallet:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--leaf-deep);
 }
 .sw-nav-wallet .dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: var(--r-pill);
-  background: var(--accent);
+  background: var(--leaf-deep);
 }
 .sw-nav-send {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   padding: 0 var(--s-5);
-  margin-left: var(--s-1);
-  border-radius: var(--r-md);
-  background: var(--accent);
-  color: var(--accent-ink);
+  margin-left: var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--brand);
+  color: var(--brand-ink);
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: 700;
+  transition: background var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
 }
 .sw-nav-send:hover {
-  background: var(--accent-strong);
+  background: var(--brand-strong);
 }
 .sw-nav-menu {
   display: none;
@@ -136,30 +140,31 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   color: var(--ink);
 }
 .sw-nav-sheet {
   position: absolute;
-  top: calc(100% + var(--s-1));
+  top: calc(100% + var(--s-2));
   right: 0;
   z-index: 50;
   display: grid;
-  width: min(280px, calc(100vw - 2 * var(--s-4)));
+  width: min(300px, calc(100vw - 2 * var(--s-4)));
   padding: var(--s-2);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-float);
+  color: var(--ink);
 }
 .sw-nav-sheet a {
   display: flex;
   align-items: center;
-  min-height: 48px;
-  padding: 0 var(--s-3);
+  min-height: 50px;
+  padding: 0 var(--s-4);
   border-radius: var(--r-md);
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 600;
 }
 .sw-nav-sheet a:hover {
   background: var(--bg);
@@ -175,10 +180,10 @@
   background: var(--warn-soft);
   color: var(--warn);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .sw-nav .is-wide {
     display: none;
   }
@@ -187,12 +192,53 @@
   }
 }
 
+/* ── the hero ground: the nav sits on evergreen at the top of the front door ─── */
+.sw-site.is-hero .sw-nav {
+  --leaf-mark: var(--leaf);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.sw-site.is-hero .sw-nav-brand,
+.sw-site.is-hero .sw-nav-menu-btn {
+  color: var(--ink-inverse);
+}
+.sw-site.is-hero .sw-nav-link {
+  color: var(--ink-inverse-muted);
+}
+.sw-site.is-hero .sw-nav-link:hover,
+.sw-site.is-hero .sw-nav-link[aria-current="page"] {
+  color: var(--ink-inverse);
+  background: rgba(255, 255, 255, 0.08);
+}
+.sw-site.is-hero .sw-nav-wallet {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-inverse);
+  color: var(--ink-inverse);
+}
+.sw-site.is-hero .sw-nav-wallet .dot {
+  background: var(--leaf);
+}
+.sw-site.is-hero .sw-nav-send {
+  background: var(--leaf);
+  color: var(--brand-strong);
+}
+.sw-site.is-hero .sw-net {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-inverse);
+  color: var(--ink-inverse-muted);
+}
+.sw-site.is-hero {
+  position: relative;
+}
+
 /* ── sections and the reading column ─────────────────────────────────── */
 .sw-sec {
   width: 100%;
-  max-width: 1120px;
+  max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--s-8) var(--gutter);
+  padding: var(--s-9) var(--gutter);
 }
 .sw-sec + .sw-sec {
   border-top: 1px solid var(--line);
@@ -203,23 +249,31 @@
 .sw-kicker {
   margin-bottom: var(--s-3);
   font-size: var(--fs-caption);
-  color: var(--ink-faint);
+  font-weight: 700;
+  color: var(--leaf-deep);
 }
 .sw-h1 {
-  max-width: 22ch;
+  max-width: 24ch;
   margin-bottom: var(--s-4);
+  font-family: var(--font-display);
   font-size: var(--fs-h1);
   line-height: var(--lh-h1);
   letter-spacing: var(--tracking-h1);
-  font-weight: 600;
+  font-weight: 400;
 }
 .sw-display {
-  max-width: 16ch;
+  max-width: 14ch;
   margin-bottom: var(--s-4);
+  font-family: var(--font-display);
   font-size: var(--fs-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tracking-display);
-  font-weight: 600;
+  font-weight: 400;
+}
+.sw-display em,
+.sw-h1 em {
+  font-style: italic;
+  color: var(--leaf-deep);
 }
 .sw-h2 {
   max-width: 30ch;
@@ -227,17 +281,17 @@
   font-size: var(--fs-h2);
   line-height: var(--lh-h2);
   letter-spacing: var(--tracking-h2);
-  font-weight: 600;
+  font-weight: 700;
 }
 .sw-lede {
-  max-width: 60ch;
+  max-width: 58ch;
   font-size: var(--fs-lead);
   line-height: var(--lh-lead);
   letter-spacing: var(--tracking-lead);
   color: var(--ink-muted);
 }
 .sw-body {
-  max-width: 68ch;
+  max-width: 66ch;
   color: var(--ink-muted);
 }
 .sw-body + .sw-body {
@@ -250,19 +304,27 @@
 .sw-body a,
 .sw-truth .v a,
 .sw-lede a {
-  color: var(--accent);
+  color: var(--link);
+  font-weight: 600;
 }
 .sw-link:hover,
 .sw-body a:hover,
 .sw-truth .v a:hover {
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
-/* a ruled section with a label */
+/* a card: white on sand */
+.sw-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* a section with a label */
 .sw-section {
   display: grid;
-  /* Beside a taller neighbour, the label stays one line tall and the rows start under it. */
   align-content: start;
   gap: var(--s-4);
   padding-top: var(--s-4);
@@ -276,10 +338,11 @@
   justify-content: space-between;
   gap: var(--s-4);
   font-size: var(--fs-caption);
+  font-weight: 700;
   color: var(--ink-faint);
 }
 .sw-section-label a {
-  color: var(--accent);
+  color: var(--link);
 }
 
 /* facts: a key, then a sentence */
@@ -288,7 +351,7 @@
 }
 .sw-truth {
   display: grid;
-  grid-template-columns: minmax(120px, 0.32fr) 1fr;
+  grid-template-columns: minmax(130px, 0.3fr) 1fr;
   gap: var(--s-4);
   padding: var(--s-3) 0;
   border-top: 1px solid var(--line);
@@ -298,12 +361,13 @@
 }
 .sw-truth .k {
   font-size: var(--fs-small);
-  color: var(--ink-muted);
+  font-weight: 700;
+  color: var(--ink);
 }
 .sw-truth .v {
   font-size: var(--fs-small);
   line-height: 1.55;
-  color: var(--ink);
+  color: var(--ink-muted);
   overflow-wrap: anywhere;
 }
 @media (max-width: 560px) {
@@ -319,50 +383,54 @@
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
-  min-height: 48px;
+  min-height: 50px;
   padding: 0 var(--s-5);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--ink);
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
-  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
 }
 .sw-btn:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--leaf-deep);
+  color: var(--leaf-deep);
+}
+.sw-btn:active:not(:disabled) {
+  transform: translateY(1px);
 }
 .sw-btn.is-primary {
   min-height: 56px;
-  font-size: 1.125rem;
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
+  padding: 0 var(--s-6);
+  font-size: 1.0625rem;
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--brand-ink);
 }
 .sw-btn.is-primary:hover:not(:disabled) {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
-  color: var(--accent-ink);
+  background: var(--brand-strong);
+  border-color: var(--brand-strong);
+  color: var(--brand-ink);
 }
 .sw-btn.is-block {
   width: 100%;
 }
 .sw-btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 .sw-textbtn {
   display: inline;
   min-height: 0;
   padding: 0;
-  color: var(--accent);
+  color: var(--link);
+  font-weight: 600;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
-/* A link or a text button standing on its own is a target a finger can hit: 44 px tall,
-   without moving the text around it. */
+/* A link or a text button standing on its own is a target a finger can hit: 44 px tall. */
 .sw-link,
 .sw-textbtn {
   position: relative;
@@ -406,6 +474,25 @@
   border-color: var(--ok-border);
 }
 
+/* a small label chip */
+.sw-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sw-tag.is-gold {
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+}
+
 /* ── the footer ───────────────────────────────────────────────────────── */
 .sw-foot {
   display: flex;
@@ -413,7 +500,7 @@
   align-items: center;
   gap: 0 var(--s-5);
   width: 100%;
-  max-width: 1120px;
+  max-width: var(--measure-wide);
   margin: var(--s-9) auto 0;
   padding: var(--s-6) var(--gutter) var(--s-8);
   border-top: 1px solid var(--line);
@@ -427,41 +514,51 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  font-weight: 600;
 }
 .sw-foot a:hover {
-  color: var(--accent);
+  color: var(--leaf-deep);
 }
 
-/* ── ink: the one dark surface, /proof ───────────────────────────────── */
+/* ── ink: the evergreen ground, /proof ───────────────────────────────── */
 .sw-ink {
   --line: var(--border-inverse);
   --line-strong: var(--border-inverse);
-  --leaf: var(--accent-inverse);
+  --leaf-mark: var(--leaf);
   background: var(--surface-inverse);
   color: var(--ink-inverse);
 }
-.sw-ink .sw-kicker,
+.sw-ink .sw-kicker {
+  color: var(--leaf);
+}
 .sw-ink .sw-section-label,
 .sw-ink .sw-foot {
   color: var(--ink-inverse-faint);
 }
 .sw-ink .sw-lede,
 .sw-ink .sw-body,
-.sw-ink .sw-truth .k,
+.sw-ink .sw-truth .v,
 .sw-ink .sw-nav-link {
   color: var(--ink-inverse-muted);
 }
-.sw-ink .sw-truth .v,
+.sw-ink .sw-truth .k,
 .sw-ink .sw-nav-brand,
-.sw-ink .sw-nav-link:hover {
+.sw-ink .sw-nav-link:hover,
+.sw-ink .sw-nav-link[aria-current="page"],
+.sw-ink .sw-nav-menu-btn {
   color: var(--ink-inverse);
+}
+.sw-ink .sw-nav-link:hover,
+.sw-ink .sw-nav-link[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.08);
 }
 .sw-ink .sw-link,
 .sw-ink .sw-body a,
 .sw-ink .sw-truth .v a,
 .sw-ink .sw-section-label a,
-.sw-ink .sw-lede a {
-  color: var(--accent-inverse);
+.sw-ink .sw-lede a,
+.sw-ink .sw-foot a:hover {
+  color: var(--leaf);
 }
 .sw-ink .sw-nav-wallet {
   background: var(--surface-inverse-raised);
@@ -469,8 +566,8 @@
   color: var(--ink-inverse);
 }
 .sw-ink .sw-nav-send {
-  background: var(--accent-inverse);
-  color: var(--surface-inverse);
+  background: var(--leaf);
+  color: var(--brand-strong);
 }
 .sw-ink .sw-net {
   background: transparent;
@@ -487,6 +584,7 @@
 .sw-ink .sw-nav-sheet a:hover {
   background: var(--surface-inverse);
 }
-.sw-ink .sw-nav-menu-btn {
-  color: var(--ink-inverse);
+.sw-ink .sw-display em,
+.sw-ink .sw-h1 em {
+  color: var(--leaf);
 }

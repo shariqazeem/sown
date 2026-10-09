@@ -38,16 +38,24 @@ export function writeJson(key: string, value: unknown): boolean {
  * wallet is asked to sign, so a send that lands while the tab is closing still has its link
  * here: the envelope names its own key, and the key finds the secret.
  */
-export type Links = Record<string, { readonly secret: string; readonly at: number }>;
+export type Links = Record<string, { readonly secret: string; readonly at: number; readonly note?: string | null }>;
 
-export function saveLink(claimKeyHex: string, secret: string): boolean {
+/** `note` is the fragment's note part (`note.ts`), so the link can be rebuilt whole. */
+export function saveLink(claimKeyHex: string, secret: string, note: string | null = null): boolean {
   const links = readJson<Links>("links") ?? {};
-  links[claimKeyHex] = { secret, at: Math.floor(Date.now() / 1000) };
+  links[claimKeyHex] = { secret, at: Math.floor(Date.now() / 1000), note };
   return writeJson("links", links);
 }
 
 export function linkFor(claimKeyHex: string): string | null {
   return readJson<Links>("links")?.[claimKeyHex]?.secret ?? null;
+}
+
+/** The whole fragment of a link this browser made: the secret, and the note if one was written. */
+export function fragmentFor(claimKeyHex: string): string | null {
+  const l = readJson<Links>("links")?.[claimKeyHex];
+  if (!l) return null;
+  return l.note ? `${l.secret}.${l.note}` : l.secret;
 }
 
 /** The passkey wallet made in this browser. */

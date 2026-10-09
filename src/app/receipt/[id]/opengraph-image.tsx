@@ -30,28 +30,30 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const e = r.value.envelope;
   const a = r.value.asset;
   const h = headline(e);
-  const tone = h.tone === "ok" ? OG.ok : h.tone === "waiting" ? OG.warn : OG.inkMuted;
+  const tone = h.tone === "ok" ? OG.leaf : h.tone === "waiting" ? OG.gold : OG.inkFaint;
   return new ImageResponse(
     (
       <div style={{ ...row, width: "100%", height: "100%", background: OG.bg, alignItems: "center", justifyContent: "center", padding: 48 }}>
-        <div style={{ ...col, width: 760, background: OG.surface, border: `2px ${h.tone === "waiting" ? "dashed" : "solid"} ${OG.border}`, borderRadius: 16, padding: 44, color: OG.ink, fontFamily: "sans-serif" }}>
-          <div style={{ ...row, justifyContent: "space-between", alignItems: "center", fontSize: 22, color: OG.inkFaint, marginBottom: 26 }}>
-            <div style={{ ...row, alignItems: "center", gap: 10, color: tone, fontWeight: 600 }}>
-              <div style={{ display: "flex", width: 11, height: 11, borderRadius: 11, background: tone }} />
+        <div style={{ ...col, width: 800, background: OG.surface, border: `2px solid ${OG.border}`, borderRadius: 36, overflow: "hidden", color: OG.ink, fontFamily: "sans-serif" }}>
+          <div style={{ ...row, justifyContent: "space-between", alignItems: "center", padding: "20px 40px", background: OG.surfaceInverse, color: OG.bg, fontSize: 22 }}>
+            <div style={{ ...row, alignItems: "center", gap: 10, fontWeight: 700 }}>
+              <div style={{ display: "flex", width: 12, height: 12, borderRadius: 12, background: tone }} />
               <div style={{ display: "flex" }}>{h.kicker}</div>
             </div>
-            <div style={{ display: "flex", fontSize: 26, fontWeight: 700, color: OG.ink }}>Sown</div>
+            <div style={{ display: "flex", fontSize: 28, fontFamily: "serif" }}>Sown</div>
           </div>
-          <div style={{ display: "flex", fontSize: 32, color: OG.inkMuted }}>{`${usdAligned(fromRaw(sentTotal(e)))} sent`}</div>
-          <div style={{ display: "flex", fontSize: 24, color: OG.inkFaint, marginTop: 18 }}>{e.keepIn > 0n ? `${bps(e.keepBps)} kept as` : "nothing kept"}</div>
-          <div style={{ ...row, alignItems: "baseline", fontSize: 104, fontWeight: 700, letterSpacing: -4, lineHeight: 1 }}>
-            <div style={{ display: "flex" }}>{units(e.keepOut)}</div>
-            <div style={{ display: "flex", fontSize: 38, color: OG.inkMuted, marginLeft: 16, fontWeight: 500, letterSpacing: 0 }}>{a?.ticker ?? "units"}</div>
-          </div>
-          <div style={{ display: "flex", fontSize: 24, color: OG.inkMuted, marginTop: 16 }}>{a ? assetLine(a) : ""}</div>
-          <div style={{ ...row, borderTop: `2px solid ${OG.border}`, marginTop: 28, paddingTop: 18, justifyContent: "space-between", fontSize: 22, color: OG.inkMuted }}>
-            <div style={{ display: "flex" }}>{`${usdAligned(fromRaw(e.cash))} to spend`}</div>
-            <div style={{ display: "flex" }}>{stampUTC(e.createdAt)}</div>
+          <div style={{ ...col, padding: "36px 44px 40px" }}>
+            <div style={{ display: "flex", fontSize: 30, color: OG.inkMuted }}>{`${usdAligned(fromRaw(sentTotal(e)))} sent`}</div>
+            <div style={{ display: "flex", fontSize: 22, color: OG.goldInk, fontWeight: 700, marginTop: 22 }}>{e.keepIn > 0n ? `${bps(e.keepBps)} kept as` : "nothing kept"}</div>
+            <div style={{ ...row, alignItems: "baseline", fontSize: 100, fontWeight: 800, letterSpacing: -4, lineHeight: 1 }}>
+              <div style={{ display: "flex" }}>{units(e.keepOut)}</div>
+              <div style={{ display: "flex", fontSize: 36, color: OG.goldInk, marginLeft: 16, fontWeight: 700, letterSpacing: 0 }}>{a?.ticker ?? "units"}</div>
+            </div>
+            <div style={{ display: "flex", fontSize: 24, color: OG.inkMuted, marginTop: 14 }}>{a ? assetLine(a) : ""}</div>
+            <div style={{ ...row, borderTop: `2px solid ${OG.border}`, marginTop: 28, paddingTop: 18, justifyContent: "space-between", fontSize: 22, color: OG.inkMuted }}>
+              <div style={{ display: "flex" }}>{`${usdAligned(fromRaw(e.cash))} to spend`}</div>
+              <div style={{ display: "flex" }}>{stampUTC(e.createdAt)}</div>
+            </div>
           </div>
         </div>
       </div>

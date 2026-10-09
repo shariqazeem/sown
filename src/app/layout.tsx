@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import { DM_Mono, Instrument_Serif, Manrope } from "next/font/google";
 import { Toasts } from "@/components/toast/toasts";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 import "../styles/tokens.css";
 
-const instrument = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-instrument", display: "swap" });
-const fraunces = Fraunces({ subsets: ["latin"], weight: "variable", axes: ["opsz", "SOFT"], variable: "--font-fraunces", display: "swap" });
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono", display: "swap" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
+const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-instrument-serif", display: "swap" });
+const mono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dm-mono", display: "swap" });
 
 /** Written to be quoted: an answer engine lifting one sentence should lift what Sown does. */
 const TITLE = "Sown — send money home, part of it stays theirs";
@@ -21,19 +21,18 @@ export const metadata: Metadata = {
   applicationName: "Sown",
   openGraph: { type: "website", siteName: "Sown" },
   twitter: { card: "summary_large_image" },
-  // A claim link must never be indexed: the path is public, but nothing else should be.
   robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f5ef",
+  themeColor: "#0f3f2f",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrument.variable} ${plexMono.variable} ${fraunces.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${serif.variable} ${mono.variable}`}>
       <body>
         {children}
         <Toasts />

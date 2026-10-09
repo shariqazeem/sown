@@ -1,0 +1,52 @@
+.sw-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+  margin-top: var(--s-6);
+}
+@media (max-width: 860px) {
+  .sw-steps {
+    grid-template-columns: 1fr;
+  }
+}
+.sw-step {
+  display: grid;
+  gap: var(--s-2);
+  align-content: start;
+  padding: var(--s-6) var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+.sw-step .art {
+  display: inline-flex;
+  width: 72px;
+  height: 72px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+  color: var(--brand);
+}
+.sw-step .art svg {
+  width: 48px;
+  height: 48px;
+}
+.sw-step .n {
+  font-size: var(--fs-caption);
+  font-weight: 800;
+  color: var(--leaf-deep);
+}
+.sw-step .t {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.sw-step .d {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}

@@ -38,7 +38,7 @@
   min-height: 360px;
   padding: var(--s-5);
   border: 1px dashed var(--border-strong);
-  border-radius: 0 0 var(--r-md) var(--r-md);
+  border-radius: var(--r-lg);
   background: var(--surface);
 }
 .sw-skel-sheet hr {

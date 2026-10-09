@@ -16,6 +16,8 @@ const Body = z.object({
   minKeepOut: z.string().regex(/^\d{1,30}$/),
   claimKey: z.string().regex(/^[0-9a-f]{64}$/),
   returnDays: z.number().int().min(1).max(365).optional(),
+  /** sha256 of the note that rides in the link (note.ts); zeros, or absent, for no note. */
+  memo: z.string().regex(/^[0-9a-f]{64}$/).optional(),
 });
 
 /** POST /api/send/prepare — the send, simulated and assembled for one wallet signature. */
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     keepAsset: asset.sac,
     minKeepOutRaw: BigInt(b.minKeepOut),
     claimKeyHex: b.claimKey,
-    memoHex: "00".repeat(32),
+    memoHex: b.memo ?? "00".repeat(32),
     returnAt: returnAtFor(b.returnDays ?? DEFAULT_RETURN_DAYS, Math.floor(Date.now() / 1000)),
   });
   if (!prepared.ok) return NextResponse.json({ error: prepared.why }, { status: 422 });

@@ -56,10 +56,13 @@ export function encodeSecret(secret: Uint8Array): string {
   return toBase64Url(secret);
 }
 
-/** Null for anything that is not exactly a 32-byte secret: an incomplete link says so. */
+/**
+ * Null for anything that is not exactly a 32-byte secret: an incomplete link says so. A note
+ * may follow the secret after a "." (`note.ts`); only the part before it is the secret.
+ */
 export function decodeSecret(fragment: string | null | undefined): Uint8Array | null {
   if (!fragment) return null;
-  const s = fragment.replace(/^#/, "").trim();
+  const s = fragment.replace(/^#/, "").trim().split(".")[0]!;
   if (!/^[A-Za-z0-9_-]{43}$/.test(s)) return null;
   const b = fromBase64Url(s);
   return b.length === 32 ? new Uint8Array(b) : null;

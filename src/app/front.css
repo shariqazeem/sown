@@ -1,90 +1,118 @@
 /**
- * THE FRONT DOOR, ON PAPER. Headline left, the card right; on a phone the card comes first so
- * it is within reach of the first screen. Every value is a token.
+ * THE FRONT DOOR. An evergreen hero (the nav floats over it), then sections on sand. Every
+ * value is a token.
  */
 .sw-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
-  gap: var(--s-8);
-  align-items: start;
+  position: relative;
+  background: var(--surface-inverse);
+  color: var(--ink-inverse);
+  overflow: hidden;
 }
-/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
-.sw-sec.sw-hero {
-  padding-top: var(--s-7);
+/* a warm glow where the sun is, and a leaf glow under the card */
+.sw-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 55% at 85% 0%, rgba(224, 166, 58, 0.22), transparent 70%),
+    radial-gradient(45% 40% at 10% 100%, rgba(53, 196, 127, 0.16), transparent 70%);
+  pointer-events: none;
+}
+.sw-hero-in {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
+  gap: var(--s-9);
+  align-items: center;
+  width: 100%;
+  max-width: var(--measure-wide);
+  margin: 0 auto;
+  padding: calc(var(--s-11) + var(--s-2)) var(--gutter) var(--s-10);
 }
 .sw-hero-words {
-  padding-top: var(--s-6);
+  display: grid;
+  gap: var(--s-5);
+  align-content: center;
+}
+.sw-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--ink-inverse-muted);
+}
+.sw-hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--leaf);
+  box-shadow: 0 0 0 4px rgba(53, 196, 127, 0.2);
+}
+.sw-hero .sw-display {
+  margin-bottom: 0;
+  color: var(--ink-inverse);
+}
+.sw-hero .sw-display em {
+  color: var(--gold);
+}
+.sw-hero .sw-lede {
+  color: var(--ink-inverse-muted);
+}
+.sw-hero-points {
+  display: grid;
+  gap: var(--s-2);
+}
+.sw-hero-points li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-inverse);
+}
+.sw-hero-points svg {
+  flex: none;
+  color: var(--leaf);
 }
 .sw-hero-line {
-  margin-top: var(--s-5);
-  max-width: 46ch;
-  font-size: var(--fs-small);
-  color: var(--ink-faint);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--ink-inverse-faint);
 }
-.sw-hero-net {
-  margin-top: var(--s-5);
-  max-width: 52ch;
+.sw-hero-card {
+  position: relative;
 }
-@media (max-width: 900px) {
-  .sw-hero {
+@media (max-width: 960px) {
+  .sw-hero-in {
     grid-template-columns: 1fr;
-    gap: var(--s-6);
-  }
-  .sw-sec.sw-hero {
-    padding-top: var(--s-4);
-  }
-  .sw-hero-card {
-    order: -1;
+    gap: var(--s-7);
+    padding-top: calc(var(--s-10) + var(--s-3));
+    padding-bottom: var(--s-8);
   }
   .sw-hero-words {
-    padding-top: 0;
+    gap: var(--s-4);
   }
   .sw-hero .sw-display {
-    font-size: var(--fs-h1);
+    max-width: 12ch;
+  }
+  .sw-hero-points {
+    display: none;
   }
 }
 
-/* how it works */
-.sw-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s-6);
-  margin-top: var(--s-6);
+/* sections on sand */
+.sw-sec.sw-front-sec {
+  padding-top: var(--s-9);
+  padding-bottom: var(--s-9);
 }
-.sw-steps li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--s-3);
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--border-strong);
+.sw-front-head {
+  max-width: var(--measure);
+  margin-bottom: var(--s-6);
 }
-.sw-steps .n {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--r-pill);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-  font-size: var(--fs-small);
-  font-weight: 600;
-}
-.sw-steps .t {
-  font-weight: 600;
-  line-height: 1.4;
-}
-.sw-steps .d {
-  margin-top: var(--s-2);
-  font-size: var(--fs-small);
-  color: var(--ink-muted);
-  line-height: 1.55;
-}
-@media (max-width: 900px) {
-  .sw-steps {
-    grid-template-columns: 1fr;
-    gap: var(--s-4);
-  }
+.sw-front-head .sw-h2 {
+  max-width: 24ch;
 }
 
 /* two columns: words, then an object */
@@ -102,23 +130,27 @@
 }
 .sw-asset-list {
   display: grid;
+  gap: var(--s-3);
 }
 .sw-asset-row {
-  padding: var(--s-4) 0;
-  border-top: 1px solid var(--border);
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
 }
-.sw-asset-row:last-child {
-  border-bottom: 1px solid var(--border);
+.sw-asset-row.is-next {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--border-strong);
 }
 .sw-asset-row .name {
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
-/* The ticker and issuer wrap as one piece on a phone, never word by word. */
 .sw-asset-row .tick {
   display: inline-block;
   font-size: var(--fs-caption);
-  font-weight: 400;
+  font-weight: 600;
   color: var(--ink-faint);
 }
 .sw-asset-row .line {
@@ -130,6 +162,44 @@
 .sw-env-slot {
   display: flex;
   justify-content: center;
+}
+
+/* why only Stellar */
+.sw-why {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+}
+@media (max-width: 960px) {
+  .sw-why {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .sw-why {
+    grid-template-columns: 1fr;
+  }
+}
+.sw-why li {
+  display: grid;
+  gap: var(--s-2);
+  align-content: start;
+  padding: var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.sw-why .t {
+  font-weight: 700;
+  line-height: 1.35;
+}
+.sw-why .d {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.55;
+}
+.sw-front-cta {
+  margin-top: var(--s-6);
 }
 .sw-sec.sw-front-net {
   padding-top: 0;

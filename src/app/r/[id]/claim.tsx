@@ -3,25 +3,27 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Copy, Fingerprint } from "lucide-react";
-import { Envelope } from "@/components/envelope/envelope";
-import { LocalAmount } from "@/components/money/local-amount";
+import { SownMark } from "@/components/brand/mark";
+import { useLocalMoney } from "@/components/money/use-local-money";
 import { SkeletonEnvelope } from "@/components/skeleton/skeleton";
 import { useTxToast } from "@/components/toast/use-tx-toast";
 import { WalletSheet } from "@/components/wallet/wallet-sheet";
-import { assetLine } from "@/lib/assets/catalogue";
 import { decodeSecret, secretOpens, signClaim } from "@/lib/envelope/claim";
+import { type Note, verifiedNote } from "@/lib/envelope/note";
 import { type EnvelopeJson, envelopeFromJson } from "@/lib/envelope/types";
 import { returnWords } from "@/lib/envelope/view";
-import { bps, dateUTC, fromRaw, short, stampUTC, units, usdAligned } from "@/lib/format";
+import { dateUTC, fromRaw, short, stampUTC, units, usdAligned } from "@/lib/format";
 import { rememberClaim, saveWallet, savedWallet } from "@/lib/local";
 import { faceSupport, inAppBrowser, makeWallet, recordBirth } from "@/lib/passkey/client";
 import { type WalletOption, connectWallet, signWith } from "@/lib/wallet/kit";
 
 /**
- * THE CLAIM. One primary button, "Claim with Face ID": the phone makes a passkey (the one Face
- * ID), Sown's servers deploy the wallet and submit the claim the link signed. Or a Stellar
- * wallet: Sown's servers prepare it to hold these assets (one approval, the first time) and
- * submit the claim. The secret never leaves this page: only a signature naming the wallet does.
+ * THE CLAIM. A gift, read from the contract: who sent it, how much in the reader's own money,
+ * what is theirs to spend and what stays theirs, the note if the ledger vouches for it, and one
+ * button, "Claim with Face ID": the phone makes a passkey (the one Face ID), Sown's servers
+ * deploy the wallet and submit the claim the link signed. Or a Stellar wallet: Sown's servers
+ * prepare it to hold these assets (one approval, the first time) and submit the claim. The
+ * secret never leaves this page: only a signature naming the wallet does.
  */
 type Read = { envelope: EnvelopeJson; claimTx: string | null } | { error: string; missing: boolean };
 type AssetView = { ticker: string; name: string; fullName: string; issuerName: string; standIn: boolean; disclosure: string };
@@ -29,6 +31,7 @@ type Phase = "idle" | "making" | "preparing" | "approving" | "claiming" | "done"
 
 export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, contractId }: { id: string; read: Read; asset: AssetView | null; passphrase: string; testnet: boolean; explorer: string; contractId: string }) {
   const [secret, setSecret] = useState<Uint8Array | null | undefined>(undefined);
+  const [note, setNote] = useState<Note | null>(null);
   const [face, setFace] = useState<"yes" | "no" | "maybe" | null>(null);
   const [inApp, setInApp] = useState<string | null>(null);
   const [envelope, setEnvelope] = useState<EnvelopeJson | null>("envelope" in read ? read.envelope : null);
@@ -36,19 +39,17 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   const [why, setWhy] = useState<string | null>(null);
   const [mine, setMine] = useState<string | null>(null);
   const [sheet, setSheet] = useState(false);
-  // Which wallet this page just claimed into: a passkey wallet opens at /mine, a classic one in its own app.
   const [into, setInto] = useState<{ kind: "passkey" | "classic"; address: string } | null>(null);
-  // The path in progress (or that just failed): "Try again" retries it, and a classic claim never
-  // wears Face ID's icon or words.
   const [via, setVia] = useState<{ kind: "passkey" } | { kind: "classic"; wallet: WalletOption; address: string } | null>(null);
   const [claimTx, setClaimTx] = useState<string | null>("envelope" in read ? read.claimTx : null);
 
   useEffect(() => {
     setSecret(decodeSecret(window.location.hash));
+    if ("envelope" in read) setNote(verifiedNote(window.location.hash, read.envelope.memoHex));
     setInApp(inAppBrowser());
     setMine(savedWallet()?.contractId ?? null);
     void faceSupport().then(setFace);
-  }, []);
+  }, [read]);
 
   const busy = phase === "making" || phase === "preparing" || phase === "approving" || phase === "claiming";
   const toastPhase = phase === "making" || phase === "preparing" ? "building" : phase === "approving" ? "signing" : phase === "claiming" ? "confirming" : phase === "done" ? "done" : phase === "failed" ? "failed" : "idle";
@@ -190,33 +191,15 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
     }
   };
 
-  // ── claimed: the receipt, printing if it was claimed here and now ──
+  const passkeyHere = e.state === "claimed" && ((into?.kind === "passkey" && into.address === e.claimedBy) || (!!mine && e.claimedBy === mine));
+  const classicHere = e.state === "claimed" && into?.kind === "classic" && into.address === e.claimedBy;
+  const gift = <Gift e={e} total={total} asset={asset} ticker={ticker} note={note} yours={passkeyHere || classicHere} fresh={phase === "done"} claimTx={claimTx} explorer={explorer} />;
+
+  // ── claimed: the receipt, landing if it was claimed here and now ──
   if (e.state === "claimed") {
-    // A passkey wallet this browser holds, whether it claimed here and now or on an earlier visit.
-    const passkeyHere = (into?.kind === "passkey" && into.address === e.claimedBy) || (!!mine && e.claimedBy === mine);
-    const classicHere = into?.kind === "classic" && into.address === e.claimedBy;
     return (
       <div className="sw-claim">
-        <Envelope
-          kicker={phase === "done" ? "Claimed on Stellar, just now" : "Claimed on Stellar"}
-          tone="ok"
-          sent={<>{short(e.sender)} sent <strong>{usdAligned(fromRaw(total))}</strong></>}
-          became={`${bps(e.keepBps)} kept as`}
-          units={units(e.keepOut)}
-          symbol={ticker}
-          assetLine={asset ? assetLine(asset) : undefined}
-          when={phase === "done" ? "just now" : `Claimed ${stampUTC(e.claimedAt)}`}
-          where={passkeyHere || classicHere ? "in your wallet" : <>to <span className="addr">{short(e.claimedBy ?? "")}</span></>}
-          sections={[
-            {
-              rows: [
-                { k: "To spend", v: <>{usdAligned(fromRaw(e.cash))}<LocalAmount usd={fromRaw(e.cash)} /></> },
-                ...(claimTx ? [{ k: "Claim", v: <a href={`${explorer}/tx/${claimTx}`}>{short(claimTx)}</a> }] : []),
-              ],
-            },
-          ]}
-          printing={phase === "done"}
-        />
+        {gift}
         <div className="sw-claim-after">
           <h1 className="sw-sr">Envelope {id}, claimed</h1>
           {passkeyHere ? (
@@ -257,15 +240,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   if (e.state === "returned") {
     return (
       <div className="sw-claim">
-        <Envelope
-          kicker="Returned"
-          tone="returned"
-          sent={<>{short(e.sender)} sent <strong>{usdAligned(fromRaw(total))}</strong></>}
-          became={`${bps(e.keepBps)} was kept as`}
-          units={units(e.keepOut)}
-          symbol={ticker}
-          when={returnWords(e)}
-        />
+        {gift}
         <div className="sw-claim-after">
           <h1 className="sw-claim-title">{returnWords(e)}</h1>
           <p className="sw-claim-under">Ask them to send again. A new send makes a new link.</p>
@@ -278,7 +253,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   if (!secret || !opens) {
     return (
       <div className="sw-claim">
-        <Waiting e={e} total={total} asset={asset} ticker={ticker} />
+        {gift}
         <div className="sw-claim-after">
           <h1 className="sw-claim-title">This link is incomplete.</h1>
           <p className="sw-claim-say">Ask the sender to share it again from their sends page. The part of the link that opens the envelope is missing or changed.</p>
@@ -291,7 +266,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   const noFace = face === "no" || (inApp !== null && face !== "yes");
   return (
     <div className="sw-claim">
-      <Waiting e={e} total={total} asset={asset} ticker={ticker} />
+      {gift}
       <div className="sw-claim-after">
         {noFace ? (
           <>
@@ -310,8 +285,8 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
         ) : (
           <>
             <h1 className="sw-sr">Your envelope, waiting for you to claim it</h1>
-            <button type="button" className="sw-btn is-primary is-block" onClick={() => void (via?.kind === "classic" ? claimClassic(via.wallet) : claimPasskey())} disabled={busy}>
-              {via?.kind === "classic" ? null : <Fingerprint size={18} strokeWidth={2} aria-hidden />}
+            <button type="button" className="sw-btn is-primary is-block sw-claim-go" onClick={() => void (via?.kind === "classic" ? claimClassic(via.wallet) : claimPasskey())} disabled={busy}>
+              {via?.kind === "classic" ? null : <Fingerprint size={20} strokeWidth={2} aria-hidden />}
               {phase === "making" ? "Making your wallet…" : phase === "claiming" ? "Claiming…" : phase === "preparing" ? "Preparing your wallet…" : phase === "approving" ? "Approve in your wallet…" : phase === "failed" ? "Try again" : "Claim with Face ID"}
             </button>
             <p className="sw-claim-under">
@@ -363,18 +338,74 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
   );
 }
 
-function Waiting({ e, total, asset, ticker }: { e: ReturnType<typeof envelopeFromJson>; total: bigint; asset: AssetView | null; ticker: string }) {
+/**
+ * THE GIFT: the envelope as the recipient sees it. Who sent it (the note's name if the ledger
+ * vouches for it, else the address), the whole amount in their own money, the note, then the two
+ * parts: to spend, and what stays theirs.
+ */
+function Gift({ e, total, asset, ticker, note, yours, fresh, claimTx, explorer }: { e: ReturnType<typeof envelopeFromJson>; total: bigint; asset: AssetView | null; ticker: string; note: Note | null; yours: boolean; fresh: boolean; claimTx: string | null; explorer: string }) {
+  const money = useLocalMoney();
+  const usdTotal = fromRaw(total);
+  const state = e.state;
+  const kicker = state === "claimed" ? (fresh ? "Claimed on Stellar, just now" : "Claimed on Stellar") : state === "returned" ? "Returned to the sender" : "Sent on Stellar, waiting for you";
   return (
-    <Envelope
-      kicker="Sent, waiting for you"
-      tone="waiting"
-      sent={<><span className="addr">{short(e.sender)}</span> sent you <strong>{usdAligned(fromRaw(total))}</strong><LocalAmount usd={fromRaw(total)} /></>}
-      became={e.keepIn > 0n ? "yours to keep when you claim" : "nothing kept"}
-      units={units(e.keepOut)}
-      symbol={ticker}
-      assetLine={asset ? assetLine(asset) : undefined}
-      where={<>{usdAligned(fromRaw(e.cash))} to spend<LocalAmount usd={fromRaw(e.cash)} /></>}
-      when={`Sent ${dateUTC(e.createdAt)}`}
-    />
+    <article className={`sw-gift is-${state}${fresh ? " is-printing" : ""}`}>
+      <div className="sw-gift-head">
+        <span className="sw-gift-kicker">
+          <span className="dot" aria-hidden />
+          {kicker}
+        </span>
+        <span className="sw-gift-brand">
+          <SownMark size={18} />
+          Sown
+        </span>
+      </div>
+      <div className="sw-gift-body">
+        <p className="sw-gift-from">{note?.from ? `${note.from} sent you` : <><span className="mono">{short(e.sender)}</span> sent you</>}</p>
+        <p className="sw-gift-amount">
+          {money ? (
+            <>
+              <span className="big">{money.format(usdTotal)}</span>
+              <span className="usd">{usdAligned(usdTotal)} in USDC</span>
+            </>
+          ) : (
+            <span className="big">{usdAligned(usdTotal)}</span>
+          )}
+        </p>
+        {note?.note ? <p className="sw-gift-note">“{note.note}”</p> : null}
+        <div className="sw-gift-parts">
+          <div className="part is-spend">
+            <p className="k">
+              <span className="dot" aria-hidden />
+              {state === "claimed" ? "To spend" : "To spend, now"}
+            </p>
+            <p className="v">{usdAligned(fromRaw(e.cash))}</p>
+            <p className="sub">{money ? money.format(fromRaw(e.cash)) : "dollars, as USDC"}</p>
+          </div>
+          <div className="part is-stay">
+            <p className="k">
+              <span className="dot" aria-hidden />
+              {yours ? "Stays yours" : state === "returned" ? "Was kept as" : state === "claimed" ? "Kept as" : "Stays yours, when you claim"}
+            </p>
+            <p className="v">
+              {units(e.keepOut)} <span className="sym">{ticker}</span>
+            </p>
+            <p className="sub">{asset ? (asset.standIn ? "XLM, standing in for US Treasuries on testnet" : asset.fullName) : ticker}</p>
+          </div>
+        </div>
+        <p className="sw-gift-when">
+          {state === "claimed" ? `Claimed ${stampUTC(e.claimedAt)}` : state === "returned" ? returnWords(e) : `Sent ${dateUTC(e.createdAt)}`}
+          {state === "claimed" && yours ? " · in your wallet" : state === "claimed" && e.claimedBy ? <> · to <span className="mono">{short(e.claimedBy)}</span></> : null}
+          {claimTx ? (
+            <>
+              {" · "}
+              <a href={`${explorer}/tx/${claimTx}`} className="sw-link">
+                on the ledger
+              </a>
+            </>
+          ) : null}
+        </p>
+      </div>
+    </article>
   );
 }

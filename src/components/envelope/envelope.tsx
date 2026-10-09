@@ -67,8 +67,8 @@ export function Envelope({
       </div>
       <p className="sw-env-sent">{sent}</p>
       <p className="sw-env-became">{became}</p>
-      <p className="sw-env-units">
-        {units}
+      <p className={`sw-env-units${units.replace(/[^0-9]/g, "").length > 7 ? " is-long" : ""}`}>
+        <span className="num">{units}</span>
         <span className="sym">{symbol}</span>
       </p>
       {assetLine ? <p className="sw-env-asset">{assetLine}</p> : null}

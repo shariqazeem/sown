@@ -5,7 +5,6 @@
   gap: var(--s-8);
   align-items: start;
 }
-/* Two classes, so the section's own padding (site.css, loaded later) does not win. */
 .sw-sec.sw-receipt {
   padding-top: var(--s-6);
 }
@@ -46,27 +45,56 @@
 /* the link, once, after a send: a sheet that cannot be missed */
 .sw-sent-sheet {
   display: grid;
-  gap: var(--s-3);
+  gap: var(--s-4);
   padding: var(--s-5);
   background: var(--surface);
-  border: 2px solid var(--accent);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sheet);
+  border: 2px solid var(--leaf-deep);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
 }
 .sw-sent-sheet.is-pending {
-  min-height: 260px;
+  min-height: 280px;
   border-color: var(--border);
 }
-.sw-sent-title {
-  font-size: 1.25rem;
-  font-weight: 600;
+.sw-sent-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  gap: var(--s-5);
+  align-items: start;
 }
-.sw-sent-link {
-  padding: var(--s-3);
-  background: var(--bg);
+@media (max-width: 480px) {
+  .sw-sent-top {
+    grid-template-columns: 1fr;
+  }
+}
+.sw-sent-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: var(--s-2);
+}
+.sw-sent-say {
+  font-size: var(--fs-small);
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+.sw-sent-qr {
+  padding: var(--s-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  font-size: var(--fs-small);
+}
+.sw-sent-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.sw-sent-link {
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-caption);
   word-break: break-all;
   user-select: all;
 }

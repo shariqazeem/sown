@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, X } from "lucide-react";
+import { PenLine, ShieldCheck, X } from "lucide-react";
 import { useLocalMoney } from "@/components/money/use-local-money";
 import { useTxToast } from "@/components/toast/use-tx-toast";
 import { claimKey, encodeSecret, newSecret } from "@/lib/envelope/claim";
+import { NOTE_LIMITS, type Note, cleanNote, encodeNote, noteHashHex } from "@/lib/envelope/note";
 import { dateUTC, fromRaw, units, usd, usdAligned, xlm } from "@/lib/format";
 import { saveLink, writeJson } from "@/lib/local";
 import { type WalletOption, connectWallet, isPhone, listWallets, rememberWallet, rememberedWallet, signWith } from "@/lib/wallet/kit";
@@ -16,14 +17,17 @@ import "./send.css";
 /**
  * THE SEND CARD — the front door's one job.
  *
- * How much, keep how much, as what; the pool's own answer, live; one button that says exactly
- * what it does. Nothing opens the wallet until the confirm sheet has said, in words, what moves,
- * what it becomes, the least it can become, the fee from the transaction's own simulation, when
- * it comes back by itself, and what the issuer can do.
+ * How much, keep how much, and the split drawn live from the pool's own answer: what they get
+ * to spend, and what stays as theirs. A name and a note can ride with the link (their hash goes
+ * on the ledger). One button that says exactly what it does. Nothing opens the wallet until the
+ * confirm sheet has said, in words, what moves, what it becomes, the least it can become, the
+ * fee from the transaction's own simulation, when it comes back by itself, and what the issuer
+ * can do.
  */
 const AMOUNTS = [25, 50, 100] as const;
 const KEEPS = [500, 1_000, 2_000] as const;
 const RETURN_DAYS = 30;
+const TEST_WALLET_ID = "sown-test-wallet";
 
 type Props = {
   readonly assets: readonly CardAsset[];
@@ -32,12 +36,13 @@ type Props = {
   readonly testnet: boolean;
   readonly xlmUsd: number | null;
   readonly deployed: boolean;
+  readonly testWallet?: boolean;
 };
 
 type Phase = "idle" | "building" | "signing" | "confirming" | "failed";
 type Prepared = PreparedBody & { readonly secret: string; readonly claimKeyHex: string; readonly at: number; readonly for: string };
 
-export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, deployed }: Props) {
+export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, deployed, testWallet = false }: Props) {
   const router = useRouter();
   const money = useLocalMoney();
   const [amount, setAmount] = useState<{ usd: number; source: "chip" | "other" }>({ usd: 100, source: "chip" });
@@ -46,22 +51,29 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
   const [keepSource, setKeepSource] = useState<"chip" | "other">("chip");
   const [otherKeep, setOtherKeep] = useState("");
   const [assetKey, setAssetKey] = useState(assets[0]?.key ?? "");
+  const [from, setFrom] = useState("");
+  const [noteText, setNoteText] = useState("");
+  const [noteOpen, setNoteOpen] = useState(false);
   const [quote, setQuote] = useState<Quote | null>(initialQuote);
   const [quoting, setQuoting] = useState(false);
-  const [quoteWhy, setQuoteWhy] = useState<string | null>(deployed ? null : "Sown is not deployed on this network yet.");
+  const [quoteWhy, setQuoteWhy] = useState<string | null>(null);
   const [account, setAccount] = useState<{ id: string; address: string } | null>(null);
   const [holdings, setHoldings] = useState<HoldingsBody | null>(null);
   const [wallets, setWallets] = useState<WalletOption[] | null>(null);
-  const [sheet, setSheet] = useState<null | "wallets" | "confirm">(null);
+  const [sheet, setSheet] = useState<"wallets" | "confirm" | null>(null);
+  const [prepared, setPrepared] = useState<Prepared | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [why, setWhy] = useState<string | null>(null);
-  const [prepared, setPrepared] = useState<Prepared | null>(null);
+  const [trying, setTrying] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
 
   const asset = useMemo(() => assets.find((a) => a.key === assetKey) ?? assets[0]!, [assets, assetKey]);
   const amountRaw = BigInt(Math.round(amount.usd * 100)) * 100_000n;
   const usdLabel = usd(amount.usd);
   const intent = `${assetKey}:${amountRaw}:${keepBps}`;
+  const note: Note | null = cleanNote({ from, note: noteText });
+  const memoHex = noteHashHex(note);
+  const prepareFor = `${intent}:${memoHex}`;
   // A quote counts only for the asset, amount and keep on screen; a stale one is never shown.
   const fresh = quote && quote.asset === asset.sac && quote.amountRaw === amountRaw.toString() && quote.keepBps === keepBps ? quote : null;
   const spendable = holdings ? BigInt(holdings.usdc.balanceRaw) : null;
@@ -150,8 +162,6 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
     if (!d) return;
     if (sheet && !d.open) {
       d.showModal();
-      // Start at the top, on the title: the browser would otherwise focus the first control it
-      // finds (the close button is disabled while preparing) and scroll the outcome out of view.
       d.querySelector<HTMLElement>(".sw-sheet-title")?.focus();
       d.scrollTop = 0;
     } else if (!sheet && d.open) d.close();
@@ -168,7 +178,7 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
         const res = await fetch("/api/send/prepare", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sender: who.address, usd: String(amount.usd), keepBps, asset: assetKey, minKeepOut: q.minKeepOutRaw, claimKey: keyHex, returnDays: RETURN_DAYS }),
+          body: JSON.stringify({ sender: who.address, usd: String(amount.usd), keepBps, asset: assetKey, minKeepOut: q.minKeepOutRaw, claimKey: keyHex, returnDays: RETURN_DAYS, memo: memoHex }),
         });
         const body = (await res.json()) as PreparedBody & { error?: string };
         if (!res.ok) {
@@ -176,14 +186,14 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
           setWhy(body.error ?? "The send could not be prepared. Nothing moved.");
           return;
         }
-        setPrepared({ ...body, secret: encodeSecret(secret), claimKeyHex: keyHex, at: Date.now(), for: intent });
+        setPrepared({ ...body, secret: encodeSecret(secret), claimKeyHex: keyHex, at: Date.now(), for: prepareFor });
         setPhase("idle");
       } catch {
         setPhase("failed");
         setWhy("Could not reach Sown. Nothing moved.");
       }
     },
-    [amount.usd, keepBps, assetKey, intent],
+    [amount.usd, keepBps, assetKey, memoHex, prepareFor],
   );
 
   const openConfirm = (who: { id: string; address: string }) => {
@@ -215,15 +225,27 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
     openConfirm(who);
   };
 
+  /** Testnet: a wallet held in this browser that funds itself, so anyone can try a send. */
+  const tryIt = async () => {
+    setWhy(null);
+    setTrying(true);
+    try {
+      await listWallets(passphrase);
+      await pick({ id: TEST_WALLET_ID, name: "Test wallet", icon: "", url: "", available: true });
+    } finally {
+      setTrying(false);
+    }
+  };
+
   const approve = async () => {
     if (!account || !prepared || !fresh) return;
-    if (prepared.for !== intent || Date.now() - prepared.at > 240_000) {
+    if (prepared.for !== prepareFor || Date.now() - prepared.at > 240_000) {
       await prepare(account, fresh);
       return;
     }
     setWhy(null);
     // The link exists before the wallet is asked: a send that lands always has its link here.
-    saveLink(prepared.claimKeyHex, prepared.secret);
+    saveLink(prepared.claimKeyHex, prepared.secret, encodeNote(note));
     setPhase("signing");
     const signed = await signWith(passphrase, account.id, prepared.xdr, account.address);
     if (!signed.ok) {
@@ -267,9 +289,16 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
   const returnsOn = dateUTC(Math.floor(Date.now() / 1000) + RETURN_DAYS * 86_400);
   const feeStroops = prepared ? Number(prepared.feeStroops) : null;
   const feeMoney = feeStroops !== null && xlmUsd ? feeInMoney(feeStroops, xlmUsd) : null;
+  const spendPct = Math.max(0, 100 - keepBps / 100);
+  const keepPct = keepBps / 100;
 
   return (
     <div className="sw-send" id="send">
+      <div className="sw-send-head">
+        <p className="sw-send-title">Send home</p>
+        <p className="sw-send-sub">{testnet ? "Test dollars on Stellar testnet" : "Dollars on Stellar, one approval"}</p>
+      </div>
+
       <fieldset className="sw-send-group">
         <legend>How much</legend>
         <div className="sw-send-chips">
@@ -310,13 +339,12 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
                   : `This wallet holds ${usdAligned(fromRaw(holdings.usdc.balanceRaw))} of USDC, less than ${usdLabel}. Choose a smaller amount.`}
           </p>
         ) : account ? (
-          // Holds the line's place while the wallet is read, so nothing below it jumps.
           <p className="sw-send-held is-reading">Reading what this wallet holds…</p>
         ) : null}
       </fieldset>
 
       <fieldset className="sw-send-group">
-        <legend>Keep</legend>
+        <legend>They keep</legend>
         <div className="sw-send-chips">
           {KEEPS.map((b) => {
             const on = keepSource === "chip" && keepBps === b;
@@ -324,7 +352,7 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
               <button
                 key={b}
                 type="button"
-                className={`sw-send-chip${on ? " is-selected" : ""}`}
+                className={`sw-send-chip is-keep${on ? " is-selected" : ""}`}
                 aria-pressed={on}
                 disabled={busy}
                 onClick={() => {
@@ -336,7 +364,7 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
               </button>
             );
           })}
-          <label className={`sw-send-chip is-other${keepSource === "other" ? " is-selected" : ""}`}>
+          <label className={`sw-send-chip is-other is-keep${keepSource === "other" ? " is-selected" : ""}`}>
             <input
               inputMode="numeric"
               placeholder="Other"
@@ -356,14 +384,51 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
             <span aria-hidden>%</span>
           </label>
         </div>
-        <p className="sw-send-math">
-          Keep {usdAligned(fromRaw(keepIn))} {unitsOut ? <>→ about <strong>{unitsOut} {asset.ticker}</strong></> : null} ({asset.name}). {usdAligned(fromRaw(cashRaw))} to spend.
-        </p>
       </fieldset>
+
+      {/* THE SPLIT: what moves, drawn from the pool's own answer. */}
+      <div className="sw-split" aria-live="polite">
+        <div className="sw-split-bar" role="img" aria-label={`${spendPct}% to spend, ${keepPct}% stays`}>
+          <span className="spend" style={{ flexGrow: spendPct }} />
+          <span className="stay" style={{ flexGrow: keepPct }} />
+        </div>
+        <div className="sw-split-legend">
+          <p className="spend">
+            <span className="k">
+              <span className="dot" aria-hidden />
+              To spend
+            </span>
+            <span className="v">{usdAligned(fromRaw(cashRaw))}</span>
+            <span className="sub">{money ? money.format(fromRaw(cashRaw)) : "dollars, as USDC"}</span>
+          </p>
+          <p className="stay">
+            <span className="k">
+              <span className="dot" aria-hidden />
+              Stays theirs
+            </span>
+            <span className="v">
+              {quoteWhy ? (
+                <span className="why">{quoteWhy}</span>
+              ) : unitsOut ? (
+                <>
+                  {unitsOut} <span className="sym">{asset.ticker}</span>
+                </>
+              ) : fresh ? (
+                "nothing kept"
+              ) : (
+                <span className="why">{quoting ? "Asking Aquarius for the price…" : "—"}</span>
+              )}
+            </span>
+            <span className="sub">
+              {usdAligned(fromRaw(keepIn))} of {asset.standIn ? "XLM, standing in for US Treasuries on testnet" : asset.fullName}
+            </span>
+          </p>
+        </div>
+      </div>
 
       {assets.length > 1 ? (
         <fieldset className="sw-send-group">
-          <legend>As</legend>
+          <legend>Kept as</legend>
           <div className="sw-send-chips">
             {assets.map((a) => (
               <button key={a.key} type="button" className={`sw-send-chip${a.key === assetKey ? " is-selected" : ""}`} aria-pressed={a.key === assetKey} disabled={busy} onClick={() => setAssetKey(a.key)}>
@@ -372,34 +437,33 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
             ))}
           </div>
           <p className="sw-send-small">
-            {asset.ticker} · {asset.issuerName}
+            {asset.ticker} · issued by {asset.issuerName}
           </p>
         </fieldset>
-      ) : (
-        <p className="sw-send-small">
-          Kept as {asset.fullName}
-          {asset.standIn ? ". Test USDC and test XLM have no value." : `, ${asset.ticker} · ${asset.issuerName}`}
-        </p>
-      )}
+      ) : null}
 
-      <p className="sw-send-live" aria-live="polite">
-        {quoteWhy ? (
-          <span className="why">{quoteWhy}</span>
-        ) : fresh && unitsOut ? (
-          <>
-            {usdLabel}
-            {money ? <span className="sw-local"> · {money.format(amount.usd)}</span> : null} becomes {usdAligned(fromRaw(cashRaw))} to spend and about <strong>{unitsOut} {asset.ticker}</strong>
-          </>
-        ) : fresh ? (
-          <>
-            {usdLabel} becomes {usdAligned(fromRaw(cashRaw))} to spend, with nothing kept.
-          </>
+      <div className={`sw-send-note${noteOpen ? " is-open" : ""}`}>
+        {noteOpen ? (
+          <div className="sw-send-note-fields">
+            <label className="sw-field">
+              <span>Your name</span>
+              <input value={from} maxLength={NOTE_LIMITS.from} placeholder="So they know who it is from" disabled={busy} onChange={(e) => setFrom(e.target.value)} />
+            </label>
+            <label className="sw-field">
+              <span>A note for them</span>
+              <input value={noteText} maxLength={NOTE_LIMITS.note} placeholder="For school fees, with love" disabled={busy} onChange={(e) => setNoteText(e.target.value)} />
+            </label>
+            <p className="sw-send-small">Travels inside the link, never through our servers. The send seals it on the ledger, so it cannot be changed.</p>
+          </div>
         ) : (
-          <span className="why">{quoting ? "Asking Aquarius for a price…" : " "}</span>
+          <button type="button" className="sw-send-note-btn" onClick={() => setNoteOpen(true)} disabled={busy}>
+            <PenLine size={16} strokeWidth={2} aria-hidden />
+            Add your name and a note
+          </button>
         )}
-      </p>
+      </div>
 
-      <button type="button" className="sw-btn is-primary is-block" onClick={() => void startSend()} disabled={!deployed || busy || !fresh || !fits || !!quoteWhy}>
+      <button type="button" className="sw-btn is-primary is-block sw-send-go" onClick={() => void startSend()} disabled={!deployed || busy || !fresh || !fits || !!quoteWhy}>
         Send {usdLabel}
       </button>
       <p className="sw-send-under">
@@ -418,9 +482,22 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
             </button>
           </>
         ) : (
-          <>Uses the Stellar wallet you already have. Nothing moves until you approve it.</>
+          <>
+            Uses the Stellar wallet you already have. Nothing moves until you approve it.
+            {testWallet ? (
+              <>
+                {" "}
+                No wallet?{" "}
+                <button type="button" className="sw-textbtn" onClick={() => void tryIt()} disabled={trying || busy}>
+                  {trying ? "Making a test wallet…" : "Try it with a test wallet"}
+                </button>{" "}
+                that funds itself with test dollars.
+              </>
+            ) : null}
+          </>
         )}
       </p>
+      {why && !sheet ? <p className="sw-note is-warn">{why}</p> : null}
 
       <dialog
         ref={dialog}
@@ -461,6 +538,16 @@ export function SendCard({ assets, initialQuote, passphrase, testnet, xlmUsd, de
                   </span>
                   <span className="sub">{unitsOut ? `${asset.fullName}, ` : ""}into a wallet of their own</span>
                 </p>
+                {note ? (
+                  <p className="get">
+                    <span className="k">With your note</span>
+                    <span className="v is-note">
+                      {note.note ? `“${note.note}”` : null}
+                      {note.note && note.from ? " " : null}
+                      {note.from ? <span className="sub">from {note.from}</span> : null}
+                    </span>
+                  </p>
+                ) : null}
               </div>
               <dl className="sw-facts">
                 {leastOut ? (

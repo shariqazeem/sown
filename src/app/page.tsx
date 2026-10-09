@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { ArrowRight, Check } from "lucide-react";
 import { Envelope } from "@/components/envelope/envelope";
+import { SplitScene } from "@/components/front/split";
+import { Steps } from "@/components/front/steps";
 import { SendCard } from "@/components/send/send-card";
 import { Row, Section, SiteFrame } from "@/components/site/site-frame";
 import { deployment } from "@/lib/deployments";
@@ -13,65 +16,89 @@ import "./front.css";
 export const dynamic = "force-dynamic";
 
 /**
- * THE FRONT DOOR. Paper. The headline beside the send card (the card first on a phone), then
- * how it works, what can be kept, one envelope, and what to know before sending.
+ * THE FRONT DOOR. An evergreen hero with the headline beside the send card; then what happens
+ * to $100, how it works, what they keep, one real envelope, why only Stellar, and what to know
+ * before sending. Every figure on it is the pool's own quote or the contract's own record.
  */
 export default async function Home() {
   const net = network();
   const [assets, q, latest, price] = await Promise.all([cardAssets(), openingQuote(), latestOutsideTeam(), xlmUsd()]);
   const deployed = !!deployment(net.name);
   const testnet = isTestnet();
+  const testWallet = testnet && process.env.NEXT_PUBLIC_SOWN_TEST_WALLET === "1";
   const first = assets[0];
+  const latestAsset = latest ? assets.find((a) => a.sac === latest.keepAsset) : null;
 
   return (
-    <SiteFrame send={false}>
-      <section className="sw-sec sw-hero">
-        <div className="sw-hero-words">
-          <h1 className="sw-display">Send money home. Part of it stays theirs.</h1>
-          <p className="sw-lede">Send dollars as you do. Keep a slice as US Treasuries, in their own wallet, claimable with their face. A receipt for both.</p>
-          <p className="sw-hero-line">Remittances are spent the week they arrive. Sown makes part of every one stay.</p>
-          {testnet ? (
-            <p className="sw-note is-warn sw-hero-net">
-              This is Sown on testnet. The keep is XLM standing in for US Treasuries, which do not exist on testnet, and test USDC has no value. Mainnet keeps Ondo USDY, Etherfuse USTRY and CETES.
+    <SiteFrame hero send={false}>
+      <section className="sw-hero">
+        <div className="sw-hero-in">
+          <div className="sw-hero-words">
+            <p className="sw-hero-eyebrow">
+              <span className="sw-hero-dot" aria-hidden />
+              {testnet ? "On Stellar testnet: test dollars, nothing of value" : "Live on Stellar"}
             </p>
-          ) : null}
-        </div>
-        <div className="sw-hero-card">
-          <SendCard assets={assets} initialQuote={q} passphrase={net.passphrase} testnet={testnet} xlmUsd={price} deployed={deployed} />
+            <h1 className="sw-display">
+              Send money home. <em>Part of it stays theirs.</em>
+            </h1>
+            <p className="sw-lede">Send dollars as you do. A slice becomes US Treasuries in their own wallet, claimed with their face. A receipt for both.</p>
+            <ul className="sw-hero-points">
+              <li>
+                <Check size={16} strokeWidth={3} aria-hidden />
+                One approval, in the wallet you already use
+              </li>
+              <li>
+                <Check size={16} strokeWidth={3} aria-hidden />
+                They claim with Face ID. No app, nothing to pay
+              </li>
+              <li>
+                <Check size={16} strokeWidth={3} aria-hidden />
+                A receipt anyone can open, read from the ledger
+              </li>
+            </ul>
+            <p className="sw-hero-line">Remittances are spent the week they arrive. Sown makes part of every one stay.</p>
+          </div>
+          <div className="sw-hero-card">
+            <SendCard assets={assets} initialQuote={q} passphrase={net.passphrase} testnet={testnet} xlmUsd={price} deployed={deployed} testWallet={testWallet} />
+          </div>
         </div>
       </section>
 
-      <section className="sw-sec">
-        <h2 className="sw-h2">How Sown works</h2>
-        <ol className="sw-steps">
-          <li>
-            <span className="n">1</span>
-            <div>
-              <p className="t">You send dollars, as you do.</p>
-              <p className="d">USDC from the Stellar wallet you already use, with one approval. Choose how much they keep: 10% unless you say otherwise.</p>
-            </div>
-          </li>
-          <li>
-            <span className="n">2</span>
-            <div>
-              <p className="t">The keep becomes US Treasuries in the same transaction.</p>
-              <p className="d">Sown buys it on Aquarius, Stellar&apos;s exchange, at the price you saw, or nothing happens. Both parts wait in an envelope that only the link can open.</p>
-            </div>
-          </li>
-          <li>
-            <span className="n">3</span>
-            <div>
-              <p className="t">They claim it with their face.</p>
-              <p className="d">You share a link. They tap it, Face ID makes them a wallet only they control, and Sown&apos;s servers pay the network. Dollars to spend, Treasuries that stay.</p>
-            </div>
-          </li>
-        </ol>
+      <section className="sw-sec sw-front-sec">
+        <div className="sw-front-head">
+          <p className="sw-kicker">What happens to $100</p>
+          <h2 className="sw-h2">Most of it is spent. Some of it is planted.</h2>
+          <p className="sw-body">The sender chooses the keep. The slice is bought on Aquarius inside the same transaction, at a price the sender saw first, or nothing happens at all.</p>
+        </div>
+        {first ? (
+          <SplitScene
+            usd={100}
+            cash={q ? fromRaw(q.cashRaw) : 90}
+            keepUsd={q ? fromRaw(q.keepInRaw) : 10}
+            keepBps={1_000}
+            unitsOut={q && q.keepOutRaw !== "0" ? units(q.keepOutRaw) : null}
+            ticker={first.ticker}
+            assetLine={first.standIn ? "XLM, standing in for US Treasuries on testnet" : first.fullName}
+            ledger={q?.ledger ?? null}
+            standIn={first.standIn}
+            quoted={!!q}
+          />
+        ) : null}
       </section>
 
-      <section className="sw-sec sw-two">
+      <section className="sw-sec sw-front-sec" id="how">
+        <div className="sw-front-head">
+          <p className="sw-kicker">How Sown works</p>
+          <h2 className="sw-h2">Three steps. One signature. Nothing to install at home.</h2>
+        </div>
+        <Steps />
+      </section>
+
+      <section className="sw-sec sw-front-sec sw-two">
         <div>
-          <h2 className="sw-h2">What they can keep</h2>
-          <p className="sw-body">Government debt that already trades on Stellar, held as a balance in their own wallet. What each issuer can do is read from the ledger, not from a brochure.</p>
+          <p className="sw-kicker">What they keep</p>
+          <h2 className="sw-h2">Government debt that already trades on Stellar.</h2>
+          <p className="sw-body">Held as a balance in their own wallet. What each issuer can do is read from the ledger on every row, not from a brochure. No return is promised, because nobody can promise one.</p>
           <p className="sw-body">
             <Link href="/assets" className="sw-link">
               Every asset, with its issuer&apos;s powers
@@ -87,12 +114,19 @@ export default async function Home() {
               <p className="line">{a.disclosure}</p>
             </div>
           ))}
+          <div className="sw-asset-row is-next">
+            <p className="name">
+              Stocks and ETFs held at DTC <span className="tick">expected first half of 2027</span>
+            </p>
+            <p className="line">DTCC chose Stellar to carry stocks, ETFs and Treasuries held at DTC. When they land, a stock becomes a row here: same send, same receipt. Not on Stellar yet, so no price is shown.</p>
+          </div>
         </div>
       </section>
 
-      <section className="sw-sec sw-two">
+      <section className="sw-sec sw-front-sec sw-two">
         <div>
-          <h2 className="sw-h2">{latest ? "A real envelope" : "What a receipt looks like"}</h2>
+          <p className="sw-kicker">{latest ? "A real envelope" : "What a receipt looks like"}</p>
+          <h2 className="sw-h2">{latest ? "Sent, kept, claimed. Read from the contract." : "Every send prints a receipt."}</h2>
           <p className="sw-body">
             {latest
               ? "The latest envelope claimed from a sender outside the team, read from the contract as this page loaded."
@@ -112,8 +146,8 @@ export default async function Home() {
               sent={<><strong>{usdAligned(fromRaw(latest.cash + latest.keepIn))}</strong> sent</>}
               became={`${bps(latest.keepBps)} kept as`}
               units={units(latest.keepOut)}
-              symbol={assets.find((a) => a.sac === latest.keepAsset)?.ticker ?? "units"}
-              assetLine={assets.find((a) => a.sac === latest.keepAsset)?.fullName}
+              symbol={latestAsset?.ticker ?? "units"}
+              assetLine={latestAsset?.fullName}
               when={stampUTC(latest.claimedAt)}
               where={<>to <span className="addr">{short(latest.claimedBy ?? "")}</span></>}
               compact
@@ -142,7 +176,46 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="sw-sec">
+      <section className="sw-sec sw-front-sec">
+        <div className="sw-front-head">
+          <p className="sw-kicker">Why this only works on Stellar</p>
+          <h2 className="sw-h2">The pieces already live here. Sown puts them in one transaction.</h2>
+        </div>
+        <ul className="sw-why">
+          <li>
+            <p className="t">Real government debt, with real depth</p>
+            <p className="d">Ondo USDY, Etherfuse USTRY and CETES trade on Aquarius against USDC, about $2M deep each. The keep is bought there, inside the send, by the Sown contract itself.</p>
+          </li>
+          <li>
+            <p className="t">A wallet from a face</p>
+            <p className="d">OpenZeppelin&apos;s account contracts, deployed on the spot by Sown&apos;s servers. The recipient&apos;s Face ID is the only key; nobody at Sown can open it.</p>
+          </li>
+          <li>
+            <p className="t">Nothing to pay at home</p>
+            <p className="d">Sown&apos;s servers pay the network for the wallet and the claim, after checking the exact shape of what they are asked to pay for. The recipient needs no XLM, ever.</p>
+          </li>
+          <li>
+            <p className="t">Cash on the other end</p>
+            <p className="d">The dollars arrive as USDC, which MoneyGram-connected Stellar wallets turn into cash at agents in 170+ countries. Sown links to them; it moves no cash itself.</p>
+          </li>
+          <li>
+            <p className="t">Stock next, on the same rail</p>
+            <p className="d">DTCC chose Stellar to carry stocks, ETFs and Treasuries held at DTC, expected in 2027. Sown&apos;s catalogue is a list of what can be kept; a stock is one row away.</p>
+          </li>
+          <li>
+            <p className="t">A receipt that lives in the ledger</p>
+            <p className="d">The envelope is written by the send itself and updated by the claim. Thirty days later anyone can measure whether the keep is still held, and the receipt says so.</p>
+          </li>
+        </ul>
+        <p className="sw-front-cta">
+          <Link href="/proof" className="sw-btn">
+            The proof page, read from the chain
+            <ArrowRight size={16} strokeWidth={2.5} aria-hidden />
+          </Link>
+        </p>
+      </section>
+
+      <section className="sw-sec sw-front-sec">
         <div className="sw-col">
           <Section label="Before you send">
             <div className="sw-truths">

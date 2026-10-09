@@ -1,16 +1,38 @@
 /**
- * THE SEND CARD AND ITS SHEET — Scrip's save.css, adapted. One primary button, targets of at
- * least 44 px, body at 17 px, figures tabular. Selected is the accent wash; green never appears
- * here, because green means money that arrived. Every value is a token.
+ * THE SEND CARD AND ITS SHEET. A white card on sand (or on the evergreen hero): chips for the
+ * amount and the keep, the split drawn live, one primary button. Green is money that moves, gold
+ * is the part that stays. Every value is a token.
  */
 .sw-send {
   display: grid;
-  gap: var(--s-4);
-  padding: var(--s-5);
+  gap: var(--s-5);
+  padding: var(--s-6);
+  color: var(--ink); /* the card keeps its own ink on the evergreen hero */
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sheet);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
+}
+@media (max-width: 480px) {
+  .sw-send {
+    padding: var(--s-5);
+    border-radius: var(--r-lg);
+  }
+}
+.sw-send-head {
+  display: grid;
+  gap: 2px;
+}
+.sw-send-title {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.sw-send-sub {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink-faint);
 }
 .sw-send-group {
   display: grid;
@@ -20,7 +42,8 @@
 .sw-send-group legend {
   margin-bottom: var(--s-2);
   font-size: var(--fs-small);
-  color: var(--ink-muted);
+  font-weight: 700;
+  color: var(--ink);
 }
 .sw-send-chips {
   display: flex;
@@ -32,23 +55,31 @@
   align-items: center;
   justify-content: center;
   gap: var(--s-1);
-  min-height: 44px;
-  min-width: 64px;
+  min-height: 46px;
+  min-width: 66px;
   padding: 0 var(--s-4);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-pill);
   background: var(--surface);
   color: var(--ink);
-  font-weight: 500;
-  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+  font-weight: 700;
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
 }
 .sw-send-chip:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--leaf-deep);
+}
+.sw-send-chip:active:not(:disabled) {
+  transform: scale(0.98);
 }
 .sw-send-chip.is-selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--brand-ink);
+}
+.sw-send-chip.is-keep.is-selected {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  color: var(--gold-ink);
 }
 .sw-send-chip:disabled {
   color: var(--ink-faint);
@@ -56,91 +87,220 @@
   cursor: not-allowed;
 }
 .sw-send-chip.is-other {
-  padding: 0 var(--s-3);
+  padding: 0 var(--s-4);
   cursor: text;
 }
+.sw-send-chip.is-other.is-selected {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.sw-send-chip.is-other.is-keep.is-selected {
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+}
 .sw-send-chip.is-other input {
-  width: 4.2em;
+  width: 4.4em;
   border: 0;
   outline: 0;
   background: transparent;
+  font-weight: 700;
+}
+.sw-send-chip.is-other input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 600;
 }
 .sw-send-chip.is-other:focus-within {
-  border-color: var(--accent);
-  outline: 2px solid var(--accent);
+  border-color: var(--leaf-deep);
+  outline: 2px solid var(--leaf-deep);
   outline-offset: 2px;
 }
-/* The chip draws the focus ring; a second one on the field inside it would double it. */
 .sw-site .sw-send-chip.is-other input:focus-visible {
   outline: none;
 }
 .sw-send-held,
 .sw-send-small {
-  font-size: var(--fs-small);
+  font-size: var(--fs-caption);
   color: var(--ink-muted);
+  line-height: 1.5;
 }
-/* Not red: red is for money outcomes only. Full ink is enough to be read before the button. */
 .sw-send-held.is-short {
   color: var(--ink);
 }
 .sw-send-held.is-reading {
   color: var(--ink-faint);
 }
-.sw-send-math {
-  font-size: var(--fs-small);
+
+/* ── the split ─────────────────────────────────────────────────────── */
+.sw-split {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+  background: var(--surface-soft);
+}
+.sw-split-bar {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.sw-split-bar .spend,
+.sw-split-bar .stay {
+  display: block;
+  min-width: 6px;
+  border-radius: var(--r-pill);
+  transition: flex-grow var(--dur-3) var(--ease-out);
+}
+.sw-split-bar .spend {
+  background: var(--leaf-deep);
+}
+.sw-split-bar .stay {
+  background: var(--gold);
+}
+.sw-split-legend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--s-4);
+}
+.sw-split-legend p {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.sw-split-legend .k {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
   color: var(--ink-muted);
-  line-height: 1.55;
 }
-.sw-send-math strong {
-  color: var(--ink);
+.sw-split-legend .k .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--leaf-deep);
 }
-/* the live line: reserved height, so nothing below jumps when the quote arrives */
-.sw-send-live {
-  min-height: 3.3em;
-  line-height: 1.6;
+.sw-split-legend .stay .k .dot {
+  background: var(--gold);
 }
-@media (max-width: 520px) {
-  /* three lines on a phone once local money joins the dollars */
-  .sw-send-live {
-    min-height: 4.9em;
+.sw-split-legend .v {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+/* the keep's units: the largest figure on the card */
+.sw-split-legend .stay .v {
+  font-size: 1.7rem;
+  color: var(--gold-ink);
+}
+.sw-split-legend .stay .v .sym {
+  font-size: 0.55em;
+  font-weight: 700;
+  color: var(--gold-ink);
+  letter-spacing: 0;
+}
+.sw-split-legend .v .why {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-faint);
+  letter-spacing: 0;
+}
+.sw-split-legend .sub {
+  font-size: var(--fs-caption);
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+@media (max-width: 420px) {
+  .sw-split-legend {
+    grid-template-columns: 1fr;
   }
 }
-.sw-send-live strong {
-  font-size: 1.15em;
-  font-weight: 600;
+
+/* ── the note ──────────────────────────────────────────────────────── */
+.sw-send-note-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  color: var(--link);
+  font-size: var(--fs-small);
+  font-weight: 700;
 }
-.sw-send-live .why {
+.sw-send-note-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sw-send-note-fields {
+  display: grid;
+  gap: var(--s-3);
+}
+.sw-field {
+  display: grid;
+  gap: var(--s-1);
+  font-size: var(--fs-small);
+  font-weight: 600;
   color: var(--ink-muted);
+}
+.sw-field input,
+.sw-field select,
+.sw-field textarea {
+  min-height: 50px;
+  padding: 0 var(--s-4);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 500;
+}
+.sw-field input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+.sw-field input:focus,
+.sw-field select:focus,
+.sw-field textarea:focus {
+  outline: 2px solid var(--leaf-deep);
+  outline-offset: 1px;
+  border-color: var(--leaf-deep);
+}
+.sw-send-go {
+  margin-top: var(--s-1);
 }
 .sw-send-under {
-  font-size: var(--fs-small);
+  font-size: var(--fs-caption);
   color: var(--ink-muted);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* ── the sheet: a native dialog, a bottom sheet on a phone ──────────── */
 .sw-sheet {
-  width: min(540px, calc(100vw - 2 * var(--s-4)));
-  max-height: min(90vh, 800px);
+  width: min(560px, calc(100vw - 2 * var(--s-4)));
+  max-height: min(90vh, 820px);
   margin: auto;
   padding: 0;
   color: var(--ink);
   background: var(--bg);
   border: 1px solid var(--border-strong);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   box-shadow: var(--shadow-float);
   overflow: auto;
   font-size: 1.0625rem;
 }
 .sw-sheet::backdrop {
   background: var(--scrim);
+  backdrop-filter: blur(6px);
 }
 .sw-sheet[open] {
   animation: sw-sheet-rise var(--dur-2) var(--ease-out);
 }
 @keyframes sw-sheet-rise {
   from {
-    transform: translateY(12px);
+    transform: translateY(14px);
     opacity: 0;
   }
   to {
@@ -153,7 +313,7 @@
     width: 100vw;
     max-width: 100vw;
     margin: auto 0 0;
-    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
     border-bottom: 0;
   }
 }
@@ -164,16 +324,16 @@
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
+  padding: var(--s-4) var(--s-3) var(--s-4) var(--s-5);
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 .sw-sheet-title {
   flex: 1;
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
 }
-/* Focused only so a sheet opens at its top; it is not a control. */
 .sw-sheet-title:focus {
   outline: none;
 }
@@ -183,11 +343,12 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   color: var(--ink-muted);
 }
 .sw-sheet-close:hover {
   color: var(--ink);
+  background: rgba(16, 38, 28, 0.06);
 }
 .sw-sheet-body {
   display: grid;
@@ -217,7 +378,8 @@
   display: grid;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
+  overflow: hidden;
 }
 .sw-outcome p {
   display: grid;
@@ -228,28 +390,39 @@
   border-top: 1px solid var(--border);
 }
 .sw-outcome .k {
-  font-size: var(--fs-small);
+  font-size: var(--fs-caption);
+  font-weight: 700;
   color: var(--ink-muted);
 }
 .sw-outcome .v {
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .sw-outcome .get strong {
   font-size: var(--fs-h2);
   line-height: 1.1;
   letter-spacing: var(--tracking-h2);
+  color: var(--gold-ink);
+}
+.sw-outcome .v.is-note {
+  font-weight: 500;
+  font-style: italic;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
 }
 .sw-outcome .sub {
   font-size: var(--fs-caption);
   color: var(--ink-faint);
+  font-style: normal;
+  font-family: var(--font-sans);
 }
 .sw-facts {
   display: grid;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
+  overflow: hidden;
 }
 .sw-facts > div {
   display: grid;
@@ -263,11 +436,13 @@
 }
 .sw-facts dt {
   font-size: var(--fs-small);
-  color: var(--ink-muted);
+  font-weight: 700;
+  color: var(--ink);
 }
 .sw-facts dd {
   font-size: var(--fs-small);
   line-height: 1.5;
+  color: var(--ink-muted);
 }
 @media (max-width: 440px) {
   .sw-facts > div {
@@ -280,7 +455,8 @@
 }
 .sw-more summary {
   min-height: 32px;
-  color: var(--accent);
+  color: var(--link);
+  font-weight: 600;
   cursor: pointer;
 }
 .sw-more span {
@@ -289,7 +465,7 @@
   color: var(--ink-muted);
 }
 .sw-more a {
-  color: var(--accent);
+  color: var(--link);
 }
 .sw-trust {
   display: flex;
@@ -297,11 +473,12 @@
   align-items: flex-start;
   font-size: var(--fs-small);
   line-height: 1.5;
+  color: var(--ink-muted);
 }
 .sw-trust svg {
   flex: none;
   margin-top: 3px;
-  color: var(--accent);
+  color: var(--leaf-deep);
 }
 
 /* the wallets */
@@ -313,21 +490,23 @@
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  min-height: 52px;
+  min-height: 54px;
   padding: 0 var(--s-4);
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--r-md);
   background: var(--surface);
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
   text-align: left;
+  transition: border-color var(--dur-1) var(--ease-out);
 }
 .sw-wallet:hover {
-  border-color: var(--accent);
+  border-color: var(--leaf-deep);
 }
 .sw-wallet.is-install {
   color: var(--ink-muted);
   border-style: dashed;
+  font-weight: 600;
 }
 .sw-wallet img {
   border-radius: var(--r-sm);

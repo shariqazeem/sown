@@ -6,16 +6,20 @@ import { NavMenu, NavWallet } from "./nav-client";
 import "./site.css";
 
 /**
- * THE FRAME OF EVERY PAGE: the paper nav (Sown, Assets, Proof, Docs, "Your wallet" once a
- * passkey wallet lives in this browser, and the one primary action, Send), the page, the
- * footer. `ink` turns the whole frame dark, for /proof only.
+ * THE FRAME OF EVERY PAGE: the nav (Sown, How it works, Assets, Proof, Docs, "Your wallet" once
+ * a Face ID wallet lives in this browser, and the one primary action, Send), the page, the
+ * footer. `ink` turns the whole frame evergreen (for /proof); `hero` floats the nav over the
+ * front door's evergreen hero.
  */
 export function SiteNav({ current, send = true }: { current?: string; send?: boolean }) {
   return (
     <nav className="sw-nav" aria-label="Sown">
       <Link href="/" className="sw-nav-brand" aria-label="Sown, home">
-        <Wordmark size={22} />
+        <Wordmark size={24} />
         {isTestnet() ? <span className="sw-net">Testnet</span> : null}
+      </Link>
+      <Link href="/#how" className="sw-nav-link is-wide">
+        How it works
       </Link>
       <Link href="/assets" className="sw-nav-link is-wide" aria-current={current === "assets" ? "page" : undefined}>
         Assets
@@ -40,7 +44,7 @@ export function SiteNav({ current, send = true }: { current?: string; send?: boo
 export function SiteFooter() {
   return (
     <footer className="sw-foot">
-      <span>Sown. Unaudited. Not for US persons.</span>
+      <span>Sown · Built on Stellar · Unaudited · Not for US persons</span>
       <span className="spacer" />
       <Link href="/sent">Your sends</Link>
       <Link href="/mine">Your wallet</Link>
@@ -53,9 +57,9 @@ export function SiteFooter() {
 }
 
 /** `send={false}` on a page that has its own primary action: one primary button per screen. */
-export function SiteFrame({ children, current, ink = false, send = true }: { children: ReactNode; current?: string; ink?: boolean; send?: boolean }) {
+export function SiteFrame({ children, current, ink = false, hero = false, send = true }: { children: ReactNode; current?: string; ink?: boolean; hero?: boolean; send?: boolean }) {
   return (
-    <div className={`sw-site${ink ? " sw-ink" : ""}`}>
+    <div className={`sw-site${ink ? " sw-ink" : ""}${hero ? " is-hero" : ""}`}>
       <SiteNav current={current} send={send} />
       <main>{children}</main>
       <SiteFooter />
@@ -63,7 +67,7 @@ export function SiteFrame({ children, current, ink = false, send = true }: { chi
   );
 }
 
-/** A ruled section: a label (and an aside), then rows or paragraphs. */
+/** A section with a label (and an aside), then rows or paragraphs. */
 export function Section({ label, aside, children }: { label: string; aside?: ReactNode; children: ReactNode }) {
   return (
     <section className="sw-section">

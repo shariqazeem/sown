@@ -4,15 +4,20 @@
  * holds them to that file so they cannot drift.
  */
 export const OG = {
-  bg: "#f7f5ef",
+  bg: "#f6f2ea",
   surface: "#ffffff",
-  ink: "#14161c",
-  inkMuted: "#5a5d66",
-  inkFaint: "#8b8e97",
-  border: "#e4dfd3",
-  accent: "#2b4acb",
-  ok: "#15803d",
-  warn: "#b45309",
+  ink: "#10261c",
+  inkMuted: "#4d5f56",
+  inkFaint: "#7d8d85",
+  border: "#e7e1d4",
+  brand: "#0f3f2f",
+  leaf: "#35c47f",
+  gold: "#e0a63a",
+  goldInk: "#7a5212",
+  goldSoft: "#fbf1da",
+  ok: "#167a4b",
+  warn: "#a35f06",
+  surfaceInverse: "#0b2a1f",
 } as const;
 
 export const OG_TOKENS: Record<keyof typeof OG, string> = {
@@ -22,7 +27,12 @@ export const OG_TOKENS: Record<keyof typeof OG, string> = {
   inkMuted: "--ink-muted",
   inkFaint: "--ink-faint",
   border: "--border",
-  accent: "--accent",
+  brand: "--brand",
+  leaf: "--leaf",
+  gold: "--gold",
+  goldInk: "--gold-ink",
+  goldSoft: "--gold-soft",
   ok: "--ok",
   warn: "--warn",
+  surfaceInverse: "--surface-inverse",
 };

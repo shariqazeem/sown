@@ -7,6 +7,7 @@ import { assetLine } from "@/lib/assets/catalogue";
 import { disclose } from "@/lib/assets/issuer-flags";
 import { flagChips } from "@/lib/assets/disclosure";
 import { readReceipt } from "@/lib/envelope/receipt";
+import { NO_NOTE_HEX } from "@/lib/envelope/note";
 import { fillPrice, headline, returnWords, sentTotal, stillHeld } from "@/lib/envelope/view";
 import { bps, fromRaw, short, stampUTC, units, unitsExact, usdAligned } from "@/lib/format";
 import { isPasskeyWallet } from "@/lib/passkey/is-wallet";
@@ -152,6 +153,11 @@ export default async function ReceiptPage({ params, searchParams }: { params: Pr
               <Row k="Envelope">
                 <span className="mono">get({e.id.toString()})</span>
               </Row>
+              {e.memoHex !== NO_NOTE_HEX ? (
+                <Row k="Note">
+                  A note travels inside the link, never through Sown. The send sealed it on the ledger as <span className="mono">{short(e.memoHex, 8, 8)}</span>, so the claim page can show it only as written.
+                </Row>
+              ) : null}
               <Row k="Ledgers">
                 <span className="mono">
                   sent {e.createdLedger.toLocaleString("en-US")}

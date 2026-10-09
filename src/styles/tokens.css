@@ -1,84 +1,92 @@
 /**
- * tokens.css — the SINGLE design-token source of truth for every Sown surface (copied verbatim from Scrip, webgold/src/styles/tokens.css, 2026-10-08).
+ * tokens.css — SOWN'S OWN DESIGN TOKENS, the single source of every value on every surface.
  *
- * THE SUBJECT IS A RECEIPT. Paper, ink, ruled ledger lines, and the perforated edge of a pay
- * stub. One accent — document blue — on every interactive and brand element. Green and red
- * are reserved for money outcomes. Gold is a chip colour for the one metal on the registry
- * and nothing else.
+ * THE SUBJECT IS A SEED. Money is sent home; a part of it is planted and left to stand. The
+ * ground is warm sand, the ink and the brand are evergreen, a bright leaf marks what is alive on
+ * dark ground, and gold marks the part that stays. Green means money that moves or arrived; gold
+ * means ownership; red means something failed; amber means waiting. Nothing else uses them.
  *
  * Imported once in the root layout; every per-surface stylesheet ALIASES these
- * (`--line: var(--border)`) and never redeclares a palette value. Never write a raw hex in
- * a component or a page stylesheet.
- *
- * Fonts (--font-sans / --font-mono) are set on <html> by next/font in layout.tsx.
+ * (`--line: var(--border)`) and never redeclares a palette value. Never write a raw hex in a
+ * component or a page stylesheet. Fonts are set on <html> by next/font in layout.tsx.
  */
 
 :root {
-  /* clearance under the app shell's floating mode pill — consumed by shelled pages */
-  --pill-clear: 4.75rem;
+  /* ── type families ──────────────────────────────────────────────── */
+  /* Words and figures: Manrope (tabular numerals). Headlines: Instrument Serif. Hashes: DM Mono. */
+  --font-sans: var(--font-manrope, ui-sans-serif), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-instrument-serif, Georgia), "Iowan Old Style", "Times New Roman", serif;
+  --font-mono: var(--font-dm-mono, ui-monospace), SFMono-Regular, Menlo, monospace;
 
-  /* ── type families — defined ONCE, here ─────────────────────────── */
-  /* Words: Instrument Sans. Figures: IBM Plex Mono, tabular, at every size. The inner
-   * var() fallbacks keep font-family valid when a next/font variable is missing. */
-  --font-sans: var(--font-instrument, ui-sans-serif), system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono, ui-monospace), SFMono-Regular, "IBM Plex Mono", monospace;
-  /* The wordmark and a statement's title line, and nothing else. */
-  --font-serif: var(--font-fraunces, Georgia), "Iowan Old Style", serif;
+  /* ── ground + text ──────────────────────────────────────────────── */
+  --bg: #f6f2ea;             /* sand */
+  --bg-deep: #ede7d9;        /* a deeper band of sand */
+  --surface: #ffffff;        /* a card */
+  --surface-soft: #f8f6f0;   /* an inset area on a card */
+  --ink: #10261c;            /* text, everywhere */
+  --ink-muted: #4d5f56;
+  --ink-faint: #7d8d85;
 
-  /* ── surface + text ─────────────────────────────────────────────── */
-  --bg: #f7f5ef;             /* paper */
-  --surface: #ffffff;        /* the sheet */
-  --ink: #14161c;            /* primary text, everywhere */
-  --ink-muted: #5a5d66;      /* secondary text */
-  --ink-faint: #8b8e97;      /* tertiary / captions */
+  /* ── brand: evergreen, and the leaf ─────────────────────────────── */
+  --brand: #0f3f2f;          /* the hero, primary buttons, the wordmark */
+  --brand-strong: #0a2e22;   /* hover, active */
+  --brand-ink: #ffffff;      /* text on a brand fill */
+  --brand-soft: #e3f1e9;     /* a wash: selected, hover */
+  --brand-border: #bcdcc9;
+  --leaf: #35c47f;           /* alive, on dark ground; the mark's kept leaf */
+  --leaf-deep: #167a4b;      /* links and live states on light ground (AA on white) */
 
-  /* ── brand accent — document blue, ALL interactive/brand elements ── */
-  --accent: #2b4acb;
-  --accent-strong: #1f3aa8;  /* hover / active */
-  --accent-soft: #e8edfb;    /* subtle wash (selected, hover) */
-  --accent-ink: #ffffff;     /* text on an accent fill */
-  --accent-border: #c9d4f4;
+  /* `--accent` is the brand, under the name the components use. */
+  --accent: var(--brand);
+  --accent-strong: var(--brand-strong);
+  --accent-soft: var(--brand-soft);
+  --accent-ink: var(--brand-ink);
+  --accent-border: var(--brand-border);
+  --accent-inverse: var(--leaf);
+  --link: var(--leaf-deep);
 
-  /* ── money-outcome semantics ONLY (never generic accents) ───────── */
-  --ok: #15803d;             /* settled / still held */
-  --ok-soft: #eef6f0;
-  --ok-border: #c3e3cd;
-  --err: #dc2626;            /* failed / refused */
-  --err-soft: #fdeeee;
-  --err-border: #f2cccc;
-  --warn: #b45309;           /* held, waiting, paused */
-  --warn-soft: #fbf1e6;
-  --warn-border: #ecdcb4;
+  /* ── the part that stays: gold ──────────────────────────────────── */
+  --gold: #e0a63a;
+  --gold-ink: #7a5212;
+  --gold-soft: #fbf1da;
+  --gold-border: #efd79f;
 
-  /* ── the one metal on the registry: its chip, and nothing else ──── */
-  --gold: #9a6f1e;
-  --gold-soft: #fbf3e3;
-  --gold-border: #ecdcb8;
+  /* ── money-outcome semantics ONLY ───────────────────────────────── */
+  --ok: #167a4b;             /* arrived, settled, still held */
+  --ok-soft: #e3f1e9;
+  --ok-border: #bcdcc9;
+  --err: #c43c2f;            /* failed, refused */
+  --err-soft: #fcebe8;
+  --err-border: #f3c7c1;
+  --warn: #a35f06;           /* waiting, held */
+  --warn-soft: #fbf1dc;
+  --warn-border: #efd9a4;
 
   /* ── lines + elevation ──────────────────────────────────────────── */
-  --border: #e4dfd3;         /* a ruled line */
-  --border-strong: #cdc5b4;  /* a heavier rule */
-  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.05);
-  --shadow-sheet: 0 1px 0 rgba(20, 22, 28, 0.04), 0 12px 28px -18px rgba(20, 22, 28, 0.22);
-  --shadow-float: 0 20px 48px -26px rgba(20, 22, 28, 0.3);
-  --scrim: rgba(247, 245, 239, 0.86);
+  --border: #e7e1d4;
+  --border-strong: #d2c9b5;
+  --shadow-sm: 0 1px 2px rgba(16, 38, 28, 0.06);
+  --shadow-sheet: 0 1px 0 rgba(16, 38, 28, 0.04), 0 14px 32px -20px rgba(16, 38, 28, 0.28);
+  --shadow-card: var(--shadow-sheet);
+  --shadow-float: 0 24px 56px -28px rgba(16, 38, 28, 0.42);
+  --scrim: rgba(16, 38, 28, 0.46);
 
-  /* ── inverse: the dark surfaces — the printer, the floor, the close ─ */
-  --ink-inverse: #f4f2ee;
-  --ink-inverse-muted: #b3b6bf;
-  --ink-inverse-faint: #7c808c;
-  --border-inverse: #2c2f38;
-  --surface-inverse: #14161c;
-  --surface-inverse-raised: #1f222b;
-  --accent-inverse: #9db0f7;      /* document blue, lifted for dark ground */
-  --ok-inverse: #5fcf85;          /* settled, on dark */
-  --err-inverse: #f27b7b;         /* failed / down, on dark */
-  --glow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+  /* ── inverse: evergreen ground (the hero, /proof, the close) ────── */
+  --ink-inverse: #f3f6f2;
+  --ink-inverse-muted: #afc4b8;
+  --ink-inverse-faint: #7f9a8d;
+  --border-inverse: rgba(255, 255, 255, 0.13);
+  --surface-inverse: #0b2a1f;
+  --surface-inverse-raised: #123b2d;
+  --ok-inverse: #5fdc98;
+  --err-inverse: #ff8f82;
+  --glow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 28px 64px -24px rgba(0, 0, 0, 0.6);
 
-  /* ── radii (6/10/16, + pill for status chips ONLY) ──────────────── */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
+  /* ── radii: soft, app-like; pill for chips and the primary button ─ */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
   --r-pill: 999px;
 
   /* ── spacing — 8pt rhythm (4 is the half-step) ──────────────────── */
@@ -96,44 +104,44 @@
   --s-12: 160px;
 
   /* ── measure ────────────────────────────────────────────────────── */
-  --measure: 720px;          /* the reading column */
-  --measure-wide: 1040px;    /* a two-column surface */
+  --measure: 720px;
+  --measure-wide: 1120px;
 
-  /* ── type scale — the single source ─────────────────────────────── */
-  --fs-display: clamp(2.4rem, 1.3rem + 4.4vw, 3.9rem);
-  --lh-display: 1.04;
-  --tracking-display: -0.028em;
+  /* ── type scale ─────────────────────────────────────────────────── */
+  --fs-display: clamp(2.9rem, 1.5rem + 5.2vw, 5.4rem);
+  --lh-display: 0.98;
+  --tracking-display: -0.012em;
 
-  --fs-h1: clamp(1.9rem, 1.3rem + 2.4vw, 2.8rem);
-  --lh-h1: 1.08;
-  --tracking-h1: -0.022em;
+  --fs-h1: clamp(2.2rem, 1.4rem + 2.8vw, 3.4rem);
+  --lh-h1: 1.04;
+  --tracking-h1: -0.01em;
 
-  --fs-h2: clamp(1.4rem, 1.15rem + 1.2vw, 1.9rem);
-  --lh-h2: 1.18;
-  --tracking-h2: -0.014em;
+  --fs-h2: clamp(1.55rem, 1.2rem + 1.4vw, 2.2rem);
+  --lh-h2: 1.12;
+  --tracking-h2: -0.022em;
 
-  --fs-lead: clamp(1.08rem, 1rem + 0.45vw, 1.25rem);
+  --fs-lead: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
   --lh-lead: 1.5;
-  --tracking-lead: -0.006em;
+  --tracking-lead: -0.004em;
 
   --fs-body: 1rem;
   --lh-body: 1.6;
 
-  --fs-small: 0.875rem;
+  --fs-small: 0.9rem;
   --fs-caption: 0.8125rem;
 
-  --fs-mono: 0.8125rem;      /* data, addresses, hashes */
-  --tracking-mono: 0.01em;
+  --fs-mono: 0.8125rem;
+  --tracking-mono: 0;
 
-  /* the units: the largest thing on any page they appear on */
-  --fs-units: clamp(2.6rem, 1.4rem + 5vw, 4.6rem);
-  --fs-units-sm: clamp(1.6rem, 1.2rem + 1.6vw, 2.2rem);
+  /* the units of the keep: the largest figure on any page they appear on */
+  --fs-units: clamp(2.6rem, 1.4rem + 5vw, 4.4rem);
+  --fs-units-sm: clamp(1.7rem, 1.2rem + 1.8vw, 2.4rem);
 
-  /* ── motion — 3 durations, 2 easings ────────────────────────────── */
-  --dur-1: 160ms;  /* micro: hover, tap */
-  --dur-2: 320ms;  /* the one moment: the stub prints */
-  --dur-3: 640ms;
-  --dur-4: 1200ms; /* a scene: a number rolling to its value, a diagram playing */
+  /* ── motion — durations and two easings ─────────────────────────── */
+  --dur-1: 160ms;
+  --dur-2: 360ms;
+  --dur-3: 700ms;
+  --dur-4: 1200ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.42, 0.5, 1);
 }
@@ -168,19 +176,18 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* The Tailwind reset leaves border-color at currentColor; our hairline is the token. */
 * {
   border-color: var(--border);
 }
 
 ::selection {
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--brand);
+  color: var(--brand-ink);
 }
 
-/* Visible focus, everywhere, in the accent. */
+/* Visible focus, everywhere, in the leaf. */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--leaf-deep);
   outline-offset: 3px;
   border-radius: var(--r-sm);
 }
