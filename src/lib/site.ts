@@ -10,7 +10,7 @@ export function siteUrl(): string {
   return "http://localhost:3100";
 }
 
-export const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/";
+export const REPO_URL = process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/shariqazeem/sown";
 
 /** True on testnet: every surface says so in the same size as its figures. */
 export function isTestnet(): boolean {
