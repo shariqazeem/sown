@@ -1,6 +1,7 @@
 "use client";
 
 import { type Outcome, held, ok } from "@/lib/outcome";
+import { networkName } from "@/lib/stellar/network";
 
 /**
  * THE SENDER'S WALLET, THROUGH THE STELLAR WALLETS KIT (JSR 2.5.0, the range the Smart Account
@@ -77,12 +78,13 @@ export async function signWith(passphrase: string, id: string, xdr: string, addr
   }
 }
 
-const REMEMBERED = "sown:sender-wallet";
+/** Per network: a wallet remembered on testnet is not offered on mainnet, and the test wallet never is. */
+const remembered = () => `sown:${networkName()}:sender-wallet`;
 
 export function rememberWallet(v: { id: string; address: string } | null): void {
   try {
-    if (v) localStorage.setItem(REMEMBERED, JSON.stringify(v));
-    else localStorage.removeItem(REMEMBERED);
+    if (v) localStorage.setItem(remembered(), JSON.stringify(v));
+    else localStorage.removeItem(remembered());
   } catch {
     // A private window asks again next time, which is fine.
   }
@@ -90,9 +92,11 @@ export function rememberWallet(v: { id: string; address: string } | null): void 
 
 export function rememberedWallet(): { id: string; address: string } | null {
   try {
-    const v = localStorage.getItem(REMEMBERED);
+    const v = localStorage.getItem(remembered());
     const p = v ? (JSON.parse(v) as { id?: unknown; address?: unknown }) : null;
-    return p && typeof p.id === "string" && typeof p.address === "string" ? { id: p.id, address: p.address } : null;
+    if (!p || typeof p.id !== "string" || typeof p.address !== "string") return null;
+    if (p.id === "sown-test-wallet" && networkName() !== "testnet") return null;
+    return { id: p.id, address: p.address };
   } catch {
     return null;
   }
