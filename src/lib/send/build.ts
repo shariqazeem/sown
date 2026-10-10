@@ -84,11 +84,15 @@ export async function prepareSend(net: NetworkConfig, contractId: string, a: Sen
   return ok({ xdr: assembled.toXDR(), feeStroops: assembled.fee, minResourceFee: sim.minResourceFee, ledger: sim.latestLedger });
 }
 
-/** A simulation's failure, in the sentence the confirm sheet shows. */
+/**
+ * A simulation's failure, in the sentence the confirm sheet shows. The wallet's own balance and
+ * lines are read first: the USDC contract numbers its errors too (#10 is its "balance out of
+ * range", #13 its missing trust line), and those numbers would otherwise read as Sown's.
+ */
 export function explainSendFailure(error: string): string {
+  if (/balance|insufficient|underfunded|trustline|NotAuthorized|trust line entry is missing/i.test(error)) return "This wallet does not hold enough USDC for this send. Nothing moved.";
   const code = /Error\(Contract, #(\d+)\)/.exec(error)?.[1];
   if (code && CONTRACT_ERRORS[Number(code)]) return `${CONTRACT_ERRORS[Number(code)]} Nothing moved.`;
-  if (/balance|insufficient|underfunded|#10\b|trustline|NotAuthorized|trust line entry is missing/i.test(error)) return "This wallet does not hold enough USDC for this send. Nothing moved.";
   if (/short fill|out_min|slippage|InsufficientOutput|#2006|#2004/i.test(error)) return "The price on Aquarius moved more than 1% while you were deciding. Nothing moved; ask for a new price.";
   return `The network would refuse this send (${simulationReason(error)}). Nothing moved.`;
 }

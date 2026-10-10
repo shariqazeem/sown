@@ -50,6 +50,9 @@ describe("a failed simulation, in the sheet's words", () => {
     expect(explainSendFailure("HostError: Error(Contract, #6)")).toBe("The return date must be between one day and one year away. Nothing moved.");
     expect(explainSendFailure("HostError: Error(Contract, #7)")).toContain("not offered");
     expect(explainSendFailure("resulting balance is not within the allowed range")).toContain("does not hold enough USDC");
+    // The USDC contract's own numbers (#10 balance, #13 trust line) never read as Sown's #10 and #13.
+    expect(explainSendFailure('HostError: Error(Contract, #10)\nEvent log: "resulting balance is not within the allowed range"')).toContain("does not hold enough USDC");
+    expect(explainSendFailure('HostError: Error(Contract, #13)\nEvent log: "trustline entry is missing for account"')).toContain("does not hold enough USDC");
     expect(explainSendFailure("something new")).toContain("Nothing moved.");
   });
 });

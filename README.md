@@ -12,7 +12,7 @@ and every claim is a receipt anyone can open, read from the ledger.
 
 | | |
 | --- | --- |
-| **Mainnet contract** | not deployed yet: the founder deploys it (see [Deploy to mainnet](#deploy-to-mainnet)) |
+| **Mainnet contract** | [`CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE`](https://stellar.expert/explorer/public/contract/CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE), deployed 10 Oct 2026 with US Treasuries (Ondo USDY), US Treasury notes (Etherfuse USTRY) and Mexican CETES registered ([`deployments/mainnet.json`](deployments/mainnet.json)) |
 | **Testnet contract** | [`CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB`](https://stellar.expert/explorer/testnet/contract/CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB) |
 | **Its code** | sha256 `7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167`, the bytes of [`artifacts/sown.wasm`](artifacts/sown.wasm), dumped back from the ledger and compared. No upgrade function exists |
 | **Every path, run on testnet** | [`deployments/testnet-battery.json`](deployments/testnet-battery.json) and [`deployments/testnet-smoke.json`](deployments/testnet-smoke.json): every transaction hash |

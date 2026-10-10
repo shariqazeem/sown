@@ -1,5 +1,47 @@
 {
   "network": "mainnet",
-  "contractId": null,
-  "note": "Not deployed yet. The founder runs `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet`, which overwrites this file."
+  "contractId": "CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE",
+  "sha256": "7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167",
+  "wasmHash": "7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167",
+  "bytes": 15311,
+  "admin": "GB7X3MGEX3EESITTTHEHTRJL65VQ7OQDVLZXVZCA5R4HUJCN2JGRALQY",
+  "usdc": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+  "assets": [
+    {
+      "key": "usdy",
+      "sac": "CB3YA656OYIHU57657I5KGSBRHE5I3OZU4VFC22PYAOANFZHEWNYGAGP",
+      "pool": "CAFHLHGZXOVNCGFJ7DOXL7JDNMBCEZKDI3LS5NRQH3GXC7CSIMQZHUSM",
+      "inIdx": 1,
+      "outIdx": 0,
+      "tx": "7616f164013bf6837b329206cc10bc615056c9dd2bdf703fca1929410cf88663"
+    },
+    {
+      "key": "ustry",
+      "sac": "CBLV4ATSIWU67CFSQU2NVRKINQIKUZ2ODSZBUJTJ43VJVRSBTZYOPNUR",
+      "pool": "CCX2TYR4AQTPPMTZOIMP3YIBHAYLLSTXVP47PAGTL753PCQFSKV32MIA",
+      "inIdx": 1,
+      "outIdx": 0,
+      "tx": "2da5c7f4157c1acbac283b9a261366e666c48485922befa320809d7284f40763"
+    },
+    {
+      "key": "cetes",
+      "sac": "CAL6ER2TI6CTRAY6BFXWNWA7WTYXUXTQCHUBCIBU5O6KM3HJFG6Z6VXV",
+      "pool": "CCKGQSQG5JLZBMYMB4HT6M4H7FUC3NK5C75MIHN6627LRAY5B2SYL2AD",
+      "inIdx": 1,
+      "outIdx": 0,
+      "tx": "c73eda4c86123190026286c2bb76182d81a29c263644b555501a939c37f4e461"
+    }
+  ],
+  "uploadTx": "0795cd339ffb48811062a71041ee60cca9a6367a3d12ba4bae381027bb8deefc",
+  "deployTx": "c52539f4949a47f6387c1776b7cd3928ed1f436999eaed7cb0524b77d6255ba3",
+  "extendTx": null,
+  "ledger": 64861798,
+  "deployedAt": "2026-10-10T01:12:52.000Z",
+  "config": {
+    "admin": "GB7X3MGEX3EESITTTHEHTRJL65VQ7OQDVLZXVZCA5R4HUJCN2JGRALQY",
+    "max_hold": "31536000",
+    "min_hold": "86400",
+    "min_send": "10000000",
+    "usdc": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75"
+  }
 }
