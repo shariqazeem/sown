@@ -251,19 +251,18 @@ placeholder comment marks the spot.
 
 1. **Confirm the deadline hour** on demo.stellarpassport.xyz and paste the submission fields into
    `docs/DEMO-AND-PITCH.md` §Submission.
-2. **Choose the domain and host the app on it** (TLS required for Face ID). Passkeys bind to the
-   origin they were made on, so the domain must be final before the first mainnet claim. On the
-   server: `npm ci && npm run build`, then `npm run start` (port 3100, from `.next-build`) behind
-   nginx, e.g. under pm2. Environment: `NEXT_PUBLIC_SOWN_NETWORK=mainnet`,
-   `NEXT_PUBLIC_SITE_URL=https://<domain>`, `SOWN_SPONSOR_SECRET`, `NEXT_PUBLIC_REPO_URL`; a paid
-   RPC (`SOWN_RPC_URL`, `NEXT_PUBLIC_SOWN_RPC_URL`) is worth it once strangers arrive.
-3. **Fund three mainnet accounts** (no secret ever goes into git; each is read from the environment):
-   - the **admin**, about **24 XLM** (upload 22.1, create and assets 0.1, its own 1 XLM minimum);
-     its key stays on your machine;
-   - **Sown's servers** (`SOWN_SPONSOR_SECRET`), **30–60 XLM**: about 0.3 XLM per Face ID claim,
-     2 XLM set aside per brand-new classic wallet, alerts under 20 XLM;
-   - a **smoke sender** (`SOWN_SMOKE_SENDER_SECRET`, e.g. `stellar keys generate sown-smoke`):
-     **$2 USDC and 3 XLM**; and your **Freighter** wallet for the film: about **$20 USDC and 2 XLM**.
+2. ~~Choose the domain and host the app on it~~ **Done 10 Oct: https://sown.world** (testnet
+   until the contract is deployed; the switch to mainnet is one environment change and a rebuild).
+   A paid RPC (`SOWN_RPC_URL`, `NEXT_PUBLIC_SOWN_RPC_URL`) is worth it once strangers arrive.
+3. **Fund three mainnet accounts** (identities made 10 Oct on the founder's Mac, seeds in
+   `.keys/`, public keys in `src/lib/team.ts`; the scripts read `SOWN_*_SECRET` from the
+   environment, e.g. `export SOWN_ADMIN_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-admin)`):
+   - the **admin** `GB7X…ALQY`: **25 XLM, funded 10 Oct**;
+   - **Sown's servers** `GDYR…BJ33`: **60 XLM, funded 10 Oct**;
+   - the **smoke sender** `GDUC…MJGG`: **4 XLM, funded 10 Oct**; still needs a USDC line and
+     **$2 USDC** (`scripts/stellar.sh tx new change-trust --source-account sown-mainnet-smoke --line USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN --network mainnet`, then a USDC payment from Freighter);
+   - the founder's **Freighter** `GARL…3EFM`: 13.9 XLM on 10 Oct and **no USDC yet**; the film and
+     the judges' real sends need about **$30 of USDC** (buy XLM, swap to USDC in Freighter).
 4. **Deploy**: `npm run preflight`, then
    `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet` (if it stops, run it
    again: it resumes). Add your wallets (admin, servers, smoke sender, Freighter) to `src/lib/team.ts`.
