@@ -12,13 +12,14 @@
 
 ## 0. Start here
 
-**Where it stands (9 Oct 2026).** Everything that does not need the founder is built and verified
-on testnet (the contract, every path in the battery, the mainnet smoke run on testnet, every
-screen at 375 and 1440 px, 128 offline and 23 contract tests). It is **live for testing** at
-https://sown.80.225.209.190.sslip.io (testnet) and **public** at
-https://github.com/shariqazeem/sown (MIT). What remains is the founder's: the deadline hour, a
-final domain, mainnet funding and deploy, the two film takes, the submission — in order, with
-commands, in `PROGRESS.md`. The film draft and its workshop: §13.
+**Where it stands (10 Oct 2026).** **Sown is on mainnet**: the contract
+`CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE` with USDY, USTRY and CETES registered,
+served at **https://sown.world** (the final domain; a Face ID wallet is bound to it), public at
+https://github.com/shariqazeem/sown (MIT). Testnet carried every proof first: the contract, the
+battery, the smoke, real Face ID claims on an iPhone and a MacBook, 137 offline and 23 contract
+tests. The design is Sown's own since 9 Oct (§8). What remains is the founder's: USDC in the
+wallets, the mainnet smoke (one line), the first real send and phone claim, the two film takes,
+the submission by **12 Oct 23:59 UTC** — in order, with commands, in `PROGRESS.md`.
 
 Read in this order, then say what you are building:
 
@@ -384,12 +385,11 @@ npm run preflight                 # what a deploy and a hundred sponsored claims
 
 ## 13. Deployed, and the film
 
-**Testnet, live for testing**: https://sown.80.225.209.190.sslip.io — the founder's VM, behind
-nginx with a certbot certificate, the app under pm2 (`deploy/ecosystem.vm.cjs`), "Test wallet in
-this browser" switched on so a send can be tried without installing a wallet. A Face ID wallet is
-bound to the hostname it was made on, so wallets made there stay there; **mainnet needs the final
-domain first**. Access, the exact deploy commands and what else runs on that VM (never touch it):
-`CLAUDE.local.md`.
+**Mainnet, live**: https://sown.world — the founder's VM, behind nginx with a certbot
+certificate, the app under pm2 (`deploy/ecosystem.vm.cjs`), on the mainnet contract since 10 Oct.
+The first host, `sown.80.225.209.190.sslip.io`, serves the same app. A Face ID wallet is bound to
+the hostname it was made on, so testnet wallets made on the first host stay there. Access, the
+exact deploy commands and what else runs on that VM (never touch it): `CLAUDE.local.md`.
 
 **The film**: the workshop lives outside the repo (`../sown-video`, recordings are large). A
 106-second draft (`../sown-video/out/pitch.mp4`) was built on 9 Oct from the live testnet site,

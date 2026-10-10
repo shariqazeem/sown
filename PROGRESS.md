@@ -1,8 +1,32 @@
 # Progress
 
 > Kept by the build agent. Every "works" line names the transaction that proves it; each hash
-> opens on `https://stellar.expert/explorer/testnet/tx/<hash>`. Last updated Fri 9 Oct 2026,
-> 16:00 PKT (11:00 UTC).
+> opens on `https://stellar.expert/explorer/testnet/tx/<hash>` (mainnet hashes on
+> `/explorer/public/tx/`). Last updated Sat 10 Oct 2026, 06:30 PKT (01:30 UTC).
+
+## 10 Oct: mainnet
+
+- **The Sown contract is on Stellar mainnet**: `CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE`,
+  deployed 10 Oct 2026, 01:12 UTC by the admin `GB7X…ALQY` (upload
+  `0795cd339ffb48811062a71041ee60cca9a6367a3d12ba4bae381027bb8deefc`, create
+  `c52539f4949a47f6387c1776b7cd3928ed1f436999eaed7cb0524b77d6255ba3`, ledger 64,861,798); USDY
+  `7616f164…88663`, USTRY `2da5c7f4…40763`, CETES `c73eda4c…4e461` registered with the catalogue's
+  pools; the code dumped back from the ledger is the same 15,311 bytes, sha256
+  `7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167`. The live parity test
+  (`SOWN_LIVE=1 NEXT_PUBLIC_SOWN_NETWORK=mainnet`) is green. The admin kept 6.06 XLM.
+  (`deployments/mainnet.json`; each hash opens on `https://stellar.expert/explorer/public/tx/<hash>`.)
+- **Run by the agent at the founder's request** ("run commands yourself and deploy it"): the
+  smoke sender's USDC line (`5b104e12…6ed4`), the preflight, the deploy, the dry smoke. The real
+  smoke moves a dollar of real USDC and is the founder's to run (one line, below).
+- **The dry smoke** (`npm run smoke:mainnet -- --dry`): code ✓, USDY open with the pool ✓, Sown's
+  servers can spend 59 XLM ✓; the smoke sender held no USDC yet, so the send could not simulate.
+  Found on the way: a balance error from the USDC contract (#10) read as Sown's own #10; fixed
+  (`explainSendFailure` reads the wallet's balance and lines first; tested).
+- **https://sown.world is Sown on mainnet** (the VM switched 10 Oct: network mainnet, Sown's
+  servers' key, the test wallet off). `var/sown.mainnet.db` is its cache.
+- **Mainnet accounts**: admin `GB7X…ALQY` 6.06 XLM; Sown's servers `GDYR…BJ33` 60 XLM; the smoke
+  sender `GDUC…MJGG` 4 XLM with a USDC line and no USDC yet; the founder's Freighter `GARL…3EFM`
+  13.9 XLM and no USDC yet.
 
 ## 9 Oct, afternoon: Sown's own design, the note, the QR
 
@@ -263,14 +287,13 @@ placeholder comment marks the spot.
      **$2 USDC** (`scripts/stellar.sh tx new change-trust --source-account sown-mainnet-smoke --line USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN --network mainnet`, then a USDC payment from Freighter);
    - the founder's **Freighter** `GARL…3EFM`: 13.9 XLM on 10 Oct and **no USDC yet**; the film and
      the judges' real sends need about **$30 of USDC** (buy XLM, swap to USDC in Freighter).
-4. **Deploy**: `npm run preflight`, then
-   `SOWN_ADMIN_SECRET=S… SOWN_MAINNET=yes npm run contract:deploy:mainnet` (if it stops, run it
-   again: it resumes). Add your wallets (admin, servers, smoke sender, Freighter) to `src/lib/team.ts`.
-5. **Smoke**: `npm run smoke:mainnet -- --dry` (read only) with `SOWN_SPONSOR_PUBLIC` and
-   `SOWN_SMOKE_SENDER_PUBLIC`, then `SOWN_MAINNET=yes SOWN_SPONSOR_SECRET=S… SOWN_SMOKE_SENDER_SECRET=S… npm run smoke:mainnet`.
-   It sends $1 into USDY, claims it, moves both parts back, and writes `deployments/mainnet-smoke.json`.
-6. **Put the mainnet contract id into the README** (a test fails until it is there) and commit
-   `deployments/mainnet.json` and `deployments/mainnet-smoke.json`.
+4. ~~Deploy~~ **Done 10 Oct** (above); the team wallets are in `src/lib/team.ts`.
+5. **Smoke**: send **$2 USDC** from Freighter to the smoke sender `GDUC…MJGG` (its USDC line
+   exists now), then run, from the repo:
+   `export SOWN_SPONSOR_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-servers) SOWN_SMOKE_SENDER_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-smoke) && SOWN_MAINNET=yes npm run smoke:mainnet`.
+   It sends $1 into USDY, claims it with a software passkey, moves both parts back, and writes
+   `deployments/mainnet-smoke.json` (commit it).
+6. ~~Put the mainnet contract id into the README~~ **Done 10 Oct**.
 7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
    Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
    events after about a week) so `/proof` prints it.
