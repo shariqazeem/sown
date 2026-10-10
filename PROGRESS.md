@@ -22,6 +22,19 @@
   servers can spend 59 XLM ✓; the smoke sender held no USDC yet, so the send could not simulate.
   Found on the way: a balance error from the USDC contract (#10) read as Sown's own #10; fixed
   (`explainSendFailure` reads the wallet's balance and lines first; tested).
+- **The mainnet smoke, all green** (10 Oct, 01:55 UTC, run by the founder; `deployments/mainnet-smoke.json`):
+  envelope 0 on mainnet, $1 keeping 10% from the smoke sender `GDUC…MJGG` → 0.9000 USDC and
+  **0.0881 USDY** (real Ondo USDY from the real Aquarius pool, floor 0.0873), 7.2 s:
+  `9485b378d0ddb772113024b18bf3fb6d257a1f3372d2211027201951970e573a`; claimed into a wallet made
+  with one (software) passkey `CADQCXPORKG3HLH4UBEZRW227LT7ANGETCG5XWGQ374KUCEHO5Q6LP4B`, deployed
+  and paid by Sown's servers: wallet `1291ca30…b1fdc`, claim
+  `a0f9f464fcdf859c0439dbe2194c09a7d2eb8ca82b7148e4d064e37db3cf6a77`, 14.2 s; the wallet held
+  exactly what the envelope said; 0.9000 USDC moved back `06301575…3d00`, the sender made ready
+  to hold USDY again `123831b0…2e37f`, 0.0881 USDY moved back `75feaccc…ad8d4`; the wallet
+  emptied and its key removed. The first attempt (01:40 UTC) was refused with
+  `txInsufficientFee`: mainnet's fee market wanted 200 stroops where the builder bid the 100
+  minimum; sends and refunds now bid the network's own statistics (`inclusionFee` in
+  `src/lib/stellar/soroban.ts`, floored at 200).
 - **https://sown.world is Sown on mainnet** (the VM switched 10 Oct: network mainnet, Sown's
   servers' key, the test wallet off). `var/sown.mainnet.db` is its cache.
 - **Mainnet accounts**: admin `GB7X…ALQY` 6.06 XLM; Sown's servers `GDYR…BJ33` 60 XLM; the smoke
@@ -288,11 +301,9 @@ placeholder comment marks the spot.
    - the founder's **Freighter** `GARL…3EFM`: 13.9 XLM on 10 Oct and **no USDC yet**; the film and
      the judges' real sends need about **$30 of USDC** (buy XLM, swap to USDC in Freighter).
 4. ~~Deploy~~ **Done 10 Oct** (above); the team wallets are in `src/lib/team.ts`.
-5. **Smoke**: send **$2 USDC** from Freighter to the smoke sender `GDUC…MJGG` (its USDC line
-   exists now), then run, from the repo:
-   `export SOWN_SPONSOR_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-servers) SOWN_SMOKE_SENDER_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-smoke) && SOWN_MAINNET=yes npm run smoke:mainnet`.
-   It sends $1 into USDY, claims it with a software passkey, moves both parts back, and writes
-   `deployments/mainnet-smoke.json` (commit it).
+5. ~~Smoke~~ **Done 10 Oct, all green** (above). To run it again later, from the repo:
+   `export SOWN_SPONSOR_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-servers) SOWN_SMOKE_SENDER_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-smoke) && SOWN_MAINNET=yes npm run smoke:mainnet`
+   (it refuses to run twice in an hour).
 6. ~~Put the mainnet contract id into the README~~ **Done 10 Oct**.
 7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
    Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets

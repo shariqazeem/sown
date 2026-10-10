@@ -1,6 +1,50 @@
 {
   "network": "mainnet",
-  "contract": null,
-  "at": null,
-  "steps": []
+  "contract": "CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE",
+  "at": "2026-10-10T01:47:32.683Z",
+  "usd": 1,
+  "keepBps": 1000,
+  "asset": "USDY",
+  "sender": "GDUCOKR7RYTJDRO3HY27ZT5VF3KB63RS2V3C26KOZZ4OUZ2OSPPRMJGG",
+  "steps": [
+    {
+      "name": "sent $1, keeping 10% as US Treasuries",
+      "id": "0",
+      "tx": "9485b378d0ddb772113024b18bf3fb6d257a1f3372d2211027201951970e573a",
+      "seconds": "7.2",
+      "keep": "0.0881",
+      "least": "0.0873"
+    },
+    {
+      "name": "claimed into a wallet made with one Face ID (a software one), Sown's servers paid both",
+      "wallet": "CADQCXPORKG3HLH4UBEZRW227LT7ANGETCG5XWGQ374KUCEHO5Q6LP4B",
+      "deployTx": "1291ca30a1965203308e4840da32cc9dfd9d38d213e116521e5decdacabb1fdc",
+      "claimTx": "a0f9f464fcdf859c0439dbe2194c09a7d2eb8ca82b7148e4d064e37db3cf6a77",
+      "seconds": "14.2",
+      "prompts": 1
+    },
+    {
+      "name": "moved 0.9000 USDC back to the sender, paid by Sown's servers",
+      "tx": "063015754104031a31b56d9895f52257c6ab2ac10b114439886ee77e9bbe3d00",
+      "seconds": "50.0",
+      "prompts": 1
+    },
+    {
+      "name": "the sender was made ready to hold US Treasuries again",
+      "tx": "123831b06f4c66569baab3b2bd2e0ba818d27d574b3ad73a76153d43e4b2e37f"
+    },
+    {
+      "name": "moved 0.0881 USDY back to the sender, paid by Sown's servers",
+      "tx": "75feacccab1ea35b795b3be4a301945155b1f8f1b1672d5807da19e22f8ad8d4",
+      "seconds": "26.5",
+      "prompts": 1
+    }
+  ],
+  "wallet": "CADQCXPORKG3HLH4UBEZRW227LT7ANGETCG5XWGQ374KUCEHO5Q6LP4B",
+  "seconds": {
+    "send": 7.2,
+    "claim": 14.2,
+    "sendToClaimOnTheLedger": 15
+  },
+  "failures": 0
 }
