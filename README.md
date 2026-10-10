@@ -8,7 +8,7 @@ bought on Aquarius inside a Soroban contract. The person at home taps a link; on
 them a wallet, and both parts are theirs: dollars to spend, Treasuries that stay. Every send
 and every claim is a receipt anyone can open, read from the ledger.
 
-<p align="center"><img src="docs/sown-send.gif" width="360" alt="The send card on a phone: $50, keep 10%, the split between what is spent and what stays, on Stellar testnet"></p>
+<p align="center"><img src="docs/sown-send.gif" width="360" alt="The send card on a phone, on mainnet: $50, keep 10%, the split between what is spent and what stays as US Treasuries (Ondo USDY), then a name and a note"></p>
 
 | | |
 | --- | --- |
