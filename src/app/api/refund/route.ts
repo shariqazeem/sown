@@ -5,7 +5,7 @@ import { contractId } from "@/lib/deployments";
 import { readEnvelope } from "@/lib/envelope/read";
 import { gated } from "@/lib/stellar/limiter";
 import { network } from "@/lib/stellar/network";
-import { INSTRUCTION_LEEWAY, rpcServer, sendAndWait, simulationReason } from "@/lib/stellar/soroban";
+import { inclusionFee, INSTRUCTION_LEEWAY, rpcServer, sendAndWait, simulationReason } from "@/lib/stellar/soroban";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "This wallet has no account on the network." }, { status: 400 });
   }
-  const tx = new TransactionBuilder(account, { fee: "100", networkPassphrase: net.passphrase })
+  const tx = new TransactionBuilder(account, { fee: await inclusionFee(net), networkPassphrase: net.passphrase })
     .addOperation(
       Operation.invokeHostFunction({
         func: xdr.HostFunction.hostFunctionTypeInvokeContract(

@@ -1,5 +1,6 @@
 import { Account, Keypair, Networks, Operation, TransactionBuilder, xdr, Address } from "@stellar/stellar-sdk";
 import { describe, expect, it } from "vitest";
+import { INCLUSION_FEE_CAP, INCLUSION_FEE_FLOOR, clampInclusionFee } from "@/lib/stellar/soroban";
 import { DAY, explainSendFailure, inspectSignedSend, returnAtFor, sendArgs, validateSend } from "./build";
 
 const CONTRACT = "CBNZK4NDWZZD5YBLK4GTUICA2RF7PIXL7RHADRVQSTYF7EQ4OSCGMOFB";
@@ -54,5 +55,17 @@ describe("a failed simulation, in the sheet's words", () => {
     expect(explainSendFailure('HostError: Error(Contract, #10)\nEvent log: "resulting balance is not within the allowed range"')).toContain("does not hold enough USDC");
     expect(explainSendFailure('HostError: Error(Contract, #13)\nEvent log: "trustline entry is missing for account"')).toContain("does not hold enough USDC");
     expect(explainSendFailure("something new")).toContain("Nothing moved.");
+  });
+});
+
+describe("the bid for a place in the ledger", () => {
+  it("rides the network's own statistics, floored and capped, and never below what mainnet refused", () => {
+    expect(clampInclusionFee(null)).toBe(INCLUSION_FEE_FLOOR);
+    expect(clampInclusionFee(100)).toBe(INCLUSION_FEE_FLOOR);
+    expect(clampInclusionFee(200)).toBe(300);
+    expect(clampInclusionFee(1_000)).toBe(1_500);
+    expect(clampInclusionFee(1_000_000)).toBe(INCLUSION_FEE_CAP);
+    expect(clampInclusionFee(Number.NaN)).toBe(INCLUSION_FEE_FLOOR);
+    expect(INCLUSION_FEE_FLOOR).toBeGreaterThan(100);
   });
 });

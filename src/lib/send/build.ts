@@ -2,7 +2,7 @@ import { Address, FeeBumpTransaction, Operation, StrKey, Transaction, Transactio
 import { type Outcome, held, ok } from "@/lib/outcome";
 import { gated } from "@/lib/stellar/limiter";
 import type { NetworkConfig } from "@/lib/stellar/network";
-import { INSTRUCTION_LEEWAY, rpcServer, simulationReason } from "@/lib/stellar/soroban";
+import { INSTRUCTION_LEEWAY, inclusionFee, rpcServer, simulationReason } from "@/lib/stellar/soroban";
 import { CONTRACT_ERRORS } from "@/lib/envelope/types";
 
 /**
@@ -66,7 +66,7 @@ export async function prepareSend(net: NetworkConfig, contractId: string, a: Sen
   } catch {
     return held("This wallet has no account on the network yet. Add XLM and USDC to it first.");
   }
-  const tx = new TransactionBuilder(account, { fee: "100", networkPassphrase: net.passphrase })
+  const tx = new TransactionBuilder(account, { fee: await inclusionFee(net), networkPassphrase: net.passphrase })
     .addOperation(Operation.invokeHostFunction({
       func: xdr.HostFunction.hostFunctionTypeInvokeContract(new xdr.InvokeContractArgs({ contractAddress: Address.fromString(contractId).toScAddress(), functionName: "send", args: sendArgs(a) })),
       auth: [],

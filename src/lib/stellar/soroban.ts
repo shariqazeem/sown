@@ -38,6 +38,39 @@ export function rpcServer(net: NetworkConfig): rpc.Server {
   return new rpc.Server(net.rpcUrl, { allowHttp: net.rpcUrl.startsWith("http://") });
 }
 
+/**
+ * THE BID FOR A PLACE IN THE LEDGER. Mainnet has a fee market: when its ledgers are full, a
+ * transaction bidding the 100-stroop minimum is refused (txInsufficientFee), which is how the
+ * first mainnet smoke failed on 10 Oct 2026, with every Soroban transaction of the last 50
+ * ledgers paying 200. The bid is read from the network's own fee statistics (the 90th percentile
+ * of recent Soroban inclusion fees, with half again on top), floored at 200 stroops and capped at
+ * 20,000 (0.002 XLM): the ledger charges its clearing price, never the whole bid. Testnet has no
+ * market and pays the floor. Cached for twenty seconds.
+ */
+export const INCLUSION_FEE_FLOOR = 200;
+export const INCLUSION_FEE_CAP = 20_000;
+
+export function clampInclusionFee(p90: number | null | undefined): number {
+  if (p90 === null || p90 === undefined || !Number.isFinite(p90) || p90 <= 0) return INCLUSION_FEE_FLOOR;
+  return Math.min(INCLUSION_FEE_CAP, Math.max(INCLUSION_FEE_FLOOR, Math.ceil(p90 * 1.5)));
+}
+
+let feeBid: { readonly url: string; readonly at: number; readonly fee: string } | null = null;
+
+export async function inclusionFee(net: NetworkConfig): Promise<string> {
+  if (feeBid && feeBid.url === net.rpcUrl && Date.now() - feeBid.at < 20_000) return feeBid.fee;
+  let p90: number | null = null;
+  try {
+    const stats = await gated(net.rpcUrl, () => rpcServer(net).getFeeStats());
+    p90 = Number(stats.sorobanInclusionFee.p90);
+  } catch {
+    // The floor is a safe bid when the statistics are unavailable.
+  }
+  const fee = String(clampInclusionFee(p90));
+  feeBid = { url: net.rpcUrl, at: Date.now(), fee };
+  return fee;
+}
+
 export type Simulated = {
   readonly tx: Transaction;
   readonly sim: rpc.Api.SimulateTransactionSuccessResponse;
