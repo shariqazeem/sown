@@ -35,6 +35,12 @@
   `txInsufficientFee`: mainnet's fee market wanted 200 stroops where the builder bid the 100
   minimum; sends and refunds now bid the network's own statistics (`inclusionFee` in
   `src/lib/stellar/soroban.ts`, floored at 200).
+- **The film, draft 3, on mainnet** (`../sown-video/out/pitch.mp4`, 110 s, 1920×1080, 40 MB):
+  the card, the home, assets and proof pages and the receipt of envelope 0 recorded from
+  sown.world on mainnet (real USDY); the close card says "sown.world · live on Stellar mainnet".
+  The claim scene is still the testnet take (envelope 11, the recorder's real WebAuthn claim)
+  until the founder's phone take P1 exists; its captions say nothing a testnet claim does not
+  show. The README's GIF is the mainnet card.
 - **https://sown.world is Sown on mainnet** (the VM switched 10 Oct: network mainnet, Sown's
   servers' key, the test wallet off). `var/sown.mainnet.db` is its cache.
 - **Mainnet accounts**: admin `GB7X…ALQY` 6.06 XLM; Sown's servers `GDYR…BJ33` 60 XLM; the smoke
