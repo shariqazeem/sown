@@ -1,6 +1,6 @@
 # Sown
 
-**Send money home. Part of it stays theirs.**
+**Send money home. Part of it stays theirs.** Live on Stellar mainnet at [sown.world](https://sown.world).
 
 A person abroad sends dollars home on Stellar and answers one question, *keep how much?* In the
 same transaction, that slice becomes US Treasuries (Ondo USDY) or Mexican CETES (Etherfuse),
@@ -15,6 +15,7 @@ and every claim is a receipt anyone can open, read from the ledger.
 | **Mainnet contract** | [`CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE`](https://stellar.expert/explorer/public/contract/CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE), deployed 10 Oct 2026 with US Treasuries (Ondo USDY), US Treasury notes (Etherfuse USTRY) and Mexican CETES registered ([`deployments/mainnet.json`](deployments/mainnet.json)) |
 | **Testnet contract** | [`CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB`](https://stellar.expert/explorer/testnet/contract/CCKMIXT4SERT4OFTIGCRLPAFPUED4WW6J7SKCZ46QBOLHBCV3CTAHQSB) |
 | **Its code** | sha256 `7d047dcedfe73b692e2def44c1ab16634b0dfe4325c0e40ce9bdefb189c9e167`, the bytes of [`artifacts/sown.wasm`](artifacts/sown.wasm), dumped back from the ledger and compared. No upgrade function exists |
+| **Run on mainnet** | [`deployments/mainnet-smoke.json`](deployments/mainnet-smoke.json): $1 sent keeping 10% as real USDY, claimed into a wallet made with one passkey, both parts moved back; the receipt at [sown.world/receipt/0](https://sown.world/receipt/0) |
 | **Every path, run on testnet** | [`deployments/testnet-battery.json`](deployments/testnet-battery.json) and [`deployments/testnet-smoke.json`](deployments/testnet-smoke.json): every transaction hash |
 | **Unaudited** | the contract and the wallet kit. Not offered to US persons, by the issuers' terms |
 
