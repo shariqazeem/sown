@@ -311,9 +311,12 @@ placeholder comment marks the spot.
    `export SOWN_SPONSOR_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-servers) SOWN_SMOKE_SENDER_SECRET=$(scripts/stellar.sh keys secret sown-mainnet-smoke) && SOWN_MAINNET=yes npm run smoke:mainnet`
    (it refuses to run twice in an hour).
 6. ~~Put the mainnet contract id into the README~~ **Done 10 Oct**.
-7. **The film**: send $1–$50 from Freighter on the final domain and claim it on a real phone with
-   Face ID; then `npm run smoke:mainnet -- --record <id>` within a few days (the network forgets
-   events after about a week) so `/proof` prints it.
+7. **The pitch video (3 minutes, the founder on camera, the product live)**: the script and the
+   one-take setup (Loom or Zoom with the webcam; the iPhone mirrored into QuickTime beside the
+   browser) are in `docs/DEMO-AND-PITCH.md`. The real $5 send and the phone claim happen inside
+   the recording; afterwards `npm run smoke:mainnet -- --record <id>` within a few days so
+   `/proof` prints that envelope. Then three $1 envelopes with notes for the judges, their links
+   in the form's "other links". Upload the video unlisted and paste the fields from the same doc.
 8. **A real phone on testnet first**: the founder claimed envelope 12 on a MacBook with Touch ID
    (10 Oct). A fresh open envelope for the phone is made from the card with "Try it with a test
    wallet"; its link is given in chat and lives in the sender's browser storage (a claim link is
