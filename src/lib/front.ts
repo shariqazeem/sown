@@ -35,19 +35,38 @@ export async function cardAssets(): Promise<CardAsset[]> {
   }));
 }
 
+/**
+ * The front door is read by strangers all day; the pool's price and the contract's newest
+ * envelopes change slowly. Each is held for a few seconds per server, so the first byte comes
+ * from memory and the figures are never more than that old. A send still quotes live.
+ */
+const HOLD_QUOTE_MS = 15_000;
+const HOLD_LATEST_MS = 20_000;
+type Held<T> = { readonly at: number; readonly value: T };
+const held = globalThis as unknown as { __sownFront?: { quote?: Held<Quote | null>; latest?: Held<Envelope | null> } };
+const store = () => (held.__sownFront ??= {});
+
 export async function openingQuote(usd = 100, keepBps = 1_000): Promise<Quote | null> {
+  const hit = store().quote;
+  if (hit && Date.now() - hit.at < HOLD_QUOTE_MS) return hit.value;
   const net = network();
   const a = keepAssets(net.name)[0];
   if (!a || !contractId(net.name)) return null;
   const q = await quote(net, a, BigInt(usd) * 10_000_000n, keepBps);
-  return q.ok ? q.value : null;
+  const value = q.ok ? q.value : null;
+  if (value) store().quote = { at: Date.now(), value };
+  return value;
 }
 
 export async function latestOutsideTeam(): Promise<Envelope | null> {
+  const hit = store().latest;
+  if (hit && Date.now() - hit.at < HOLD_LATEST_MS) return hit.value;
   const net = network();
   const id = contractId(net.name);
   if (!id) return null;
   const all = await readAll(net, id, 60);
   if (!all.ok) return null;
-  return outsideTeam(all.value).find((e) => e.state === "claimed") ?? null;
+  const value = outsideTeam(all.value).find((e) => e.state === "claimed") ?? null;
+  store().latest = { at: Date.now(), value };
+  return value;
 }

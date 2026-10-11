@@ -1,0 +1,53 @@
+/* The card that keeps Sown on a phone. Tokens only. */
+.sw-install {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-3) var(--s-4);
+  align-items: center;
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface-inverse);
+  color: var(--ink-inverse);
+  border-radius: var(--r-lg);
+}
+.sw-install-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--leaf);
+}
+.sw-install-words .t {
+  font-weight: 700;
+}
+.sw-install-words .d {
+  margin-top: 2px;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-inverse-muted);
+}
+.sw-install-words .d strong {
+  color: var(--ink-inverse);
+}
+.sw-install-btn {
+  grid-column: 1 / -1;
+  background: var(--leaf);
+  border-color: var(--leaf);
+  color: var(--brand-strong);
+}
+.sw-install-btn:hover:not(:disabled) {
+  background: var(--leaf);
+  border-color: var(--leaf);
+  color: var(--brand-strong);
+  filter: brightness(1.05);
+}
+@media (min-width: 560px) {
+  .sw-install {
+    grid-template-columns: auto 1fr auto;
+  }
+  .sw-install-btn {
+    grid-column: auto;
+  }
+}

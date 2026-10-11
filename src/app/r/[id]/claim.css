@@ -243,3 +243,18 @@
 .sw-gift.is-returned .sw-gift-parts .v {
   color: var(--ink-muted);
 }
+
+/* the link as a code, for a device without Face ID */
+.sw-claim-qr {
+  justify-self: center;
+  width: 200px;
+  padding: var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.sw-claim-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

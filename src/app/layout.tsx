@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: "Sown" },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Sown" },
 };
 
 export const viewport: Viewport = {

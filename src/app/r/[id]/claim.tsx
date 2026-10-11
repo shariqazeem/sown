@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Copy, Fingerprint } from "lucide-react";
 import { SownMark } from "@/components/brand/mark";
+import { AddToPhone } from "@/components/install/add-to-phone";
+import { LinkQr } from "./link-qr";
 import { useLocalMoney } from "@/components/money/use-local-money";
 import { SkeletonEnvelope } from "@/components/skeleton/skeleton";
 import { useTxToast } from "@/components/toast/use-tx-toast";
@@ -213,6 +215,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
                   The receipt
                 </Link>
               </p>
+              <AddToPhone what="your wallet" />
             </>
           ) : classicHere ? (
             <>
@@ -270,11 +273,14 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
       <div className="sw-claim-after">
         {noFace ? (
           <>
-            <h1 className="sw-claim-title">Open this link in Safari or Chrome.</h1>
+            <h1 className="sw-claim-title">{inApp ? "Open this link in Safari or Chrome." : "Claim it on your phone."}</h1>
             <p className="sw-claim-say">
-              {inApp ? `${inApp}'s own browser` : "This browser"} cannot make a wallet with your face. Copy the link, then paste it into Safari or Chrome. Your envelope waits.
+              {inApp
+                ? `${inApp}'s own browser cannot make a wallet with your face. Copy the link, then paste it into Safari or Chrome. Your envelope waits.`
+                : "This device cannot make a wallet with your face. Point your phone's camera at the code, and the envelope opens there, ready for Face ID."}
             </p>
-            <button type="button" className="sw-btn is-primary is-block" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
+            {inApp ? null : <LinkQr />}
+            <button type="button" className="sw-btn is-block" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
               <Copy size={16} strokeWidth={2} aria-hidden />
               Copy the link
             </button>
@@ -361,7 +367,9 @@ function Gift({ e, total, asset, ticker, note, yours, fresh, claimTx, explorer }
         </span>
       </div>
       <div className="sw-gift-body">
-        <p className="sw-gift-from">{note?.from ? `${note.from} sent you` : <><span className="mono">{short(e.sender)}</span> sent you</>}</p>
+        <p className="sw-gift-from">
+          {note?.from ? note.from : <span className="mono">{short(e.sender)}</span>} {state === "claimed" && !yours ? "sent" : "sent you"}
+        </p>
         <p className="sw-gift-amount">
           {money ? (
             <>

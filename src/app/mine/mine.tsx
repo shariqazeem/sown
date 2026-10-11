@@ -7,6 +7,7 @@ import { StrKey } from "@stellar/stellar-sdk";
 import { EnvelopeRow } from "@/components/envelope/envelope";
 import { LocalAmount } from "@/components/money/local-amount";
 import type { HoldingsBody } from "@/components/send/types";
+import { AddToPhone } from "@/components/install/add-to-phone";
 import { SkeletonRows } from "@/components/skeleton/skeleton";
 import { useTxToast } from "@/components/toast/use-tx-toast";
 import { type EnvelopeJson, envelopeFromJson } from "@/lib/envelope/types";
@@ -146,11 +147,22 @@ export function Mine({ usdcSac, assets, explorer, testnet }: { usdcSac: string; 
 
   const h = data?.holdings;
   const usdc = h ? BigInt(h.usdc.balanceRaw) : null;
+  // Everything, in dollars: the cash plus each keep at Aquarius's price right now (a keep the pool
+  // did not price just now is left out, and the line says so).
+  const totalUsd = h ? fromRaw(usdc!) + h.keeps.reduce((sum, k) => sum + (k.valueUsdcRaw ? fromRaw(k.valueUsdcRaw) : 0), 0) : null;
+  const unpriced = h ? h.keeps.some((k) => BigInt(k.balanceRaw) > 0n && !k.valueUsdcRaw) : false;
   return (
     <div className="sw-mine">
       <div className="sw-mine-head">
         <p className="sw-kicker">Your wallet</p>
         <h1 className="sw-h1">What you hold</h1>
+        {totalUsd !== null ? (
+          <p className="sw-mine-total">
+            <span className="big">{usdAligned(totalUsd)}</span>
+            <LocalAmount usd={totalUsd} prefix="" />
+            <span className="sub">{unpriced ? "dollars to spend, plus a keep Aquarius did not price just now" : "dollars to spend, plus what stays, at Aquarius's price right now"}</span>
+          </p>
+        ) : null}
         <p className="sw-mine-addr">
           <span className="mono">{short(wallet.contractId, 6, 6)}</span>
           <button
@@ -293,6 +305,8 @@ export function Mine({ usdcSac, assets, explorer, testnet }: { usdcSac: string; 
           ))}
         </ul>
       </section>
+
+      <AddToPhone what="your wallet" />
 
       <p className="sw-mine-note">
         This wallet is yours: it opens with your face on this phone. To use it on another phone, open Sown there and continue with the same face or fingerprint.{" "}
