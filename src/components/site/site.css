@@ -64,7 +64,8 @@
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: var(--s-4) var(--gutter);
+  /* installed on a phone, the nav starts under the status bar, never behind it */
+  padding: calc(var(--s-4) + env(safe-area-inset-top, 0px)) calc(var(--gutter) + env(safe-area-inset-right, 0px)) var(--s-4) calc(var(--gutter) + env(safe-area-inset-left, 0px));
 }
 .sw-nav-brand {
   display: inline-flex;
@@ -503,7 +504,7 @@
   width: 100%;
   max-width: var(--measure-wide);
   margin: var(--s-9) auto 0;
-  padding: var(--s-6) var(--gutter) var(--s-8);
+  padding: var(--s-6) var(--gutter) calc(var(--s-8) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--line);
   font-size: var(--fs-caption);
   color: var(--ink-faint);

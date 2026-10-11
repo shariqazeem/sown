@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Copy, Fingerprint } from "lucide-react";
+import { Check, Copy, Fingerprint } from "lucide-react";
 import { SownMark } from "@/components/brand/mark";
 import { AddToPhone } from "@/components/install/add-to-phone";
 import { LinkQr } from "./link-qr";
@@ -126,6 +126,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
       if (body.claimTx) setClaimTx(body.claimTx);
       await refresh();
       setPhase("done");
+      buzz();
     } catch {
       setPhase("failed");
       setWhy("Could not reach Sown's servers. Nothing moved; your envelope is still waiting.");
@@ -187,6 +188,7 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
       if (claimed.claimTx) setClaimTx(claimed.claimTx);
       await refresh();
       setPhase("done");
+      buzz();
     } catch {
       setPhase("failed");
       setWhy("Could not reach Sown's servers. Nothing moved; your envelope is still waiting.");
@@ -295,11 +297,15 @@ export function ClaimCard({ id, read, asset, passphrase, testnet, explorer, cont
               {via?.kind === "classic" ? null : <Fingerprint size={20} strokeWidth={2} aria-hidden />}
               {phase === "making" ? "Making your wallet…" : phase === "claiming" ? "Claiming…" : phase === "preparing" ? "Preparing your wallet…" : phase === "approving" ? "Approve in your wallet…" : phase === "failed" ? "Try again" : "Claim with Face ID"}
             </button>
-            <p className="sw-claim-under">
-              {via?.kind === "classic"
-                ? `Into your Stellar wallet, ${short(via.address)}. Sown's servers pay the network.`
-                : "Your face or fingerprint makes a wallet that only you control. No app, no password, nothing to pay. Sown's servers pay the network."}
-            </p>
+            {busy ? (
+              <Steps phase={phase} classic={via?.kind === "classic"} />
+            ) : (
+              <p className="sw-claim-under">
+                {via?.kind === "classic"
+                  ? `Into your Stellar wallet, ${short(via.address)}. Sown's servers pay the network.`
+                  : "Your face or fingerprint makes a wallet that only you control. No app, no password, nothing to pay. Sown's servers pay the network."}
+              </p>
+            )}
             {via?.kind === "classic" && phase === "failed" ? (
               <button
                 type="button"
@@ -415,5 +421,44 @@ function Gift({ e, total, asset, ticker, note, yours, fresh, claimTx, explorer }
         </p>
       </div>
     </article>
+  );
+}
+
+/** A short buzz when it lands, where the phone allows one. */
+function buzz(): void {
+  try {
+    navigator.vibrate?.(24);
+  } catch {
+    // No haptics here.
+  }
+}
+
+/**
+ * THE WAIT, SHOWN AS STEPS. A claim takes ten to forty seconds on the network; each step ticks as
+ * it is done, so the wait reads as progress and not as a stuck button.
+ */
+function Steps({ phase, classic }: { phase: Phase; classic: boolean }) {
+  const steps: ReadonlyArray<{ readonly label: string; readonly done: boolean; readonly now: boolean }> = classic
+    ? [
+        { label: "Your wallet made ready to hold these", done: phase === "claiming", now: phase === "preparing" || phase === "approving" },
+        { label: "Sown's servers submit the claim, and pay for it", done: false, now: phase === "claiming" },
+        { label: "It is yours", done: false, now: false },
+      ]
+    : [
+        { label: "Your face makes your wallet", done: phase === "claiming", now: phase === "making" },
+        { label: "Sown's servers deploy it and submit the claim, and pay for both", done: false, now: phase === "claiming" },
+        { label: "It is yours", done: false, now: false },
+      ];
+  return (
+    <ol className="sw-claim-steps" aria-live="polite">
+      {steps.map((st) => (
+        <li key={st.label} className={st.done ? "is-done" : st.now ? "is-now" : ""}>
+          <span className="mark" aria-hidden>
+            {st.done ? <Check size={14} strokeWidth={3} /> : null}
+          </span>
+          <span>{st.label}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

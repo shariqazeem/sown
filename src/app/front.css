@@ -27,7 +27,7 @@
   width: 100%;
   max-width: var(--measure-wide);
   margin: 0 auto;
-  padding: calc(var(--s-11) + var(--s-2)) var(--gutter) var(--s-10);
+  padding: calc(var(--s-11) + var(--s-2) + env(safe-area-inset-top, 0px)) var(--gutter) var(--s-10);
 }
 .sw-hero-words {
   display: grid;

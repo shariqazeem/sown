@@ -19,6 +19,28 @@ and every claim is a receipt anyone can open, read from the ledger.
 | **Every path, run on testnet** | [`deployments/testnet-battery.json`](deployments/testnet-battery.json) and [`deployments/testnet-smoke.json`](deployments/testnet-smoke.json): every transaction hash |
 | **Unaudited** | the contract and the wallet kit. Not offered to US persons, by the issuers' terms |
 
+## For the judges: two minutes
+
+1. **Open [sown.world](https://sown.world) on your phone.** The card quotes the real Aquarius pool: $100 keeping 10% becomes about 8.8 USDY, Ondo's US Treasuries. Nothing on any page is sampled or simulated.
+2. **Claim an envelope with your face.** The submission's "other links" carry claim links to small real envelopes on mainnet. Tap one, tap "Claim with Face ID": a wallet only you control is made on the spot, Sown's servers pay the network, and your wallet page shows the dollars and the Treasuries in your own money. On a laptop without Touch ID the page shows a QR to open it on your phone.
+3. **Read a receipt from the ledger**: [sown.world/receipt/0](https://sown.world/receipt/0) is the mainnet smoke, a dollar into real USDY and back. Every figure is read from the contract, and the proof page ([sown.world/proof](https://sown.world/proof)) shows the code's hash matching this repository.
+4. **Send one yourself** with Freighter, xBull, LOBSTR or Hana holding USDC on Stellar: one approval, and the receipt prints with the link and a QR.
+
+<p align="center"><img src="docs/architecture.svg" width="900" alt="How a send becomes an envelope, and an envelope a wallet: the sender signs one transaction; the Sown contract pulls USDC, swaps the slice on Aquarius with its own authorisation, writes the envelope; the recipient taps the link, one Face ID makes a wallet, Sown's servers pay; thirty days later anyone measures what is still held"></p>
+
+### What Stellar gives it
+
+| Stellar feature | Where it is used |
+| --- | --- |
+| Soroban contract with a cross-contract Aquarius swap, authorised by the contract itself (`authorize_as_current_contract`) | `send`: the slice is bought at the pool's price in the same transaction, or nothing happens |
+| Stellar Asset Contracts for USDC, USDY, USTRY, CETES | real issued assets, held by the contract and by passkey wallets with nothing to set up first |
+| Passkey smart accounts (OpenZeppelin's account contracts through the Smart Account Kit) | the recipient's wallet, made from one Face ID, controlled by nobody else |
+| Fees paid for the recipient, and the XLM a classic wallet must set aside | Sown's servers pay for the wallet, the claim, and a classic wallet's lines, after inspecting the exact shape |
+| Persistent storage with TTL | the envelope is the receipt, in the ledger, not only in a database |
+| `ed25519_verify` in the contract | a claim is a signature by the link's key over (contract, envelope, destination); the secret never travels |
+| Issuer flags read from Horizon | what Ondo and Etherfuse can do, on every row, from the chain |
+| Aquarius liquidity in government debt issued on Stellar | about $2M of USDC depth for each keep asset on mainnet |
+
 ## Run it
 
 ```bash

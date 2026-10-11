@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" font-family="Manrope, Inter, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4d5f56"/></marker>
+  </defs>
+  <rect width="1200" height="560" fill="#f6f2ea"/>
+  <text x="48" y="54" font-size="26" font-weight="700" fill="#10261c">How a send becomes an envelope, and an envelope a wallet</text>
+  <text x="48" y="82" font-size="15" fill="#4d5f56">One signature by the sender. One Face ID by the recipient. Everything in between is on the Stellar ledger.</text>
+
+  <!-- sender -->
+  <rect x="48" y="130" width="250" height="118" rx="18" fill="#ffffff" stroke="#e7e1d4"/>
+  <text x="70" y="162" font-size="13" font-weight="700" fill="#167a4b">THE SENDER</text>
+  <text x="70" y="188" font-size="16" font-weight="700" fill="#10261c">Freighter, xBull, LOBSTR…</text>
+  <text x="70" y="210" font-size="14" fill="#4d5f56">signs one transaction:</text>
+  <text x="70" y="230" font-size="14" fill="#4d5f56">send($100, keep 10%, note, floor)</text>
+
+  <!-- contract -->
+  <rect x="380" y="112" width="440" height="156" rx="18" fill="#0f3f2f"/>
+  <text x="404" y="144" font-size="13" font-weight="700" fill="#35c47f">THE SOWN CONTRACT · SOROBAN</text>
+  <text x="404" y="172" font-size="15" fill="#f3f6f2">1. pulls $100 USDC from the sender (require_auth)</text>
+  <text x="404" y="196" font-size="15" fill="#f3f6f2">2. swaps the $10 slice on the Aquarius pool, itself authorising</text>
+  <text x="404" y="216" font-size="15" fill="#afc4b8">    the pull (authorize_as_current_contract); refuses a short fill</text>
+  <text x="404" y="242" font-size="15" fill="#f3f6f2">3. writes the envelope: cash, keep, the link's public key, the note's hash</text>
+
+  <!-- aquarius -->
+  <rect x="900" y="112" width="252" height="90" rx="18" fill="#fbf1da" stroke="#efd79f"/>
+  <text x="922" y="142" font-size="13" font-weight="700" fill="#7a5212">AQUARIUS POOL</text>
+  <text x="922" y="166" font-size="15" fill="#10261c">USDC → USDY (Ondo), USTRY,</text>
+  <text x="922" y="186" font-size="15" fill="#10261c">CETES (Etherfuse) · ~$2M each</text>
+
+  <!-- envelope -->
+  <rect x="380" y="310" width="440" height="108" rx="18" fill="#ffffff" stroke="#e7e1d4"/>
+  <rect x="380" y="310" width="440" height="6" rx="3" fill="#167a4b"/>
+  <rect x="688" y="310" width="132" height="6" fill="#e0a63a"/>
+  <text x="404" y="344" font-size="13" font-weight="700" fill="#167a4b">THE ENVELOPE · PERSISTENT LEDGER ENTRY</text>
+  <text x="404" y="370" font-size="15" fill="#10261c">$90 USDC to spend  ·  8.77 USDY that stays  ·  opens only to the link's key</text>
+  <text x="404" y="394" font-size="14" fill="#4d5f56">the receipt anyone can read at /receipt/id · returns to the sender after 30 days unclaimed</text>
+
+  <!-- recipient -->
+  <rect x="900" y="310" width="252" height="138" rx="18" fill="#ffffff" stroke="#e7e1d4"/>
+  <text x="922" y="342" font-size="13" font-weight="700" fill="#167a4b">THE RECIPIENT</text>
+  <text x="922" y="368" font-size="16" font-weight="700" fill="#10261c">taps the link, one Face ID</text>
+  <text x="922" y="392" font-size="14" fill="#4d5f56">a passkey makes an OpenZeppelin</text>
+  <text x="922" y="412" font-size="14" fill="#4d5f56">account only they control;</text>
+  <text x="922" y="432" font-size="14" fill="#4d5f56">Sown's servers pay the network</text>
+
+  <!-- servers -->
+  <rect x="48" y="310" width="250" height="138" rx="18" fill="#ffffff" stroke="#e7e1d4"/>
+  <text x="70" y="342" font-size="13" font-weight="700" fill="#167a4b">SOWN'S SERVERS</text>
+  <text x="70" y="368" font-size="14" fill="#10261c">pay for the wallet and the claim,</text>
+  <text x="70" y="388" font-size="14" fill="#10261c">after inspecting exactly what they</text>
+  <text x="70" y="408" font-size="14" fill="#10261c">are asked to sign (once per envelope).</text>
+  <text x="70" y="432" font-size="14" fill="#4d5f56">They can move no envelope. Ever.</text>
+
+  <!-- arrows -->
+  <path d="M298 189 L380 189" stroke="#4d5f56" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M820 157 L900 157" stroke="#4d5f56" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M600 268 L600 310" stroke="#4d5f56" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M820 364 L900 364" stroke="#4d5f56" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M298 379 L380 379" stroke="#4d5f56" stroke-width="2" marker-end="url(#a)" stroke-dasharray="6 5"/>
+  <text x="310" y="372" font-size="12" fill="#7d8d85">claim(id, to, sig)</text>
+  <text x="826" y="356" font-size="12" fill="#7d8d85">claim</text>
+  <text x="826" y="150" font-size="12" fill="#7d8d85">swap</text>
+
+  <!-- foot -->
+  <text x="48" y="500" font-size="14" fill="#4d5f56">Thirty days after a claim anyone can call measure(id): the contract reads the keep's balance in that wallet and writes it into the receipt. Still held is the number that decides everything.</text>
+  <text x="48" y="526" font-size="13" fill="#7d8d85">The link's secret never reaches a server or the ledger: the claim is a signature over (contract, envelope, destination). The note travels with the link; its hash is sealed by the send.</text>
+</svg>

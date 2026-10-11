@@ -30,6 +30,8 @@ export const viewport: Viewport = {
   themeColor: "#0f3f2f",
   width: "device-width",
   initialScale: 1,
+  // Installed on a phone, the page runs under the status bar: every edge keeps its safe area.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
