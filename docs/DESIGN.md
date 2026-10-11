@@ -77,6 +77,23 @@ money beside them in muted type, with the rate and its date in the title attribu
 6. **The split scene** (`components/front/split.tsx`): "$100 sent home", the bar filling once
    when reached, two parts with the pool's figures, labelled arithmetic.
 
+## On their phone, and the wait
+
+- **Installable** (`src/app/manifest.ts`, icons under `/pwa/`, `apple-icon.tsx`): standalone,
+  evergreen chrome, opens on `/mine`, the recipient's door. `viewport-fit: cover`, and the nav,
+  the hero and the footer keep the safe areas, so the installed app never runs under the status bar.
+- **"Keep Sown on your phone"** (`components/install`): an evergreen card on the wallet page and
+  after a claim; the browser's own install prompt where one exists (Android, desktop Chrome), the
+  two iOS taps (Share, Add to Home Screen) otherwise; nothing once installed.
+- **The wait is three ticked steps** under the claim button: the wallet made with their face,
+  Sown's servers deploying it and submitting the claim, "It is yours"; the step in progress pulses.
+  When it lands: a short haptic where the phone allows one, the gift lands, and the gold part
+  catches the light once.
+- **A device without Face ID** (a laptop without Touch ID, Windows without Hello) sees a QR of its
+  own link and "Claim it on your phone", never a dead end; the Stellar-wallet path stays beside it.
+- **The wallet page leads with one total** in the viewer's own money: the dollars plus each keep
+  at Aquarius's price right now, and says so.
+
 ## The note
 
 Optional: the sender's name (40 characters) and a note (140). They ride in the link's fragment
