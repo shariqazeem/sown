@@ -1,0 +1,41 @@
+/* The judges' page: the envelopes first, then two columns of links. Tokens only. */
+.sw-judges-claims {
+  display: grid;
+  gap: var(--s-4);
+  margin: var(--s-7) 0;
+  padding: var(--s-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card);
+}
+.sw-judges-claims .sw-h2 {
+  margin-bottom: 0;
+}
+.sw-judges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--s-3);
+}
+.sw-judges-claim {
+  min-height: 56px;
+}
+.sw-judges-fine {
+  font-size: var(--fs-caption);
+  color: var(--ink-faint);
+}
+.sw-judges-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-7) var(--s-8);
+  margin: var(--s-7) 0;
+}
+.sw-judges-cols .sw-section + .sw-section {
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .sw-judges-cols {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+  }
+}

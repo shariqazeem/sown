@@ -111,17 +111,17 @@ https://github.com/shariqazeem/sown
 
 **Link to your video pitch**: the unlisted YouTube link of the three-minute recording.
 
-**Any other relevant links** (one per line)
+**Any other relevant links** (the form takes exactly one URL)
 
 ```
-Live on mainnet: https://sown.world
-Try it as the recipient (a real $1 envelope; the first to tap it with Face ID keeps it): <claim link 1>
-A second one, in case the first is taken: <claim link 2>
-A real receipt, read from the ledger: https://sown.world/receipt/<the filmed envelope>
-The contract on stellar.expert: https://stellar.expert/explorer/public/contract/CDQUJPAEWFFPS6ZBVF7SIRIVSKZDVMDZB4NFD3IAFS6D67N2JHMUHRFE
-The proof page (code hash, admin, what Sown's servers hold): https://sown.world/proof
-The silent product film (110 s): <the film's link, if uploaded>
+https://sown.world/judges
 ```
+
+That page carries everything else: the two-minute path, the video, the contract on
+stellar.expert, the receipts, the proof page, the code, and the judges' real envelopes. The
+envelopes, the video and the filmed receipt come from the VM's environment (`SOWN_JUDGE_LINKS`,
+comma-separated; `SOWN_VIDEO_URL`; `SOWN_FILM_RECEIPT_ID`) and a `pm2 restart sown`, never from
+the repository.
 
 ## Launch posts (X, from the founder's account; draft, never post from an agent)
 
