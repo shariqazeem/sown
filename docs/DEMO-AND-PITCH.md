@@ -33,93 +33,32 @@ wallet" → "Open your wallet" → `/mine`.
 R2 stellar.expert: the send transaction (the Sown contract, the Aquarius pool, USDC in, USDY
 out), then the claim into a C-address.
 
-## The pitch video: three minutes, the founder on camera, the product live
+## The pitch video: three minutes, you on camera, the product live, step by step
 
-**The setup, one take, three devices.** The MacBook records its own screen with its own camera
-for your face (Loom's free tier, Zoom's "record to this computer" with the camera on, or OBS); the
-iPhone is the recipient, plugged in by cable and mirrored into QuickTime (File › New Movie
-Recording › the camera menu › your iPhone), its window beside the browser, so the Face ID claim
-happens on the same screen; a second phone shows the script as a teleprompter (Notes, or any
-teleprompter app, scrolling slowly). Before you start: Freighter unlocked with USDC on Stellar
-(Circle's USDC, the asset Freighter lists; about $15 is plenty); the browser at `sown.world`, no
-bookmarks bar; `sown.world/proof` and `sown.world/assets` in two more tabs. Read naturally while
-you do each step; pauses while the network works are fine, they are real. Say every number as it
-is on screen that day (the script assumes a $10 send; with $5 say "five", "forty cents", "four
-dollars fifty"). If a step fails, stop, fix, record again: never narrate around a failure.
+**Three devices, one take.** The MacBook records its screen and your face with its own camera
+(Loom, or Zoom "record to this computer" with the camera on, or OBS). The iPhone is the recipient,
+plugged in by cable and mirrored into QuickTime (File › New Movie Recording › the arrow by the
+record button › your iPhone), its window beside the browser. A second phone shows this script,
+scrolling slowly, held under the camera. Before you start: Freighter unlocked with USDC on
+Stellar; `sown.world` in the browser, no bookmarks bar; `sown.world/proof` in a second tab.
+Every line below is said while you do that step. The waits are real; keep talking through them.
+Say numbers as they appear on screen that day. If a step fails, stop, fix, start again.
 
-**Timing**: 0:00–0:25 the problem · 0:25–1:20 the send (laptop) · 1:20–2:05 the claim (phone) ·
-2:05–2:40 the receipt, the proof, why Stellar · 2:40–3:00 the close. About 420 words.
+| Step | You do | You say |
+| --- | --- | --- |
+| 0 · 0:00 | Look at the camera. The home page behind you. | "Hi, I'm Shariq. This is Sown, live on Stellar mainnet. Every year, seven hundred billion dollars is sent home to families, and it is spent the week it arrives. Sown makes part of every send stay. Let me show you, with real money, start to finish." |
+| 1 · 0:15 | Tap **Other**, type **10**. Tap **10%**. Point at the split. | "I'm sending ten dollars home, and I choose how much stays: ten percent. The card asks the real Aquarius pool, right now, what that slice buys: about ninety cents of USDY, Ondo's US Treasuries, already issued on Stellar. Nine dollars to spend. Ninety cents that stays." |
+| 2 · 0:35 | Tap **Add your name and a note**. Type your name, then "For school fees, with love". | "I add my name and a note. The note travels inside the link, never through our servers, and the send seals its hash on the ledger." |
+| 3 · 0:50 | Tap **Send $10**. Point down the confirm sheet as you speak. | "Before my wallet opens, Sown says exactly what happens. What leaves my wallet. What they get. The least it can become if the price moves. And what the issuer can do: Ondo can freeze this or take it back, and it says so here, read from Ondo's account on the chain, not from a brochure." |
+| 4 · 1:10 | Tap **Approve $10 in wallet**. Approve in Freighter. Wait for the receipt. | "One approval. That single signature does the send and the keep in one Soroban transaction: the contract takes my ten dollars, buys the slice on Aquarius, and writes the envelope into the ledger." *(the receipt prints)* "The receipt. And the link: the link is the money. There is a QR for the phone in the room." |
+| 5 · 1:30 | Pick up the iPhone. Open the camera, point it at the QR, tap the banner. The gift page opens in Safari. | "Now I'm the person at home. No wallet, no app, nothing. I scan the code." *(the page opens)* "It says who sent it and why, in my own money. Nine dollars to spend, and the part that stays. One button." |
+| 6 · 1:45 | Tap **Claim with Face ID**. The passkey sheet, Face ID. The three steps tick. | "Claim with Face ID. My face makes a wallet that only I control, an OpenZeppelin account deployed on the spot, and Sown's servers pay the network." *(the steps tick)* "The wallet is made. The claim goes through. And it is mine: dollars I can cash out through any MoneyGram-connected Stellar wallet, and Treasuries that stay." |
+| 7 · 2:10 | Tap **Open your wallet**. Show the total. Scroll to **Keep Sown on your phone**. | "This is the wallet: what I hold, in my own money. And it stays on my phone, behind my face: Share, Add to Home Screen, and Sown is an app." |
+| 8 · 2:25 | On the Mac, reload the receipt tab, then open the **proof** tab. | "Every figure on this receipt is read from the ledger, not from our database: what was sent, what was kept, the floor, who claimed it. In thirty days anyone can ask the contract whether it is still held. The proof page shows the contract's code hash matching the open-source repo." |
+| 9 · 2:40 | Back to the camera. | "Only Stellar makes this possible: government debt with real liquidity on Aquarius, wallets made from a face, fees paid for the recipient, MoneyGram cash on the other end. And when DTCC brings stocks to Stellar next year, a send can keep stock. Sown. Send money home. Part of it stays theirs. sown dot world." |
 
-```
-[0:00, you on camera, the sown.world home page behind you]
-
-Every year, seven hundred billion dollars is sent home to families in
-countries like mine. It arrives as cash and it is gone within the week.
-Nothing stays. Nobody will turn a mother in Lahore into an investor. But
-the person sending the money would keep a slice for her, if that were one
-question. Sown is that question. I'm Shariq, and this is live on Stellar
-mainnet.
-
-[0:25, the send card. Tap Other, type 10. Keep 10%. Add your name and a note.]
-
-I'm sending ten dollars home and keeping ten percent. The card asks Ondo's
-pool on Aquarius what that slice is worth right now: about ninety cents of
-USDY, real US Treasuries, already issued on Stellar. I add my name and a
-note; it travels inside the link, and the send seals its hash on the
-ledger.
-
-[Tap Send $10. The confirm sheet.]
-
-Before my wallet opens, Sown says what moves, what it becomes, the least it
-can become, and what the issuer can do, read from Ondo's account on the
-chain. One approval in Freighter.
-
-[Approve. The receipt prints with the QR.]
-
-That one signature did the send and the keep in a single Soroban
-transaction: the contract pulled my dollars, bought the slice on Aquarius,
-and wrote the envelope into the ledger. Here is the link, and a QR for the
-phone in the room.
-
-[1:20, the iPhone window. Scan the QR. The gift page.]
-
-She has no wallet, no app, nothing. She taps. "Shariq sent you" and the
-note, in her own money. Nine dollars to spend, and the part that stays. One
-button.
-
-[Tap Claim with Face ID. Face ID. The steps tick. "Stays yours, in your wallet".]
-
-Her face makes a wallet that only she controls, an OpenZeppelin account
-deployed on the spot. Sown's servers pay the network. Fifteen seconds. It
-is hers: dollars she can cash out through any MoneyGram-connected Stellar
-wallet, and Treasuries that stay.
-
-[Tap Open your wallet.]
-
-And it stays on her phone: her wallet, behind her face.
-
-[2:05, the receipt tab, then the proof tab.]
-
-Every figure here is read from the envelope on the ledger, not from our
-database: what was sent, what was kept, the floor she was promised, who
-claimed it. In thirty days anyone can ask the contract whether it is still
-held. That number cannot be faked, and it decides whether this works. The
-proof page shows the contract's hash matching the open-source repo.
-
-This only works on Stellar: government debt with millions of dollars of
-liquidity on Aquarius, wallets made from a face, fees paid for the
-recipient, and MoneyGram cash on the other end. And when DTCC brings stocks
-and ETFs to Stellar next year, a send can keep stock. Same send, same
-receipt.
-
-[2:40, you on camera.]
-
-Send money home. Part of it stays theirs. Sown, at sown dot world, live
-today. Thank you.
-```
-
-**If a line runs long**, cut in this order: the DTCC sentence, the "fee" clause in the confirm
-sheet, the "after checking the exact shape" clause. Never cut a number that is on screen.
+About 400 spoken words: 2:45 at a natural pace. If you run long, drop the DTCC sentence first,
+then "not from a brochure". With a $5 send say "five", "forty cents", "four dollars fifty".
 
 ## Judge questions, with the short true answers
 
