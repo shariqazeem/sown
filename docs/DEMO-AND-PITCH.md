@@ -35,14 +35,17 @@ out), then the claim into a C-address.
 
 ## The pitch video: three minutes, the founder on camera, the product live
 
-**The setup, one take.** Record the Mac screen with your webcam in the corner (Loom's free tier,
-or Zoom's "record to this computer" with the camera on, or OBS). Before you start: Freighter
-unlocked with about $12 USDC; the iPhone plugged in by cable and mirrored into QuickTime (File ›
-New Movie Recording › the camera menu › your iPhone), its window placed beside the browser, so
-the Face ID claim happens on the same screen; the browser at `sown.world`, no bookmarks bar;
-`sown.world/proof` and `sown.world/assets` in two more tabs. Read the script; the product does the
-rest. Say every number as it is on screen that day. If a step fails, stop the recording, fix,
-record again: never narrate around a failure.
+**The setup, one take, three devices.** The MacBook records its own screen with its own camera
+for your face (Loom's free tier, Zoom's "record to this computer" with the camera on, or OBS); the
+iPhone is the recipient, plugged in by cable and mirrored into QuickTime (File › New Movie
+Recording › the camera menu › your iPhone), its window beside the browser, so the Face ID claim
+happens on the same screen; a second phone shows the script as a teleprompter (Notes, or any
+teleprompter app, scrolling slowly). Before you start: Freighter unlocked with USDC on Stellar
+(Circle's USDC, the asset Freighter lists; about $15 is plenty); the browser at `sown.world`, no
+bookmarks bar; `sown.world/proof` and `sown.world/assets` in two more tabs. Read naturally while
+you do each step; pauses while the network works are fine, they are real. Say every number as it
+is on screen that day (the script assumes a $10 send; with $5 say "five", "forty cents", "four
+dollars fifty"). If a step fails, stop, fix, record again: never narrate around a failure.
 
 **Timing**: 0:00–0:25 the problem · 0:25–1:20 the send (laptop) · 1:20–2:05 the claim (phone) ·
 2:05–2:40 the receipt, the proof, why Stellar · 2:40–3:00 the close. About 420 words.
@@ -57,15 +60,15 @@ the person sending the money would keep a slice for her, if that were one
 question. Sown is that question. I'm Shariq, and this is live on Stellar
 mainnet.
 
-[0:25, the send card. Tap $5. Keep 10%. Add your name and a note.]
+[0:25, the send card. Tap Other, type 10. Keep 10%. Add your name and a note.]
 
-I'm sending five dollars home and keeping ten percent. The card asks
-Ondo's pool on Aquarius what that slice is worth right now: about forty
-cents of USDY, real US Treasuries, already issued on Stellar. I add my name
-and a note; it travels inside the link, and the send seals its hash on the
+I'm sending ten dollars home and keeping ten percent. The card asks Ondo's
+pool on Aquarius what that slice is worth right now: about ninety cents of
+USDY, real US Treasuries, already issued on Stellar. I add my name and a
+note; it travels inside the link, and the send seals its hash on the
 ledger.
 
-[Tap Send $5. The confirm sheet.]
+[Tap Send $10. The confirm sheet.]
 
 Before my wallet opens, Sown says what moves, what it becomes, the least it
 can become, and what the issuer can do, read from Ondo's account on the
@@ -81,8 +84,8 @@ phone in the room.
 [1:20, the iPhone window. Scan the QR. The gift page.]
 
 She has no wallet, no app, nothing. She taps. "Shariq sent you" and the
-note, in her own money. Four dollars fifty to spend, and the part that
-stays. One button.
+note, in her own money. Nine dollars to spend, and the part that stays. One
+button.
 
 [Tap Claim with Face ID. Face ID. The steps tick. "Stays yours, in your wallet".]
 

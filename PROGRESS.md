@@ -51,7 +51,7 @@
 
 The founder read the first build and asked for a product that looks like its own, premium and
 usable by anyone, after an assessment of the field (47 submissions on the platform; the deadline
-confirmed as **13 Oct 04:59 PKT = 12 Oct 23:59 UTC**; verdict: keep the idea, do not pivot to
+confirmed as **13 Oct 04:59 PKT = 12 Oct 23:59 UTC**, then moved by the platform to **14 Oct 04:59 PKT = 13 Oct 23:59 UTC**; verdict: keep the idea, do not pivot to
 stocks that do not exist on Stellar yet, fix the face and get on mainnet).
 
 - **The design system is Sown's** (`docs/DESIGN.md`, `src/styles/tokens.css`): evergreen, sand,

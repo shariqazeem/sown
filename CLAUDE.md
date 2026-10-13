@@ -19,7 +19,7 @@ https://github.com/shariqazeem/sown (MIT). Testnet carried every proof first: th
 battery, the smoke, real Face ID claims on an iPhone and a MacBook, 137 offline and 23 contract
 tests. The design is Sown's own since 9 Oct (§8). What remains is the founder's: USDC in the
 wallets, the mainnet smoke (one line), the first real send and phone claim, the two film takes,
-the submission by **12 Oct 23:59 UTC** — in order, with commands, in `PROGRESS.md`.
+the submission by **13 Oct 23:59 UTC (14 Oct 04:59 PKT; the platform moved it by a day on 12 Oct)** — in order, with commands, in `PROGRESS.md`.
 
 Read in this order, then say what you are building:
 
